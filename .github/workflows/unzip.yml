@@ -1,0 +1,21 @@
+name: unzip
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unzip
+        run: |
+          unzip -o shorts-growth-agents-1.zip -x ".github/*"
+          rm shorts-growth-agents-1.zip
+      - name: Commit
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -A
+          git commit -m "unpack zip"
+          git push
