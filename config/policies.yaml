@@ -1,0 +1,21 @@
+# Har platform ke rules. Agents inhi ko follow karte hain. Policies badalti rehti hain,
+# kabhi kabhi official page dekh kar yahan update kar lena.
+general: |
+  - Original, helpful, honest content only. No fake claims, no fake statistics, no misleading promises.
+  - No copyrighted music, clips, or brand logos. No medical, legal, financial or income claims.
+  - No engagement bait (no "like/share/tag to win", no "follow for follow").
+  - No hate, harassment, adult, dangerous or spammy content. Not made for kids.
+  - Every video must have a different topic/angle and different wording from recent ones (no mass-produced repetition).
+youtube: |
+  - Title must truthfully describe the video. No clickbait, no ALL CAPS shouting, max 70 characters.
+  - Description: 2-3 plain sentences describing the video. No keyword stuffing, no unrelated tags.
+  - Hashtags: 3 to 5, all relevant. Tags: 5 to 10 relevant keywords, nothing misleading or unrelated.
+  - Do NOT write any URL (code adds the link). Do not write "#Shorts" (code adds it).
+facebook: |
+  - Caption: 1-3 short, natural sentences. No engagement bait, no misleading claims.
+  - Hashtags: 3 to 5 relevant ones. Original content only, no reposted/watermarked clips.
+  - Do NOT write any URL (code adds the link).
+instagram: |
+  - Caption: 1-3 short, natural sentences. Links are not clickable on Instagram, so do not write any URL.
+  - Hashtags: 3 to 5 relevant ones only (not 30). No engagement bait, no banned or irrelevant hashtags.
+  - Original content only, no watermarks from other apps.

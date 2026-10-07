@@ -1,0 +1,14 @@
+# dry_run: true = video banega, par kisi platform par post NAHI hoga
+dry_run: true
+site_base: https://easyfileonlinetools.blogspot.com
+site_name: Easy File Online Tools
+platforms:
+  youtube: true
+  facebook: true
+  instagram: true
+youtube_privacy: private   # audit pass hone ke baad "public" kar dena
+# voice: ab har video ki awaaz src/variety.py ki list se badalti rehti hai
+max_seconds: 58
+# Posting ramp-up: pehle ramp_days din 1 video/day, phir har ramp_days baad +1, max_per_day tak
+ramp_days: 15
+max_per_day: 6
