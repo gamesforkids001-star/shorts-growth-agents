@@ -1,6 +1,6 @@
 import os, json, re, time, requests
 
-MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+MODEL = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
 
 
 def ask_json(prompt, system="", temperature=0.8, retries=3):
