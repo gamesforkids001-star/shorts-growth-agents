@@ -117,13 +117,16 @@ def main():
                 report[p] = f"FAILED: {e}"
     print(json.dumps(report, indent=2))
 
-    if not dry:
+    posted_any = any(str(v).startswith("posted") for v in report.values())
+    if not dry and posted_any:
         schedule.set_start_if_missing()
         history.append({"date": schedule.today_utc().isoformat(), "slot": slot, "tool": tool["slug"],
                         "topic": plan["topic"], "format": v["format"], "hook": v["hook"],
                         "cta": v["cta"], "voice": v["voice"], "opener": plan["scenes"][0],
                         "title": final.get("youtube", {}).get("title", ""), "results": report})
         STATE.write_text(json.dumps(history[-200:], indent=2))
+    elif not dry:
+        print("Kisi platform par post nahi hui, slot done nahi maana, agla run dobara koshish karega")
     (OUT / "report.json").write_text(json.dumps(report, indent=2))
 
 
