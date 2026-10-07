@@ -1,0 +1,59 @@
+name: daily-shorts
+
+on:
+  schedule:
+    - cron: "17 0,4,8,12,16,20 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true = sirf video banao, post mat karo"
+        default: "true"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shorts
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install system packages
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - name: Install python packages
+        run: pip install -r requirements.txt
+      - name: Run agents
+        run: python -m src.main
+        env:
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+          FORCE: ${{ github.event_name == 'workflow_dispatch' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          META_PAGE_ID: ${{ secrets.META_PAGE_ID }}
+          META_PAGE_TOKEN: ${{ secrets.META_PAGE_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      - name: Save output (video + report)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: short-output
+          path: output/
+          retention-days: 7
+      - name: Save history
+        if: always()
+        run: |
+          git config user.name "shorts-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add state/ || true
+          git commit -m "update history" || echo "nothing to commit"
+          git pull --rebase || true
+          git push || true
