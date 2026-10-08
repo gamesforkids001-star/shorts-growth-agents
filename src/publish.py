@@ -1,9 +1,55 @@
-import os, time, requests
+import os, time, json, subprocess, requests
 
 G = "https://graph.facebook.com/v21.0"
 
 
-def youtube(video, m, privacy):
+def check_video(path, max_seconds=60):
+    """Upload se pehle video check: file ho, vertical ho, awaaz ho, lambai theek ho.
+    Kuch ghalat ho to error deta hai, aur ghalat video kabhi upload nahi hoti."""
+    if not os.path.exists(path) or os.path.getsize(path) < 50_000:
+        raise ValueError("video file missing ya bohat chhoti hai")
+    out = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "stream=codec_type,width,height",
+         "-show_entries", "format=duration", "-of", "json", path],
+        capture_output=True, text=True, check=True).stdout
+    info = json.loads(out)
+    streams = info.get("streams", [])
+    video = next((s for s in streams if s.get("codec_type") == "video"), None)
+    has_audio = any(s.get("codec_type") == "audio" for s in streams)
+    dur = float(info.get("format", {}).get("duration", 0))
+    if not video:
+        raise ValueError("video stream nahi mili")
+    if int(video["height"]) <= int(video["width"]):
+        raise ValueError("video vertical (9:16) nahi hai")
+    if not has_audio:
+        raise ValueError("video mein awaaz nahi hai")
+    if dur < 10 or dur > max_seconds:
+        raise ValueError(f"video ki lambai theek nahi: {dur:.0f}s")
+    return dur
+
+
+def _transient(e):
+    """Sirf aise error par dobara koshish jo aksar waqti hote hain (503, network)."""
+    if isinstance(e, (requests.ConnectionError, requests.Timeout)):
+        return True
+    status = getattr(getattr(e, "resp", None), "status", None)  # google HttpError
+    if status is None:
+        status = getattr(getattr(e, "response", None), "status_code", None)  # requests
+    return status is not None and int(status) >= 500
+
+
+def _retry(fn, tries=3, wait=30):
+    for i in range(tries):
+        try:
+            return fn()
+        except Exception as e:
+            if i == tries - 1 or not _transient(e):
+                raise
+            print(f"temporary error ({e}), {wait}s baad dobara koshish...")
+            time.sleep(wait)
+
+
+def _youtube_once(video, m, privacy):
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
     from googleapiclient.http import MediaFileUpload
@@ -32,6 +78,10 @@ def youtube(video, m, privacy):
     while resp is None:
         _, resp = req.next_chunk()
     return resp["id"]
+
+
+def youtube(video, m, privacy):
+    return _retry(lambda: _youtube_once(video, m, privacy))
 
 
 def _upload_binary(url, token, path):
