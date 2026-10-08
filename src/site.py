@@ -1,26 +1,17 @@
-import re, html, random, requests
+import json, os, random
 
-SKIP = ("privacy", "about", "contact", "terms", "disclaimer", "cookie", "sitemap", "search")
-UA = {"User-Agent": "Mozilla/5.0"}
+HERE = os.path.dirname(os.path.abspath(__file__))
+FACTS = ("Free to use, no sign-up needed. Runs in your browser: text, files and images "
+         "are not uploaded anywhere. Works on phones and tablets. Nothing to install.")
+
+
+def _load():
+    with open(os.path.join(HERE, "..", "tools.json"), encoding="utf-8") as f:
+        return json.load(f)
 
 
 def list_tools(base):
-    urls = set()
-    for sm in ("sitemap.xml", "sitemap-pages.xml"):
-        try:
-            t = requests.get(f"{base}/{sm}", timeout=30, headers=UA).text
-            urls.update(re.findall(r"<loc>\s*(.*?)\s*</loc>", t))
-        except Exception as e:
-            print("sitemap error", sm, e)
-    tools = []
-    for u in sorted(urls):
-        if not u.endswith(".html"):
-            continue
-        slug = u.rsplit("/", 1)[-1][:-5]
-        if any(s in slug for s in SKIP):
-            continue
-        tools.append({"url": u, "slug": slug, "name": slug.replace("-", " ").title()})
-    return tools
+    return [{"url": "local:" + t["slug"], "slug": t["slug"], "name": t["name"]} for t in _load()]
 
 
 def pick_tool(tools, history):
@@ -32,14 +23,11 @@ def pick_tool(tools, history):
 
 
 def page_info(url):
-    t = requests.get(url, timeout=30, headers=UA).text
-    title = re.search(r"<title>(.*?)</title>", t, re.S)
-    desc = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\'](.*?)["\']', t, re.S)
-    body = re.sub(r"<(script|style)[\s\S]*?</\1>", " ", t)
-    body = re.sub(r"<[^>]+>", " ", body)
-    body = html.unescape(re.sub(r"\s+", " ", body)).strip()
+    slug = url.replace("local:", "")
+    t = next(x for x in _load() if x["slug"] == slug)
     return {
-        "title": html.unescape(title.group(1).strip()) if title else "",
-        "description": html.unescape(desc.group(1).strip()) if desc else "",
-        "text": body[:1500],
-    }
+        "title": t["name"] + " - free online tool",
+        "description": t["description"],
+        "text": (t["description"] + " Angle ideas (choose ONE that was not used recently): "
+                 + " | ".join(t["angles"]) + ". Site facts: " + FACTS),
+            }
