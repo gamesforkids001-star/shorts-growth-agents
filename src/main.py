@@ -53,7 +53,7 @@ def main():
             return
     tools = site.list_tools(cfg["site_base"])
     if not tools:
-        raise SystemExit("Sitemap se koi tool page nahi mila")
+        raise SystemExit("tools.json se koi tool nahi mila")
     tool = site.pick_tool(tools, history)
     info = site.page_info(tool["url"])
     recent = [h.get("topic") for h in history[-30:]]
@@ -85,7 +85,7 @@ def main():
             if not issues:
                 issues = policy.ai_check(p, plan, m, pol)
             if not issues:
-                final[p] = compose(p, m, tool["url"], cfg["site_name"])
+                final[p] = compose(p, m, cfg["site_base"], cfg["site_name"])
                 break
             print(p, "issues:", issues)
             m = agents.fix_metadata(p, plan, m, issues, pol)
