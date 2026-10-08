@@ -1,4 +1,4 @@
-import asyncio, colorsys, json, os, random, subprocess
+import asyncio, colorsys, json, os, random, re, subprocess
 from PIL import Image, ImageDraw, ImageFont
 
 W, H = 1080, 1920
@@ -44,6 +44,13 @@ def _wrap(draw, text, font, max_w):
     return lines
 
 
+def find_shot(tool_name):
+    slug = re.sub(r"[^a-z0-9]+", "-", tool_name.lower()).strip("-")
+    shots_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shots")
+    found = [p for p in (f"{shots_dir}/{slug}.png", f"{shots_dir}/{slug}-2.png") if os.path.exists(p)]
+    return random.choice(found) if found else None
+
+
 def make_background(shot, pal, flip, path):
     if shot and os.path.exists(shot):
         im = Image.open(shot).convert("RGB")
@@ -63,13 +70,11 @@ def make_background(shot, pal, flip, path):
 def make_caption(text, tool_name, pal, path):
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    # tool name pill
     f_small = _font(46)
     tw = d.textlength(tool_name, font=f_small)
     py = 140
     d.rounded_rectangle([(W - tw) / 2 - 40, py, (W + tw) / 2 + 40, py + 90], radius=45, fill=(255, 255, 255, 255))
     d.text(((W - tw) / 2, py + 15), tool_name, font=f_small, fill=pal[0] + (255,))
-    # caption box
     size = 78
     font = _font(size)
     lines = _wrap(d, text, font, W - 200)
@@ -116,6 +121,8 @@ def build(scenes, tool_name, voice, out_dir, max_seconds=58, shot=None):
     os.makedirs(out_dir, exist_ok=True)
     pal = random_palette()
     flip = random.random() < 0.5
+    if shot is None:
+        shot = find_shot(tool_name)
     bg = f"{out_dir}/bg.png"
     make_background(shot, pal, flip, bg)
 
