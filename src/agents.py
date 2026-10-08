@@ -7,13 +7,36 @@ SYSTEM = (
 )
 
 
-def idea_and_script(tool, info, recent, policies, site_name, v, recent_openers):
-    prompt = f"""Write a 30-45 second vertical Short about this free browser tool.
+def _describe_demo(demo):
+    """Demo ke steps ko seedhe lafzon mein likhta hai, taake narration wahi bole jo screen par ho raha hai."""
+    if not demo:
+        return "No fixed demo. Describe using the tool in general terms only."
+    lines = []
+    for s in demo.get("steps", []):
+        do = s.get("do")
+        if do == "type":
+            lines.append(f'the text "{s.get("text", "")}" is typed into the tool')
+        elif do == "click":
+            lines.append(f'the "{s.get("label") or s.get("selector", "a button")}" button is clicked')
+        elif do == "select":
+            lines.append(f'the option "{s.get("value", "")}" is chosen')
+        elif do == "upload":
+            lines.append("a small sample file is added")
+    return f'{demo.get("title", "")}. On screen: ' + "; then ".join(lines) + "."
+
+
+def idea_and_script(tool, info, recent, policies, site_name, v, recent_openers, issues=None):
+    demo = v.get("demo")
+    cta = v["cta"].format(site=site_name)
+    fix = f"\nA previous draft had these problems, fix them: {issues}\n" if issues else ""
+    prompt = f"""Write the voice-over for a 30-40 second vertical Short. The viewer sees a real screen
+recording of this free browser tool being used, and hears your narration over it.
 
 Tool: {tool['name']}
-Page title: {info['title']}
-Page description: {info['description']}
-Page text (the ONLY source of facts): {info['text']}
+Tool description (the ONLY source of facts): {info['text']}
+
+What happens on screen (your narration must match this, and must not describe anything else):
+{_describe_demo(demo)}
 
 Recent topics (do NOT repeat the angle or wording): {recent}
 
@@ -23,18 +46,29 @@ Policy rules you must follow:
 Video format for THIS video: {FORMATS[v['format']]}
 Opening style: {HOOKS[v['hook']]}
 Recent opening lines used before (start differently, do not reuse their pattern): {recent_openers}
-Only use what the page text supports. The LAST scene must be exactly this sentence: "{v['cta'].format(site=site_name)}"
-No superlatives (best, #1, fastest), no numbers or stats unless in the page text.
+{fix}
+Rules:
+- Speak naturally, as one flowing piece, not a list of separate scenes.
+- Do not read out exact results, numbers or counts, because you cannot see them. Say things like "and the result shows up right away".
+- Only claim what the tool description supports. No superlatives (best, #1, fastest), no stats.
+- Do not say or write any URL.
+- The narration must END with exactly this sentence: "{cta}"
+- Total 55-85 words including that last sentence.
 
-Return JSON only: {{"topic": "short topic label", "scenes": ["sentence 1", "sentence 2", ...]}}
-6 to 8 scenes. Each scene is ONE spoken sentence, max 16 words. Total 75-100 words."""
-    return ask_json(prompt, SYSTEM, 0.9)
+Return JSON only: {{"topic": "short topic label", "narration": "the full voice-over text"}}"""
+    plan = ask_json(prompt, SYSTEM, 0.9)
+    text = " ".join(str(plan.get("narration", "")).split())
+    if cta not in text:
+        text = (text + " " + cta).strip()
+    plan["narration"] = text
+    plan["demo_id"] = (demo or {}).get("id", "")
+    return plan
 
 
 def metadata(plan, tool, policies, recent_titles=()):
     prompt = f"""Write separate, platform-specific text for the same short video.
 Video topic: {plan['topic']}
-Script: {' '.join(plan['scenes'])}
+Voice-over: {plan['narration']}
 Tool: {tool['name']}
 Recent titles (use a different title structure and different words): {list(recent_titles)}
 
