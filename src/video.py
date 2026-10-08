@@ -3,8 +3,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 W, H = 1080, 1920
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+
+
 def random_palette():
-    """Har video ke liye naya dark->accent rang jodi (white text hamesha saaf dikhe)."""
     h = random.random()
     c1 = colorsys.hsv_to_rgb(h, random.uniform(0.5, 0.8), random.uniform(0.15, 0.3))
     c2 = colorsys.hsv_to_rgb((h + random.uniform(0.05, 0.2)) % 1, random.uniform(0.5, 0.8), random.uniform(0.4, 0.62))
@@ -43,39 +44,49 @@ def _wrap(draw, text, font, max_w):
     return lines
 
 
-def make_frame(text, tool_name, idx, total, pal, path, style=None):
-    style = style or {}
-    img = _gradient(*pal, flip=style.get("flip", False))
+def make_background(shot, pal, flip, path):
+    if shot and os.path.exists(shot):
+        im = Image.open(shot).convert("RGB")
+        w, h = im.size
+        # phone ka status bar (oopar) aur navigation bar (neeche) hatao
+        im = im.crop((0, int(h * 0.102), w, int(h * 0.944)))
+        s = max(W / im.size[0], H / im.size[1])
+        im = im.resize((int(im.size[0] * s) + 1, int(im.size[1] * s) + 1), Image.LANCZOS)
+        l, t = (im.size[0] - W) // 2, (im.size[1] - H) // 2
+        im = im.crop((l, t, l + W, t + H))
+        im = Image.blend(im, Image.new("RGB", (W, H), (0, 0, 0)), 0.25)
+    else:
+        im = _gradient(*pal, flip=flip)
+    im.save(path)
+
+
+def make_caption(text, tool_name, pal, path):
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    # tool name pill (top)
+    # tool name pill
     f_small = _font(46)
-    label = tool_name
-    tw = d.textlength(label, font=f_small)
-    py = style.get("pill_y", 230)
-    d.rounded_rectangle([(W - tw) / 2 - 40, py, (W + tw) / 2 + 40, py + 90], radius=45, fill=(255, 255, 255))
-    d.text(((W - tw) / 2, py + 15), label, font=f_small, fill=pal[0])
-    # main caption
-    size = 84
+    tw = d.textlength(tool_name, font=f_small)
+    py = 140
+    d.rounded_rectangle([(W - tw) / 2 - 40, py, (W + tw) / 2 + 40, py + 90], radius=45, fill=(255, 255, 255, 255))
+    d.text(((W - tw) / 2, py + 15), tool_name, font=f_small, fill=pal[0] + (255,))
+    # caption box
+    size = 78
     font = _font(size)
-    lines = _wrap(d, text, font, W - 160)
-    while len(lines) > 7 and size > 52:
+    lines = _wrap(d, text, font, W - 200)
+    while len(lines) > 5 and size > 50:
         size -= 6
         font = _font(size)
-        lines = _wrap(d, text, font, W - 160)
-    lh = int(size * 1.35)
-    y = (H - lh * len(lines)) // 2
+        lines = _wrap(d, text, font, W - 200)
+    lh = int(size * 1.3)
+    th = lh * len(lines)
+    cy = 1350
+    top = cy - th // 2 - 45
+    d.rounded_rectangle([60, top, W - 60, top + th + 90], radius=40, fill=(0, 0, 0, 175))
+    y = cy - th // 2
     for ln in lines:
         w = d.textlength(ln, font=font)
-        d.text(((W - w) / 2 + 3, y + 3), ln, font=font, fill=(0, 0, 0))
-        d.text(((W - w) / 2, y), ln, font=font, fill=(255, 255, 255))
+        d.text(((W - w) / 2, y), ln, font=font, fill=(255, 255, 255, 255))
         y += lh
-    # progress dots
-    gap = 40
-    x0 = (W - gap * (total - 1)) / 2
-    for i in range(total):
-        r = 11 if i == idx else 7
-        d.ellipse([x0 + gap * i - r, 1650 - r, x0 + gap * i + r, 1650 + r],
-                  fill=(255, 255, 255) if i <= idx else (255, 255, 255, 90))
     img.save(path)
 
 
@@ -101,34 +112,55 @@ def duration(path):
     return float(json.loads(out)["format"]["duration"])
 
 
-def build(scenes, tool_name, voice, out_dir, max_seconds=58):
+def build(scenes, tool_name, voice, out_dir, max_seconds=58, shot=None):
     os.makedirs(out_dir, exist_ok=True)
     pal = random_palette()
-    style = {"flip": random.random() < 0.5, "pill_y": random.choice([230, 230, 1420])}
-    clips, total_dur = [], 0.0
+    flip = random.random() < 0.5
+    bg = f"{out_dir}/bg.png"
+    make_background(shot, pal, flip, bg)
+
+    wavs, durs = [], []
     for i, text in enumerate(scenes):
-        png = f"{out_dir}/s{i}.png"
         mp3 = f"{out_dir}/s{i}.mp3"
-        mp4 = f"{out_dir}/s{i}.mp4"
-        make_frame(text, tool_name, i, len(scenes), pal, png, style)
+        wav = f"{out_dir}/s{i}.wav"
         make_audio(text, voice, mp3)
-        dur = duration(mp3) + 0.4
-        total_dur += dur
-        subprocess.run([
-            "ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-i", png, "-i", mp3,
-            "-af", "apad=pad_dur=0.4", "-t", f"{dur:.2f}", "-r", "30",
-            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "128k", "-ar", "44100", mp4,
-        ], check=True)
-        clips.append(mp4)
-    if total_dur > max_seconds:
-        raise RuntimeError(f"video too long: {total_dur:.0f}s")
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", mp3,
+                        "-af", "apad=pad_dur=0.35", "-ar", "44100", "-ac", "1", wav], check=True)
+        wavs.append(wav)
+        durs.append(duration(wav))
+        make_caption(text, tool_name, pal, f"{out_dir}/c{i}.png")
+
+    total = sum(durs)
+    if total > max_seconds:
+        raise RuntimeError(f"video too long: {total:.0f}s")
+
     lst = f"{out_dir}/list.txt"
     with open(lst, "w") as f:
-        for c in clips:
-            f.write(f"file '{os.path.abspath(c)}'\n")
+        for w in wavs:
+            f.write(f"file '{os.path.abspath(w)}'\n")
+    voice_wav = f"{out_dir}/voice.wav"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0",
+                    "-i", lst, "-c", "copy", voice_wav], check=True)
+
+    n = len(scenes)
+    cmd = ["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", "30",
+           "-t", f"{total:.2f}", "-i", bg]
+    for i in range(n):
+        cmd += ["-loop", "1", "-framerate", "30", "-t", f"{total:.2f}", "-i", f"{out_dir}/c{i}.png"]
+    cmd += ["-i", voice_wav]
+
+    fc = (f"[0:v]scale=w='trunc(1080*(1+0.10*t/{total:.2f})/2)*2':h=-2:eval=frame,"
+          f"crop={W}:{H},format=yuv420p[v0];")
+    start = 0.0
+    for i in range(n):
+        end = start + durs[i]
+        fc += f"[v{i}][{i + 1}:v]overlay=enable='between(t,{start:.2f},{end:.2f})'[v{i + 1}];"
+        start = end
+    fc = fc.rstrip(";")
+
     final = f"{out_dir}/short.mp4"
-    subprocess.run([
-        "ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst,
-        "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-movflags", "+faststart", final,
-    ], check=True)
-    return final, total_dur
+    cmd += ["-filter_complex", fc, "-map", f"[v{n}]", "-map", f"{n + 1}:a",
+            "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p", "-r", "30",
+            "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart", final]
+    subprocess.run(cmd, check=True)
+    return final, total
