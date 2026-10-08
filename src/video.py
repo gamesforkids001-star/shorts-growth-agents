@@ -1,8 +1,14 @@
-import asyncio, colorsys, json, os, random, re, subprocess
+import asyncio, colorsys, json, os, random, subprocess
 from PIL import Image, ImageDraw, ImageFont
 
 W, H = 1080, 1920
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+
+# Layout: oopar tool ka naam, beech mein screen recording, neeche captions
+REC_Y = 230          # recording kahan se shuru ho
+REC_MAX_W = 960
+REC_MAX_H = 1130
+CAP_CY = 1620        # captions ka center
 
 
 def random_palette():
@@ -44,50 +50,40 @@ def _wrap(draw, text, font, max_w):
     return lines
 
 
-def find_shot(tool_name):
-    slug = re.sub(r"[^a-z0-9]+", "-", tool_name.lower()).strip("-")
-    shots_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shots")
-    found = [p for p in (f"{shots_dir}/{slug}.png", f"{shots_dir}/{slug}-2.png") if os.path.exists(p)]
-    return random.choice(found) if found else None
-
-
-def make_background(shot, pal, flip, path):
-    if shot and os.path.exists(shot):
-        im = Image.open(shot).convert("RGB")
-        w, h = im.size
-        # phone ka status bar (oopar) aur navigation bar (neeche) hatao
-        im = im.crop((0, int(h * 0.102), w, int(h * 0.944)))
-        s = max(W / im.size[0], H / im.size[1])
-        im = im.resize((int(im.size[0] * s) + 1, int(im.size[1] * s) + 1), Image.LANCZOS)
-        l, t = (im.size[0] - W) // 2, (im.size[1] - H) // 2
-        im = im.crop((l, t, l + W, t + H))
-        im = Image.blend(im, Image.new("RGB", (W, H), (0, 0, 0)), 0.25)
-    else:
-        im = _gradient(*pal, flip=flip)
-    im.save(path)
+def split_chunks(text, max_words=8):
+    """Narration ko chhote caption tukron mein todta hai."""
+    chunks, cur = [], []
+    for w in text.split():
+        cur.append(w)
+        if len(cur) >= max_words or (w.endswith((".", "?", "!")) and len(cur) >= 3):
+            chunks.append(" ".join(cur))
+            cur = []
+    if cur:
+        chunks.append(" ".join(cur))
+    return chunks
 
 
 def make_caption(text, tool_name, pal, path):
+    """Ek PNG: oopar tool ka naam, neeche caption."""
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     f_small = _font(46)
     tw = d.textlength(tool_name, font=f_small)
-    py = 140
+    py = 90
     d.rounded_rectangle([(W - tw) / 2 - 40, py, (W + tw) / 2 + 40, py + 90], radius=45, fill=(255, 255, 255, 255))
     d.text(((W - tw) / 2, py + 15), tool_name, font=f_small, fill=pal[0] + (255,))
-    size = 78
+    size = 70
     font = _font(size)
     lines = _wrap(d, text, font, W - 200)
-    while len(lines) > 5 and size > 50:
+    while len(lines) > 3 and size > 48:
         size -= 6
         font = _font(size)
         lines = _wrap(d, text, font, W - 200)
     lh = int(size * 1.3)
     th = lh * len(lines)
-    cy = 1350
-    top = cy - th // 2 - 45
-    d.rounded_rectangle([60, top, W - 60, top + th + 90], radius=40, fill=(0, 0, 0, 175))
-    y = cy - th // 2
+    top = CAP_CY - th // 2 - 40
+    d.rounded_rectangle([60, top, W - 60, top + th + 80], radius=40, fill=(0, 0, 0, 175))
+    y = CAP_CY - th // 2
     for ln in lines:
         w = d.textlength(ln, font=font)
         d.text(((W - w) / 2, y), ln, font=font, fill=(255, 255, 255, 255))
@@ -117,57 +113,63 @@ def duration(path):
     return float(json.loads(out)["format"]["duration"])
 
 
-def build(scenes, tool_name, voice, out_dir, max_seconds=58, shot=None):
+def build(narration, tool_name, voice, out_dir, max_seconds=58, recording=None, trim_start=0.0):
+    """narration: poora voice-over text (ek string).
+    recording: record.py ki banayi hui screen recording (webm/mp4).
+    trim_start: recording ke shuru ke kitne second kaatne hain (page load wala hissa)."""
+    if not recording or not os.path.exists(recording):
+        raise RuntimeError("screen recording nahi mili, video nahi banegi")
     os.makedirs(out_dir, exist_ok=True)
     pal = random_palette()
     flip = random.random() < 0.5
-    if shot is None:
-        shot = find_shot(tool_name)
     bg = f"{out_dir}/bg.png"
-    make_background(shot, pal, flip, bg)
+    _gradient(*pal, flip=flip).save(bg)
 
-    wavs, durs = [], []
-    for i, text in enumerate(scenes):
-        mp3 = f"{out_dir}/s{i}.mp3"
-        wav = f"{out_dir}/s{i}.wav"
-        make_audio(text, voice, mp3)
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", mp3,
-                        "-af", "apad=pad_dur=0.35", "-ar", "44100", "-ac", "1", wav], check=True)
-        wavs.append(wav)
-        durs.append(duration(wav))
-        make_caption(text, tool_name, pal, f"{out_dir}/c{i}.png")
-
-    total = sum(durs)
+    # 1) ek hi voice-over
+    mp3 = f"{out_dir}/voice.mp3"
+    wav = f"{out_dir}/voice.wav"
+    make_audio(narration, voice, mp3)
+    speech = duration(mp3)
+    tail = 0.6
+    total = speech + tail
     if total > max_seconds:
         raise RuntimeError(f"video too long: {total:.0f}s")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", mp3,
+                    "-af", f"apad=pad_dur={tail}", "-ar", "44100", "-ac", "1", wav], check=True)
 
-    lst = f"{out_dir}/list.txt"
-    with open(lst, "w") as f:
-        for w in wavs:
-            f.write(f"file '{os.path.abspath(w)}'\n")
-    voice_wav = f"{out_dir}/voice.wav"
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0",
-                    "-i", lst, "-c", "copy", voice_wav], check=True)
+    # 2) captions: words ke hisaab se waqt baant do
+    chunks = split_chunks(narration)
+    counts = [max(1, len(c.split())) for c in chunks]
+    tot_words = sum(counts)
+    spans, t = [], 0.0
+    for i, c in enumerate(counts):
+        end = total if i == len(counts) - 1 else t + speech * c / tot_words
+        spans.append((t, end))
+        t = end
+        make_caption(chunks[i], tool_name, pal, f"{out_dir}/c{i}.png")
 
-    n = len(scenes)
-    cmd = ["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", "30",
-           "-t", f"{total:.2f}", "-i", bg]
-    for i in range(n):
+    # 3) sab ko ek hi ffmpeg pass mein jorna
+    cmd = ["ffmpeg", "-y", "-loglevel", "error",
+           "-loop", "1", "-framerate", "30", "-t", f"{total:.2f}", "-i", bg]
+    if trim_start > 0:
+        cmd += ["-ss", f"{trim_start:.2f}"]
+    cmd += ["-i", recording]
+    for i in range(len(chunks)):
         cmd += ["-loop", "1", "-framerate", "30", "-t", f"{total:.2f}", "-i", f"{out_dir}/c{i}.png"]
-    cmd += ["-i", voice_wav]
+    cmd += ["-i", wav]
 
-    fc = (f"[0:v]scale=w='trunc(1080*(1+0.10*t/{total:.2f})/2)*2':h=-2:eval=frame,"
-          f"crop={W}:{H},format=yuv420p[v0];")
-    start = 0.0
-    for i in range(n):
-        end = start + durs[i]
-        fc += f"[v{i}][{i + 1}:v]overlay=enable='between(t,{start:.2f},{end:.2f})'[v{i + 1}];"
-        start = end
+    fc = (f"[1:v]setpts=PTS-STARTPTS,tpad=stop_mode=clone:stop_duration={total:.2f},fps=30,"
+          f"scale={REC_MAX_W}:{REC_MAX_H}:force_original_aspect_ratio=decrease,format=yuv420p[rec];"
+          f"[0:v][rec]overlay=(W-w)/2:{REC_Y}[v0];")
+    for i, (s, e) in enumerate(spans):
+        fc += f"[v{i}][{i + 2}:v]overlay=enable='between(t,{s:.2f},{e:.2f})'[v{i + 1}];"
     fc = fc.rstrip(";")
 
+    n = len(chunks)
     final = f"{out_dir}/short.mp4"
-    cmd += ["-filter_complex", fc, "-map", f"[v{n}]", "-map", f"{n + 1}:a",
+    cmd += ["-filter_complex", fc, "-map", f"[v{n}]", "-map", f"{n + 2}:a",
+            "-t", f"{total:.2f}",
             "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p", "-r", "30",
-            "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart", final]
+            "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", final]
     subprocess.run(cmd, check=True)
     return final, total
