@@ -8,7 +8,7 @@ SYSTEM = (
 
 
 def idea_and_script(tool, info, recent, policies, site_name, v, recent_openers):
-    prompt = f"""Write a 25-35 second vertical Short about this free browser tool.
+    prompt = f"""Write a 30-45 second vertical Short about this free browser tool.
 
 Tool: {tool['name']}
 Page title: {info['title']}
@@ -27,7 +27,7 @@ Only use what the page text supports. The LAST scene must be exactly this senten
 No superlatives (best, #1, fastest), no numbers or stats unless in the page text.
 
 Return JSON only: {{"topic": "short topic label", "scenes": ["sentence 1", "sentence 2", ...]}}
-5 to 7 scenes. Each scene is ONE spoken sentence, max 14 words. Total 55-80 words."""
+6 to 8 scenes. Each scene is ONE spoken sentence, max 16 words. Total 75-100 words.
     return ask_json(prompt, SYSTEM, 0.9)
 
 
