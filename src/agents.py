@@ -27,7 +27,7 @@ Only use what the page text supports. The LAST scene must be exactly this senten
 No superlatives (best, #1, fastest), no numbers or stats unless in the page text.
 
 Return JSON only: {{"topic": "short topic label", "scenes": ["sentence 1", "sentence 2", ...]}}
-6 to 8 scenes. Each scene is ONE spoken sentence, max 16 words. Total 75-100 words.
+6 to 8 scenes. Each scene is ONE spoken sentence, max 16 words. Total 75-100 words."""
     return ask_json(prompt, SYSTEM, 0.9)
 
 
