@@ -1,5 +1,19 @@
 [
-{"slug":"word-counter","name":"Word Counter","description":"Count words, characters, sentences and paragraphs, with reading time and keyword density.","angles":["check an essay or assignment against a word limit","check meta descriptions and social posts against character limits","estimate how long a blog post takes to read","spot overused words with keyword density","works with Urdu and Arabic text too"]},
+{"slug":"word-counter","name":"Word Counter","description":"Count words, characters, sentences and paragraphs, with reading time and keyword density.","angles":["check an essay or assignment against a word limit","check meta descriptions and social posts against character limits","estimate how long a blog post takes to read","spot overused words with keyword density","works with Urdu and Arabic text too"],
+ "demos":[
+  {"id":"essay-check","title":"Checking the length of a short essay","steps":[
+    {"do":"wait","seconds":2},
+    {"do":"type","selector":"textarea","text":"Reading every day is a small habit that can make a big difference. Even ten minutes before bed helps you relax and learn something new."},
+    {"do":"wait","seconds":4}]},
+  {"id":"social-post","title":"Checking a short social media caption","steps":[
+    {"do":"wait","seconds":2},
+    {"do":"type","selector":"textarea","text":"New week, new goals. Start small, stay consistent and keep going."},
+    {"do":"wait","seconds":4}]},
+  {"id":"description-length","title":"Checking a product description length","steps":[
+    {"do":"wait","seconds":2},
+    {"do":"type","selector":"textarea","text":"A simple notebook with a hard cover and plain pages, great for notes, lists and daily planning."},
+    {"do":"wait","seconds":4}]}
+ ]},
 {"slug":"case-converter","name":"Case Converter","description":"Change text to UPPER, lower, Title, Sentence, camelCase, snake_case, kebab-case and more.","angles":["fix text typed in all caps","make Title Case headings quickly","camelCase and snake_case for coders","kebab-case for clean URLs","convert text in one tap instead of retyping"]},
 {"slug":"password-generator","name":"Password Generator","description":"Create strong random passwords with a strength meter and one-click copy.","angles":["stop reusing the same password everywhere","read the strength meter before you choose","copy a password in one click","random passwords for new accounts","generated inside your browser"]},
 {"slug":"qr-code-generator","name":"QR Code Generator","description":"Turn any link or text into a QR code with custom colors, size and PNG or SVG download.","angles":["turn a link into a QR code","choose your own QR colors","download as PNG or SVG","share plain text with a QR code","no sign-up needed"]},
@@ -21,4 +35,4 @@
 {"slug":"random-number-generator","name":"Random Number Generator","description":"Generate one or many random numbers in a range you choose, with optional unique values and decimals.","angles":["pick a random number in your range","generate many numbers at once","unique values only option","decimals option","fair picks for games and giveaways"]},
 {"slug":"file-info-checker","name":"File Info Checker","description":"Check a file's type, extension, exact size and last-modified date before you use it.","angles":["check a file's exact size","check the file type and extension","see the last-modified date","check a file before you upload it","file is not uploaded anywhere"]},
 {"slug":"text-cleaner","name":"Text Cleaner","description":"Trim extra spaces, collapse blank lines, strip HTML tags and straighten smart quotes in one click.","angles":["remove extra spaces","collapse extra blank lines","strip HTML tags from text","straighten smart quotes","clean pasted text in one click"]}
-]
+  ]
