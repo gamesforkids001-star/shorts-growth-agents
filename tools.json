@@ -3,15 +3,41 @@
  "demos":[
   {"id":"essay-check","title":"Checking the length of a short essay","steps":[
     {"do":"wait","seconds":2},
-    {"do":"type","selector":"textarea","text":"Reading every day is a small habit that can make a big difference. Even ten minutes before bed helps you relax and learn something new."},
+    {"do":"click","selector":"#wc-in"},
+    {"do":"type","selector":"#wc-in","text":"Reading every day is a small habit that can make a big difference. Even ten minutes before bed helps you relax and learn something new.","delay":50},
     {"do":"wait","seconds":4}]},
   {"id":"social-post","title":"Checking a short social media caption","steps":[
     {"do":"wait","seconds":2},
-    {"do":"type","selector":"textarea","text":"New week, new goals. Start small, stay consistent and keep going."},
+    {"do":"click","selector":"#wc-in"},
+    {"do":"type","selector":"#wc-in","text":"New week, new goals. Start small, stay consistent and keep going.","delay":55},
     {"do":"wait","seconds":4}]},
   {"id":"description-length","title":"Checking a product description length","steps":[
     {"do":"wait","seconds":2},
-    {"do":"type","selector":"textarea","text":"A simple notebook with a hard cover and plain pages, great for notes, lists and daily planning."},
+    {"do":"click","selector":"#wc-in"},
+    {"do":"type","selector":"#wc-in","text":"A simple notebook with a hard cover and plain pages, great for notes, lists and daily planning.","delay":50},
+    {"do":"wait","seconds":4}]},
+  {"id":"sample-keywords","title":"Loading sample text and reading the keyword density table","steps":[
+    {"do":"wait","seconds":2},
+    {"do":"click","selector":"#wc-sample"},
+    {"do":"wait","seconds":3},
+    {"do":"scroll","y":450},
+    {"do":"wait","seconds":4}]},
+  {"id":"clear-and-retry","title":"Typing a line, clearing it and trying another","steps":[
+    {"do":"wait","seconds":2},
+    {"do":"click","selector":"#wc-in"},
+    {"do":"type","selector":"#wc-in","text":"Short and sweet wins the day.","delay":60},
+    {"do":"wait","seconds":3},
+    {"do":"click","selector":"#wc-clear"},
+    {"do":"wait","seconds":1.5},
+    {"do":"type","selector":"#wc-in","text":"Clear writing is easier to read and easier to remember.","delay":55},
+    {"do":"wait","seconds":4}]},
+  {"id":"ignore-common-words","title":"Turning common words on and off in keyword density","steps":[
+    {"do":"wait","seconds":2},
+    {"do":"click","selector":"#wc-sample"},
+    {"do":"wait","seconds":2},
+    {"do":"scroll","y":500},
+    {"do":"wait","seconds":2},
+    {"do":"click","selector":"#wc-stop"},
     {"do":"wait","seconds":4}]}
  ]},
 {"slug":"case-converter","name":"Case Converter","description":"Change text to UPPER, lower, Title, Sentence, camelCase, snake_case, kebab-case and more.","angles":["fix text typed in all caps","make Title Case headings quickly","camelCase and snake_case for coders","kebab-case for clean URLs","convert text in one tap instead of retyping"]},
