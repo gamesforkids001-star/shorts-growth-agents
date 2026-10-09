@@ -2,12 +2,12 @@
 
 Ab live site nahi khulti. Repo ke tools_local/<slug>.html se recording hoti hai.
 
-record_demo(tool, demo, out_dir) -> (recording_path, trim_start)
+record_demo(tool, demo, out_dir, ...) -> (recording_path, trim_start, marks)
 
-NAYA (v2):
-- Page ko ZOOM karte hain taake tool poori screen bhare aur text bara dikhe.
-- Naye steps: "highlight" (kisi hisse par peela frame), "scroll_to" (smooth scroll).
-- Typing thodi slow (padhne layak).
+v3:
+- Recording ka size video ke tool-area se bilkul match (1080x1380): gradient/crop nahi.
+- holds: har narrated step par awaaz ke jumle jitni der ruko (sync).
+- marks: har step kab shuru hua (video.py awaaz ko usi waqt par lagata hai).
 """
 import os
 import re
@@ -16,13 +16,16 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-VIEW_W, VIEW_H = 960, 1130  # video.py ke recording area se match (change mat karo)
+# video.py ke REC_W x REC_H se match (change mat karo)
+VIEW_W, VIEW_H = 1080, 1380
 
-# Tool ko bara karne ke liye zoom. 1.0 = purana (chota). 1.5 = theek.
-# Agar tool kinare se kat raha ho to 1.3 karo; agar abhi bhi chota lage to 1.7.
-ZOOM = float(os.environ.get("REC_ZOOM", "1.5"))
+# Tool ko bara karne ke liye zoom. Chota lage to 1.9, kata hua lage to 1.5.
+ZOOM = float(os.environ.get("REC_ZOOM", "1.7"))
 
 LOCAL_DIR = "tools_local"
+
+# Jin steps par narration ka jumla bolta hai
+NARRATED = ("type", "click", "select", "upload", "highlight", "scroll_to")
 
 
 class BotCheckError(Exception):
@@ -110,6 +113,11 @@ def _norm_step(step):
     return action
 
 
+def narrated_indices(steps):
+    """Un steps ke index jin par narration ka jumla bolega (agents.py, main.py yahi use karte hain)."""
+    return [i for i, s in enumerate(steps) if _norm_step(s) in NARRATED]
+
+
 def _find(page, selector, timeout=8000):
     """Selector dhoondo; na mile to kuch aam fallback try karo."""
     candidates = [selector]
@@ -181,7 +189,6 @@ def _run_step(page, step, repo_root):
         page.wait_for_timeout(int(step.get("hold_ms", 1200)))
     elif action == "highlight":
         # {"action": "highlight", "selector": "#wc-stats", "hold_ms": 3000}
-        # Us hisse par peela frame lagta hai taake dekhne wala wahin dekhe.
         loc = _find(page, sel)
         _smooth_center(loc)
         page.wait_for_timeout(700)
@@ -214,8 +221,16 @@ def _run_step(page, step, repo_root):
     page.wait_for_timeout(int(step.get("after_ms", 500)))
 
 
-def record_demo(tool, demo, out_dir, max_seconds=55, repo_root=".", attempts=2):
-    """Returns (recording_path, trim_start)."""
+def record_demo(tool, demo, out_dir, max_seconds=55, repo_root=".", attempts=2,
+                holds=None, intro_hold=0.0, closing_hold=0.0):
+    """Returns (recording_path, trim_start, marks).
+
+    holds: steps ki list ke barabar list; har narrated step ke liye kam az kam kitne second
+           us step par rukna hai (awaaz ke jumle ki length). None = koi hold nahi.
+    intro_hold: shuru mein itni der tool dikhao (hook + 'ye kya hai' wala jumla bolta hai).
+    closing_hold: aakhri step ke baad itni der ruko (closing jumla).
+    marks: {"steps": [har step ka shuru-waqt, trimmed video ke hisab se], "end": aakhri step khatam}
+    """
     url = _local_url(tool, repo_root)  # local file, live site nahi
     steps = demo.get("steps", []) if isinstance(demo, dict) else (demo or [])
     if not steps:
@@ -225,16 +240,18 @@ def record_demo(tool, demo, out_dir, max_seconds=55, repo_root=".", attempts=2):
     last = None
     for n in range(1, attempts + 1):
         try:
-            return _record_once(url, steps, out_dir, max_seconds, repo_root)
+            return _record_once(url, steps, out_dir, max_seconds, repo_root,
+                                holds, intro_hold, closing_hold)
         except Exception as e:
             last = e
             _log("attempt %d fail: %s" % (n, e))
     raise RecordError(str(last))
 
 
-def _record_once(url, steps, out_dir, max_seconds, repo_root):
+def _record_once(url, steps, out_dir, max_seconds, repo_root, holds, intro_hold, closing_hold):
     vid_dir = out_dir / ("rec_%d" % int(time.time()))
     vid_dir.mkdir(parents=True, exist_ok=True)
+    marks = {"steps": [], "end": 0.0}
     with sync_playwright() as p:
         browser = p.chromium.launch(args=["--no-sandbox"])
         ctx = browser.new_context(
@@ -252,12 +269,28 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root):
             page.wait_for_timeout(600)
             # loading wala hissa video se kaat do
             trim_start = max(0.0, time.time() - t0 - 0.3)
-            for step in steps:
-                if time.time() - t0 - trim_start > max_seconds:
+            base = t0 + trim_start  # trimmed video ka waqt 0 yahan hai
+
+            if intro_hold and intro_hold > 0:
+                page.wait_for_timeout(int(intro_hold * 1000))
+
+            for i, step in enumerate(steps):
+                if time.time() - base > max_seconds:
                     _log("max_seconds poore, steps rok diye")
                     break
+                s0 = time.time()
+                marks["steps"].append(round(s0 - base, 2))
                 _run_step(page, step, repo_root)
-            page.wait_for_timeout(1500)
+                hold = holds[i] if holds and i < len(holds) else None
+                if hold:
+                    left = hold - (time.time() - s0)
+                    if left > 0:
+                        page.wait_for_timeout(int(left * 1000))
+
+            marks["end"] = round(time.time() - base, 2)
+            if closing_hold and closing_hold > 0:
+                page.wait_for_timeout(int(closing_hold * 1000))
+            page.wait_for_timeout(800)
         finally:
             video = page.video
             ctx.close()  # video file yahan save hoti hai
@@ -265,5 +298,5 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root):
             browser.close()
     if not path or not os.path.exists(path):
         raise RecordError("recording file nahi bani")
-    _log("recording ok: %s (trim_start=%.1fs)" % (path, trim_start))
-    return str(path), round(trim_start, 1)
+    _log("recording ok: %s (trim_start=%.2fs) marks=%s" % (path, trim_start, marks))
+    return str(path), round(trim_start, 2), marks
