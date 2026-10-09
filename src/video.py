@@ -14,6 +14,8 @@ CAP_WORDS = 7        # ek caption mein zyada se zyada itne alfaaz
 CTA_TEXT = "Link in description & profile"
 CTA_SECS = 2.0       # aakhri itne second on-screen CTA
 
+MIN_SECONDS = 40.0   # video 40s se chhoti na ho (chhoti ho to aakhri frame ruka kar 40s kar do)
+
 
 def random_palette():
     h = random.random()
@@ -196,10 +198,12 @@ def _caption_spans(chunks, narration, words, speech, total):
     return spans
 
 
-def build(voices, tool_name, out_dir, max_seconds=58, recording=None, trim_start=0.0, starts=None):
+def build(voices, tool_name, out_dir, max_seconds=60, recording=None, trim_start=0.0, starts=None):
     """voices: make_voice() ka result (intro, har step ka jumla, closing).
     starts: har voice kab shuru ho (record.py ke marks se); None ho to jumle ek ke baad ek.
     recording: record.py ki recording. trim_start: shuru ke kitne second kaatne hain.
+    Video ki length MIN_SECONDS (40s) se max_seconds (60s) ke darmiyan rehti hai:
+    chhoti ho to 40s tak barh jati hai, 60s se lambi ho to error.
     Aakhri CTA_SECS second mein on-screen CTA aata hai."""
     if not recording or not os.path.exists(recording):
         raise RuntimeError("screen recording nahi mili, video nahi banegi")
@@ -223,7 +227,10 @@ def build(voices, tool_name, out_dir, max_seconds=58, recording=None, trim_start
     narr_end = prev_end
     total = narr_end + 0.3 + CTA_SECS
     if total > max_seconds:
-        raise RuntimeError(f"video too long: {total:.0f}s")
+        raise RuntimeError(f"video too long: {total:.0f}s (limit {max_seconds}s)")
+    if total < MIN_SECONDS:
+        print(f"video chhoti thi ({total:.1f}s), {MIN_SECONDS:.0f}s tak barhai")
+        total = MIN_SECONDS
     print("voice starts:", [round(x, 1) for x in st], "| total: %.1fs" % total)
 
     # 2) captions (har awaaz ke andar lafz-waqt ke hisaab se)
