@@ -67,25 +67,257 @@
     {"do":"click","selector":"#wc-stop"},
     {"do":"wait","seconds":8}]}
  ]},
-{"slug":"case-converter","name":"Case Converter","description":"Change text to UPPER, lower, Title, Sentence, camelCase, snake_case, kebab-case and more.","angles":["fix text typed in all caps","make Title Case headings quickly","camelCase and snake_case for coders","kebab-case for clean URLs","convert text in one tap instead of retyping"]},
-{"slug":"password-generator","name":"Password Generator","description":"Create strong random passwords with a strength meter and one-click copy.","angles":["stop reusing the same password everywhere","read the strength meter before you choose","copy a password in one click","random passwords for new accounts","generated inside your browser"]},
-{"slug":"qr-code-generator","name":"QR Code Generator","description":"Turn any link or text into a QR code with custom colors, size and PNG or SVG download.","angles":["turn a link into a QR code","choose your own QR colors","download as PNG or SVG","share plain text with a QR code","no sign-up needed"]},
-{"slug":"age-calculator","name":"Age Calculator","description":"Find your exact age in years, months and days, plus a countdown to your next birthday.","angles":["exact age for a form","countdown to your next birthday","age in years, months and days","check a friend's exact age","quick answer without doing the math"]},
-{"slug":"bmi-calculator","name":"BMI Calculator","description":"Calculate body mass index in metric or imperial units with a clear category and healthy range.","angles":["metric or imperial, your choice","a clear category result","see the healthy range","quick check in seconds (say it is only a general guide, not medical advice)","private, nothing leaves your device"]},
-{"slug":"unit-converter","name":"Unit Converter","description":"Convert length, weight, temperature, area, volume, speed and file sizes (KB, MB, GB, TB) with live results.","angles":["convert KB, MB, GB and TB","convert temperature","convert length and weight","convert area, volume and speed","results update live as you type"]},
-{"slug":"json-formatter","name":"JSON Formatter","description":"Beautify, minify and validate JSON, with clear error messages showing line and column.","angles":["beautify messy JSON","minify JSON to save space","find the exact line and column of an error","validate JSON before you use it","runs in your browser"]},
-{"slug":"image-compressor","name":"Image Compressor","description":"Reduce JPG, PNG and WebP file size right in your browser, with before and after comparison.","angles":["make a photo smaller for upload limits","see a before and after comparison","works with JPG, PNG and WebP","compress without installing an app","images are not uploaded anywhere"]},
-{"slug":"color-picker","name":"Color Picker","description":"Pick a color and convert between HEX, RGB, HSL and CMYK, with palettes and contrast checks.","angles":["convert HEX to RGB","see HSL and CMYK values","build a color palette","check contrast between colors","pick a color right on your phone"]},
-{"slug":"merge-pdf","name":"Merge PDF","description":"Combine two or more PDF files into a single document, in the order you choose.","angles":["join several PDFs into one","choose the order of the files","combine documents for one email","no app to install","files stay in your browser"]},
-{"slug":"split-pdf","name":"Split PDF","description":"Pull specific pages out of a PDF or split it into a smaller file, right in your browser.","angles":["pull out just the pages you need","make a smaller PDF from a big one","share only one part of a document","no sign-up","files stay in your browser"]},
-{"slug":"rotate-pdf","name":"Rotate PDF","description":"Fix sideways or upside-down pages by rotating some or all pages of a PDF.","angles":["fix a sideways scanned page","fix upside-down pages","rotate only some pages or all of them","quick fix on your phone","files stay in your browser"]},
-{"slug":"jpg-to-pdf","name":"JPG to PDF","description":"Turn one or more JPG, PNG or WebP images into a single PDF file, in the order you choose.","angles":["turn photos into one PDF","put images in the order you choose","make a PDF from a few phone photos","works with JPG, PNG and WebP","no app to install"]},
-{"slug":"image-resizer","name":"Image Resizer","description":"Resize a JPG, PNG or WebP image to exact dimensions or a percentage, right in your browser.","angles":["resize to exact dimensions","resize by percentage","make an image fit a size requirement","works with JPG, PNG and WebP","images are not uploaded anywhere"]},
-{"slug":"image-converter","name":"Image Converter","description":"Convert JPG, PNG, WebP and other images between formats, right in your browser.","angles":["convert PNG to JPG","convert WebP to JPG or PNG","change image format in seconds","no app to install","images are not uploaded anywhere"]},
-{"slug":"image-cropper","name":"Image Cropper","description":"Crop a JPG, PNG or WebP image to an exact area or aspect ratio, right in your browser.","angles":["crop a photo to an exact area","crop to an aspect ratio","remove the extra part of a photo","works with JPG, PNG and WebP","crop on your phone, free, no sign-up"]},
-{"slug":"remove-duplicate-lines","name":"Remove Duplicate Lines","description":"Paste a list and instantly remove repeated lines, with optional case-insensitive matching.","angles":["clean a list with repeated lines","case-insensitive matching option","tidy a list of names or emails","instant result after you paste","text stays in your browser"]},
-{"slug":"text-sorter","name":"Text Sorter","description":"Sort a list alphabetically, by length or numerically, with optional dedupe.","angles":["sort a list A to Z","sort by line length","sort numbers in order","remove duplicates while sorting","text stays in your browser"]},
-{"slug":"random-number-generator","name":"Random Number Generator","description":"Generate one or many random numbers in a range you choose, with optional unique values and decimals.","angles":["pick a random number in your range","generate many numbers at once","unique values only option","decimals option","fair picks for games and giveaways"]},
-{"slug":"file-info-checker","name":"File Info Checker","description":"Check a file's type, extension, exact size and last-modified date before you use it.","angles":["check a file's exact size","check the file type and extension","see the last-modified date","check a file before you upload it","file is not uploaded anywhere"]},
-{"slug":"text-cleaner","name":"Text Cleaner","description":"Trim extra spaces, collapse blank lines, strip HTML tags and straighten smart quotes in one click.","angles":["remove extra spaces","collapse extra blank lines","strip HTML tags from text","straighten smart quotes","clean pasted text in one click"]}
-     ]
+{"slug":"case-converter","name":"Case Converter","description":"Change text to UPPER, lower, Title, Sentence, camelCase, snake_case, kebab-case and more.","angles":["fix text typed in all caps","make Title Case headings quickly","camelCase and snake_case for coders","kebab-case for clean URLs","convert text in one tap instead of retyping"],
+ "demos":[
+  {"id":"headline-title-case","title":"Turning a plain headline into Title Case","steps":[
+    {"do":"highlight","selector":"#cc-in","label":"text box","hold_ms":2500},
+    {"do":"type","selector":"#cc-in","text":"how to write a clear headline for your blog post","label":"text box","delay":55},
+    {"do":"click","selector":"button[data-m=\"title\"]","label":"Title Case option"},
+    {"do":"highlight","selector":"#cc-out","label":"result box","hold_ms":2500}]},
+  {"id":"code-names","title":"Changing a phrase into camelCase and snake_case","steps":[
+    {"do":"type","selector":"#cc-in","text":"user profile page settings","label":"text box","delay":55},
+    {"do":"click","selector":"button[data-m=\"camel\"]","label":"camelCase option"},
+    {"do":"highlight","selector":"#cc-out","label":"result box","hold_ms":2500},
+    {"do":"click","selector":"button[data-m=\"snake\"]","label":"snake_case option"},
+    {"do":"highlight","selector":"#cc-out","label":"result box","hold_ms":2500}]}
+ ]},
+{"slug":"password-generator","name":"Password Generator","description":"Create strong random passwords with a strength meter and one-click copy.","angles":["stop reusing the same password everywhere","read the strength meter before you choose","copy a password in one click","random passwords for new accounts","generated inside your browser"],
+ "demos":[
+  {"id":"generate-and-meter","title":"Generating a password and reading the strength meter","steps":[
+    {"do":"highlight","selector":"#pw-out","label":"password box","hold_ms":2500},
+    {"do":"click","selector":"#pw-gen","label":"Generate option"},
+    {"do":"highlight","selector":"#pw-bar","label":"strength meter","hold_ms":2500}]},
+  {"id":"longer-password","title":"Making the password longer with the length slider","steps":[
+    {"do":"set","selector":"#pw-len","value":"24","label":"length slider"},
+    {"do":"click","selector":"#pw-gen","label":"Generate option"},
+    {"do":"highlight","selector":"#pw-out","label":"password box","hold_ms":2500}]}
+ ]},
+{"slug":"qr-code-generator","name":"QR Code Generator","description":"Turn any link or text into a QR code with custom colors, size and PNG or SVG download.","angles":["turn a link into a QR code","choose your own QR colors","download as PNG or SVG","share plain text with a QR code","no sign-up needed"],
+ "demos":[
+  {"id":"text-to-qr","title":"Turning a short line of text into a QR code","steps":[
+    {"do":"highlight","selector":"#qr-text","label":"text box","hold_ms":2500},
+    {"do":"type","selector":"#qr-text","text":"Welcome to our cafe, open daily","label":"text box","delay":55},
+    {"do":"highlight","selector":"#qr-cv","label":"QR code","hold_ms":2500}]},
+  {"id":"colored-qr","title":"Changing the QR code color","steps":[
+    {"do":"type","selector":"#qr-text","text":"Meeting room 5, second floor","label":"text box","delay":55},
+    {"do":"set","selector":"#qr-fg","value":"#7c3aed","label":"QR color picker"},
+    {"do":"highlight","selector":"#qr-cv","label":"QR code","hold_ms":2500}]}
+ ]},
+{"slug":"age-calculator","name":"Age Calculator","description":"Find your exact age in years, months and days, plus a countdown to your next birthday.","angles":["exact age for a form","countdown to your next birthday","age in years, months and days","check a friend's exact age","quick answer without doing the math"],
+ "demos":[
+  {"id":"exact-age","title":"Finding an exact age from a birth date","steps":[
+    {"do":"set","selector":"#ag-dob","value":"1995-06-15","label":"birth date field"},
+    {"do":"click","selector":"#ag-go","label":"calculate option"},
+    {"do":"highlight","selector":"#ag-res","label":"result","hold_ms":2500}]},
+  {"id":"another-date","title":"Trying a different birth date","steps":[
+    {"do":"set","selector":"#ag-dob","value":"2000-12-25","label":"birth date field"},
+    {"do":"click","selector":"#ag-go","label":"calculate option"},
+    {"do":"highlight","selector":"#ag-res","label":"result","hold_ms":2500},
+    {"do":"click","selector":"#ag-reset","label":"reset option"}]}
+ ]},
+{"slug":"bmi-calculator","name":"BMI Calculator","description":"Calculate body mass index in metric or imperial units with a clear category and healthy range.","angles":["metric or imperial, your choice","a clear category result","see the healthy range","quick check in seconds (say it is only a general guide, not medical advice)","private, nothing leaves your device"],
+ "demos":[
+  {"id":"metric-check","title":"Checking BMI with metric units","steps":[
+    {"do":"click","selector":"#bm-t-m","label":"metric units tab"},
+    {"do":"type","selector":"#bm-cm","text":"170","label":"height in centimeters","delay":55},
+    {"do":"type","selector":"#bm-kg","text":"65","label":"weight in kilograms","delay":55},
+    {"do":"click","selector":"#bm-go","label":"calculate option"},
+    {"do":"highlight","selector":"#bm-res","label":"result","hold_ms":2500}]},
+  {"id":"imperial-check","title":"Checking BMI with imperial units","steps":[
+    {"do":"click","selector":"#bm-t-i","label":"imperial units tab"},
+    {"do":"type","selector":"#bm-ft","text":"5","label":"height in feet","delay":55},
+    {"do":"type","selector":"#bm-in","text":"7","label":"height in inches","delay":55},
+    {"do":"type","selector":"#bm-lb","text":"150","label":"weight in pounds","delay":55},
+    {"do":"click","selector":"#bm-go","label":"calculate option"},
+    {"do":"highlight","selector":"#bm-res","label":"result","hold_ms":2500}]}
+ ]},
+{"slug":"unit-converter","name":"Unit Converter","description":"Convert length, weight, temperature, area, volume, speed and file sizes (KB, MB, GB, TB) with live results.","angles":["convert KB, MB, GB and TB","convert temperature","convert length and weight","convert area, volume and speed","results update live as you type"],
+ "demos":[
+  {"id":"length-live","title":"Converting a length value","steps":[
+    {"do":"type","selector":"#uc-val","text":"5","label":"value box","delay":55},
+    {"do":"highlight","selector":"#uc-out","label":"converted result","hold_ms":2500},
+    {"do":"click","selector":"#uc-swap","label":"swap option"},
+    {"do":"highlight","selector":"#uc-out","label":"converted result","hold_ms":2500}]},
+  {"id":"temperature-tab","title":"Switching to temperature","steps":[
+    {"do":"click","selector":"button[data-c=\"temperature\"]","label":"Temperature tab"},
+    {"do":"type","selector":"#uc-val","text":"100","label":"value box","delay":55},
+    {"do":"highlight","selector":"#uc-out","label":"converted result","hold_ms":2500}]},
+  {"id":"data-tab","title":"Switching to data storage","steps":[
+    {"do":"click","selector":"button[data-c=\"data\"]","label":"Data Storage tab"},
+    {"do":"type","selector":"#uc-val","text":"2","label":"value box","delay":55},
+    {"do":"highlight","selector":"#uc-out","label":"converted result","hold_ms":2500}]}
+ ]},
+{"slug":"json-formatter","name":"JSON Formatter","description":"Beautify, minify and validate JSON, with clear error messages showing line and column.","angles":["beautify messy JSON","minify JSON to save space","find the exact line and column of an error","validate JSON before you use it","runs in your browser"],
+ "demos":[
+  {"id":"beautify-sample","title":"Beautifying sample JSON","steps":[
+    {"do":"click","selector":"#js-sample","label":"sample option"},
+    {"do":"click","selector":"#js-beauty","label":"beautify option"},
+    {"do":"highlight","selector":"#js-out","label":"formatted result","hold_ms":2500}]},
+  {"id":"minify-sample","title":"Minifying sample JSON","steps":[
+    {"do":"click","selector":"#js-sample","label":"sample option"},
+    {"do":"click","selector":"#js-min","label":"minify option"},
+    {"do":"highlight","selector":"#js-out","label":"minified result","hold_ms":2500}]}
+ ]},
+{"slug":"image-compressor","name":"Image Compressor","description":"Reduce JPG, PNG and WebP file size right in your browser, with before and after comparison.","angles":["make a photo smaller for upload limits","see a before and after comparison","works with JPG, PNG and WebP","compress without installing an app","images are not uploaded anywhere"],
+ "demos":[
+  {"id":"compress-photo","title":"Adding a photo and seeing the size comparison","steps":[
+    {"do":"upload","selector":"#ic-file","files":["samples/photo.jpg"],"label":"photo upload","after_ms":1200},
+    {"do":"highlight","selector":"#ic-stats","label":"size comparison","hold_ms":2500}]},
+  {"id":"lower-quality","title":"Lowering the quality slider","steps":[
+    {"do":"upload","selector":"#ic-file","files":["samples/photo.jpg"],"label":"photo upload","after_ms":1200},
+    {"do":"set","selector":"#ic-q","value":"50","label":"quality slider"},
+    {"do":"highlight","selector":"#ic-stats","label":"size comparison","hold_ms":2500}]}
+ ]},
+{"slug":"color-picker","name":"Color Picker","description":"Pick a color and convert between HEX, RGB, HSL and CMYK, with palettes and contrast checks.","angles":["convert HEX to RGB","see HSL and CMYK values","build a color palette","check contrast between colors","pick a color right on your phone"],
+ "demos":[
+  {"id":"hex-codes","title":"Typing a HEX color and reading the other codes","steps":[
+    {"do":"type","selector":"#cp-hex","text":"#16A34A","label":"HEX box","delay":55},
+    {"do":"highlight","selector":"#cp-codes","label":"color codes","hold_ms":2500}]},
+  {"id":"random-color","title":"Trying a random color","steps":[
+    {"do":"click","selector":"#cp-rand","label":"random color option"},
+    {"do":"highlight","selector":"#cp-codes","label":"color codes","hold_ms":2500}]}
+ ]},
+{"slug":"merge-pdf","name":"Merge PDF","description":"Combine two or more PDF files into a single document, in the order you choose.","angles":["join several PDFs into one","choose the order of the files","combine documents for one email","no app to install","files stay in your browser"],
+ "demos":[
+  {"id":"merge-two","title":"Joining two PDFs into one","steps":[
+    {"do":"upload","selector":"#mg-file","files":["samples/doc-a.pdf","samples/doc-b.pdf"],"label":"two PDF files","after_ms":1200},
+    {"do":"highlight","selector":"#mg-list","label":"file list","hold_ms":2500},
+    {"do":"click","selector":"#mg-go","label":"merge option"}]},
+  {"id":"merge-and-clear","title":"Adding PDFs and clearing the list","steps":[
+    {"do":"upload","selector":"#mg-file","files":["samples/doc-a.pdf","samples/doc-b.pdf"],"label":"two PDF files","after_ms":1200},
+    {"do":"highlight","selector":"#mg-list","label":"file list","hold_ms":2500},
+    {"do":"click","selector":"#mg-clear","label":"clear option"}]}
+ ]},
+{"slug":"split-pdf","name":"Split PDF","description":"Pull specific pages out of a PDF or split it into a smaller file, right in your browser.","angles":["pull out just the pages you need","make a smaller PDF from a big one","share only one part of a document","no sign-up","files stay in your browser"],
+ "demos":[
+  {"id":"first-page","title":"Pulling out the first page","steps":[
+    {"do":"upload","selector":"#sp-file","files":["samples/doc-a.pdf"],"label":"PDF file","after_ms":1200},
+    {"do":"type","selector":"#sp-range","text":"1","label":"page range box","delay":55},
+    {"do":"click","selector":"#sp-go","label":"extract option"}]},
+  {"id":"page-range","title":"Pulling out a page range","steps":[
+    {"do":"upload","selector":"#sp-file","files":["samples/doc-a.pdf"],"label":"PDF file","after_ms":1200},
+    {"do":"type","selector":"#sp-range","text":"1-2","label":"page range box","delay":55},
+    {"do":"click","selector":"#sp-go","label":"extract option"}]}
+ ]},
+{"slug":"rotate-pdf","name":"Rotate PDF","description":"Fix sideways or upside-down pages by rotating some or all pages of a PDF.","angles":["fix a sideways scanned page","fix upside-down pages","rotate only some pages or all of them","quick fix on your phone","files stay in your browser"],
+ "demos":[
+  {"id":"rotate-90","title":"Rotating a PDF by 90 degrees","steps":[
+    {"do":"upload","selector":"#rp-file","files":["samples/doc-a.pdf"],"label":"PDF file","after_ms":1200},
+    {"do":"select","selector":"#rp-angle","value":"90","label":"rotation angle list"},
+    {"do":"click","selector":"#rp-go","label":"rotate option"}]},
+  {"id":"rotate-180","title":"Turning a PDF upside down by 180 degrees","steps":[
+    {"do":"upload","selector":"#rp-file","files":["samples/doc-b.pdf"],"label":"PDF file","after_ms":1200},
+    {"do":"select","selector":"#rp-angle","value":"180","label":"rotation angle list"},
+    {"do":"click","selector":"#rp-go","label":"rotate option"}]}
+ ]},
+{"slug":"jpg-to-pdf","name":"JPG to PDF","description":"Turn one or more JPG, PNG or WebP images into a single PDF file, in the order you choose.","angles":["turn photos into one PDF","put images in the order you choose","make a PDF from a few phone photos","works with JPG, PNG and WebP","no app to install"],
+ "demos":[
+  {"id":"two-images","title":"Putting two images into one PDF","steps":[
+    {"do":"upload","selector":"#jp-file","files":["samples/photo.jpg","samples/photo.png"],"label":"two images","after_ms":1200},
+    {"do":"highlight","selector":"#jp-list","label":"image list","hold_ms":2500},
+    {"do":"select","selector":"#jp-fit","value":"a4","label":"page size list"},
+    {"do":"click","selector":"#jp-go","label":"create PDF option"}]},
+  {"id":"original-size","title":"Making a PDF at the image's original size","steps":[
+    {"do":"upload","selector":"#jp-file","files":["samples/photo.jpg"],"label":"image","after_ms":1200},
+    {"do":"select","selector":"#jp-fit","value":"orig","label":"page size list"},
+    {"do":"click","selector":"#jp-go","label":"create PDF option"}]}
+ ]},
+{"slug":"image-resizer","name":"Image Resizer","description":"Resize a JPG, PNG or WebP image to exact dimensions or a percentage, right in your browser.","angles":["resize to exact dimensions","resize by percentage","make an image fit a size requirement","works with JPG, PNG and WebP","images are not uploaded anywhere"],
+ "demos":[
+  {"id":"resize-width","title":"Resizing an image to a new width","steps":[
+    {"do":"upload","selector":"#rz-file","files":["samples/photo.jpg"],"label":"photo upload","after_ms":1200},
+    {"do":"type","selector":"#rz-w","text":"800","label":"width box","delay":55},
+    {"do":"click","selector":"#rz-go","label":"resize option"}]},
+  {"id":"resize-webp","title":"Resizing and saving as WebP","steps":[
+    {"do":"upload","selector":"#rz-file","files":["samples/photo.jpg"],"label":"photo upload","after_ms":1200},
+    {"do":"type","selector":"#rz-w","text":"500","label":"width box","delay":55},
+    {"do":"select","selector":"#rz-fmt","value":"image/webp","label":"format list"},
+    {"do":"click","selector":"#rz-go","label":"resize option"}]}
+ ]},
+{"slug":"image-converter","name":"Image Converter","description":"Convert JPG, PNG, WebP and other images between formats, right in your browser.","angles":["convert PNG to JPG","convert WebP to JPG or PNG","change image format in seconds","no app to install","images are not uploaded anywhere"],
+ "demos":[
+  {"id":"png-to-jpg","title":"Converting a PNG to JPG","steps":[
+    {"do":"upload","selector":"#cv-file","files":["samples/photo.png"],"label":"PNG upload","after_ms":1200},
+    {"do":"select","selector":"#cv-fmt","value":"image/jpeg","label":"format list"},
+    {"do":"click","selector":"#cv-go","label":"convert option"}]},
+  {"id":"jpg-to-webp","title":"Converting a JPG to WebP","steps":[
+    {"do":"upload","selector":"#cv-file","files":["samples/photo.jpg"],"label":"JPG upload","after_ms":1200},
+    {"do":"select","selector":"#cv-fmt","value":"image/webp","label":"format list"},
+    {"do":"click","selector":"#cv-go","label":"convert option"},
+    {"do":"highlight","selector":"#cv-stats","label":"size comparison","hold_ms":2500}]}
+ ]},
+{"slug":"image-crop","name":"Image Cropper","description":"Crop a JPG, PNG or WebP image to an exact area or aspect ratio, right in your browser.","angles":["crop a photo to an exact area","crop to an aspect ratio","remove the extra part of a photo","works with JPG, PNG and WebP","crop on your phone, free, no sign-up"],
+ "demos":[
+  {"id":"square-crop","title":"Cropping a photo to a square","steps":[
+    {"do":"upload","selector":"#cp2-file","files":["samples/photo.jpg"],"label":"photo upload","after_ms":1200},
+    {"do":"select","selector":"#cp2-ratio","value":"1:1","label":"aspect ratio list"},
+    {"do":"click","selector":"#cp2-center","label":"center option"},
+    {"do":"click","selector":"#cp2-go","label":"crop option"}]},
+  {"id":"wide-crop","title":"Cropping a photo to a wide 16:9 shape","steps":[
+    {"do":"upload","selector":"#cp2-file","files":["samples/photo.jpg"],"label":"photo upload","after_ms":1200},
+    {"do":"select","selector":"#cp2-ratio","value":"16:9","label":"aspect ratio list"},
+    {"do":"click","selector":"#cp2-center","label":"center option"},
+    {"do":"click","selector":"#cp2-go","label":"crop option"}]}
+ ]},
+{"slug":"remove-duplicate-lines","name":"Remove Duplicate Lines","description":"Paste a list and instantly remove repeated lines, with optional case-insensitive matching.","angles":["clean a list with repeated lines","case-insensitive matching option","tidy a list of names or emails","instant result after you paste","text stays in your browser"],
+ "demos":[
+  {"id":"fruit-list","title":"Removing repeated lines from a short list","steps":[
+    {"do":"type","selector":"#dl-in","text":"apple\nbanana\napple\ncherry\nbanana\ndate","label":"list box","delay":55},
+    {"do":"click","selector":"#dl-go","label":"remove duplicates option"},
+    {"do":"highlight","selector":"#dl-out","label":"result box","hold_ms":2500}]},
+  {"id":"ignore-case","title":"Matching repeated names regardless of letter case","steps":[
+    {"do":"type","selector":"#dl-in","text":"Alice\nbob\nALICE\nCarol\nBob","label":"list box","delay":55},
+    {"do":"click","selector":"#dl-ci","label":"case-insensitive option"},
+    {"do":"click","selector":"#dl-go","label":"remove duplicates option"},
+    {"do":"highlight","selector":"#dl-out","label":"result box","hold_ms":2500}]}
+ ]},
+{"slug":"sort-text-lines","name":"Text Sorter","description":"Sort a list alphabetically, by length or numerically, with optional dedupe.","angles":["sort a list A to Z","sort by line length","sort numbers in order","remove duplicates while sorting","text stays in your browser"],
+ "demos":[
+  {"id":"a-to-z","title":"Sorting a list from A to Z","steps":[
+    {"do":"type","selector":"#ts-in","text":"pear\napple\nbanana\ncherry","label":"list box","delay":55},
+    {"do":"click","selector":"button[data-m=\"az\"]","label":"A to Z option"},
+    {"do":"highlight","selector":"#ts-out","label":"result box","hold_ms":2500}]},
+  {"id":"numbers","title":"Sorting numbers in order","steps":[
+    {"do":"type","selector":"#ts-in","text":"10\n2\n33\n4\n21","label":"list box","delay":55},
+    {"do":"click","selector":"button[data-m=\"numeric\"]","label":"Numeric option"},
+    {"do":"highlight","selector":"#ts-out","label":"result box","hold_ms":2500}]},
+  {"id":"by-length","title":"Sorting lines from shortest to longest","steps":[
+    {"do":"type","selector":"#ts-in","text":"kiwi\nwatermelon\nfig\nbanana","label":"list box","delay":55},
+    {"do":"click","selector":"button[data-m=\"shortlong\"]","label":"Shortest first option"},
+    {"do":"highlight","selector":"#ts-out","label":"result box","hold_ms":2500}]}
+ ]},
+{"slug":"random-number-generator","name":"Random Number Generator","description":"Generate one or many random numbers in a range you choose, with optional unique values and decimals.","angles":["pick a random number in your range","generate many numbers at once","unique values only option","decimals option","fair picks for games and giveaways"],
+ "demos":[
+  {"id":"one-number","title":"Picking one random number in a range","steps":[
+    {"do":"type","selector":"#rn-min","text":"1","label":"minimum box","delay":55},
+    {"do":"type","selector":"#rn-max","text":"50","label":"maximum box","delay":55},
+    {"do":"click","selector":"#rn-go","label":"generate option"},
+    {"do":"highlight","selector":"#rn-out","label":"result box","hold_ms":2500}]},
+  {"id":"unique-numbers","title":"Picking several unique numbers","steps":[
+    {"do":"type","selector":"#rn-count","text":"5","label":"how many box","delay":55},
+    {"do":"click","selector":"#rn-unique","label":"unique values option"},
+    {"do":"click","selector":"#rn-go","label":"generate option"},
+    {"do":"highlight","selector":"#rn-out","label":"result box","hold_ms":2500}]}
+ ]},
+{"slug":"file-info","name":"File Info Checker","description":"Check a file's type, extension, exact size and last-modified date before you use it.","angles":["check a file's exact size","check the file type and extension","see the last-modified date","check a file before you upload it","file is not uploaded anywhere"],
+ "demos":[
+  {"id":"photo-info","title":"Checking the details of a photo","steps":[
+    {"do":"upload","selector":"#fi-file","files":["samples/photo.jpg"],"label":"file upload","after_ms":1200},
+    {"do":"highlight","selector":"#fi-list","label":"file details","hold_ms":2500}]},
+  {"id":"pdf-info","title":"Checking the details of a PDF","steps":[
+    {"do":"upload","selector":"#fi-file","files":["samples/doc-a.pdf"],"label":"file upload","after_ms":1200},
+    {"do":"highlight","selector":"#fi-list","label":"file details","hold_ms":2500}]}
+ ]},
+{"slug":"text-cleaner","name":"Text Cleaner","description":"Trim extra spaces, collapse blank lines, strip HTML tags and straighten smart quotes in one click.","angles":["remove extra spaces","collapse extra blank lines","strip HTML tags from text","straighten smart quotes","clean pasted text in one click"],
+ "demos":[
+  {"id":"extra-spaces","title":"Cleaning extra spaces from pasted text","steps":[
+    {"do":"type","selector":"#tc-in","text":"  Hello    world!   This   text  has   extra   spaces.  ","label":"text box","delay":55},
+    {"do":"click","selector":"#tc-go","label":"clean option"},
+    {"do":"highlight","selector":"#tc-out","label":"result box","hold_ms":2500}]},
+  {"id":"strip-html","title":"Removing HTML tags from text","steps":[
+    {"do":"type","selector":"#tc-in","text":"<p>Hello <b>world</b>, this is <i>sample</i> text.</p>","label":"text box","delay":55},
+    {"do":"click","selector":"#tc-html","label":"strip HTML tags option"},
+    {"do":"click","selector":"#tc-go","label":"clean option"},
+    {"do":"highlight","selector":"#tc-out","label":"result box","hold_ms":2500}]}
+ ]}
+]
