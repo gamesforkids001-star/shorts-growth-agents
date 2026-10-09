@@ -8,7 +8,7 @@ platforms:
   instagram: true
 youtube_privacy: private   # audit pass hone ke baad "public" kar dena
 # voice: ab har video ki awaaz src/variety.py ki list se badalti rehti hai
-max_seconds: 58
+max_seconds: 60
 # Posting ramp-up: pehle ramp_days din 1 video/day, phir har ramp_days baad +1, max_per_day tak
 ramp_days: 15
 max_per_day: 6
