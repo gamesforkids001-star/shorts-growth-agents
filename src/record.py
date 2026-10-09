@@ -3,6 +3,11 @@
 Ab live site nahi khulti. Repo ke tools_local/<slug>.html se recording hoti hai.
 
 record_demo(tool, demo, out_dir) -> (recording_path, trim_start)
+
+NAYA (v2):
+- Page ko ZOOM karte hain taake tool poori screen bhare aur text bara dikhe.
+- Naye steps: "highlight" (kisi hisse par peela frame), "scroll_to" (smooth scroll).
+- Typing thodi slow (padhne layak).
 """
 import os
 import re
@@ -11,7 +16,11 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-VIEW_W, VIEW_H = 960, 1130  # video.py ke recording area se match
+VIEW_W, VIEW_H = 960, 1130  # video.py ke recording area se match (change mat karo)
+
+# Tool ko bara karne ke liye zoom. 1.0 = purana (chota). 1.5 = theek.
+# Agar tool kinare se kat raha ho to 1.3 karo; agar abhi bhi chota lage to 1.7.
+ZOOM = float(os.environ.get("REC_ZOOM", "1.5"))
 
 LOCAL_DIR = "tools_local"
 
@@ -76,10 +85,20 @@ def _dump_elements(page):
         _log("dump fail: " + str(e))
 
 
+def _apply_zoom(page):
+    """Page ko bara karo taake tool poori screen bhare (layout dobara set hota hai)."""
+    if ZOOM and abs(ZOOM - 1.0) > 0.01:
+        page.add_style_tag(content="html{zoom:%s !important;}" % ZOOM)
+        page.wait_for_timeout(400)
+
+
 def _norm_step(step):
     action = (step.get("action") or step.get("do") or step.get("op")
               or step.get("type") or "").lower()
-    if action not in ("wait", "type", "click", "select", "upload", "scroll"):
+    if action == "focus":
+        action = "highlight"
+    if action not in ("wait", "type", "click", "select", "upload", "scroll",
+                      "highlight", "scroll_to"):
         if "text" in step:
             action = "type"
         elif "file" in step:
@@ -107,6 +126,16 @@ def _find(page, selector, timeout=8000):
     raise RecordError("selector nahi mila: " + str(selector))
 
 
+def _smooth_center(loc):
+    """Element ko screen ke beech mein smooth scroll karo."""
+    try:
+        loc.evaluate(
+            "e => e.scrollIntoView({behavior: 'smooth', block: 'center'})"
+        )
+    except Exception:
+        loc.scroll_into_view_if_needed()
+
+
 def _run_step(page, step, repo_root):
     action = _norm_step(step)
     sel = step.get("selector")
@@ -117,14 +146,15 @@ def _run_step(page, step, repo_root):
         page.wait_for_timeout(int(ms))
     elif action == "type":
         loc = _find(page, sel or "textarea")
-        loc.scroll_into_view_if_needed()
+        _smooth_center(loc)
+        page.wait_for_timeout(500)
         loc.click()
         text = step.get("text") or step.get("value") or ""
-        page.keyboard.type(text, delay=int(step.get("delay", 45)))
+        page.keyboard.type(text, delay=int(step.get("delay", 70)))
     elif action == "click":
         loc = _find(page, sel)
-        loc.scroll_into_view_if_needed()
-        page.wait_for_timeout(400)
+        _smooth_center(loc)
+        page.wait_for_timeout(600)
         loc.click()
     elif action == "select":
         loc = _find(page, sel)
@@ -144,6 +174,41 @@ def _run_step(page, step, repo_root):
         loc.set_input_files(str(fp))
     elif action == "scroll":
         page.mouse.wheel(0, int(step.get("y", 400)))
+    elif action == "scroll_to":
+        # {"action": "scroll_to", "selector": "#kd-table"}
+        loc = _find(page, sel)
+        _smooth_center(loc)
+        page.wait_for_timeout(int(step.get("hold_ms", 1200)))
+    elif action == "highlight":
+        # {"action": "highlight", "selector": "#wc-stats", "hold_ms": 3000}
+        # Us hisse par peela frame lagta hai taake dekhne wala wahin dekhe.
+        loc = _find(page, sel)
+        _smooth_center(loc)
+        page.wait_for_timeout(700)
+        try:
+            loc.evaluate(
+                """e => {
+                  e.__old = [e.style.outline, e.style.outlineOffset,
+                             e.style.borderRadius, e.style.transition];
+                  e.style.transition = 'all .3s';
+                  e.style.outline = '5px solid #ffd54a';
+                  e.style.outlineOffset = '6px';
+                  e.style.borderRadius = '12px';
+                }"""
+            )
+        except Exception as ex:
+            _log("highlight style fail: " + str(ex))
+        page.wait_for_timeout(int(step.get("hold_ms", 2500)))
+        try:
+            loc.evaluate(
+                """e => {
+                  const o = e.__old || ['', '', '', ''];
+                  e.style.outline = o[0]; e.style.outlineOffset = o[1];
+                  e.style.borderRadius = o[2]; e.style.transition = o[3];
+                }"""
+            )
+        except Exception:
+            pass
     else:
         raise RecordError("anjaan step: " + str(step))
     page.wait_for_timeout(int(step.get("after_ms", 500)))
@@ -182,7 +247,9 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root):
         trim_start = 0.0
         try:
             page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            page.wait_for_timeout(1000)
+            page.wait_for_timeout(600)
+            _apply_zoom(page)
+            page.wait_for_timeout(600)
             # loading wala hissa video se kaat do
             trim_start = max(0.0, time.time() - t0 - 0.3)
             for step in steps:
