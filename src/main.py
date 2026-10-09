@@ -135,7 +135,7 @@ def main():
     # 2) separate metadata per platform, each policy-checked
     platforms = [p for p, on in cfg["platforms"].items() if on]
     titles = [h.get("title") for h in history[-12:] if h.get("title")]
-    meta = agents.metadata(plan, tool, pol, titles)
+    meta = agents.metadata(plan, tool, pol, titles, info)
     final, report = {}, {}
     for p in platforms:
         m = meta.get(p, {})
@@ -151,20 +151,40 @@ def main():
         else:
             report[p] = "skipped: policy check pass nahi hua"
 
-    # 3) asli tool ki screen recording (bot-check par skip)
+    # 3) awaaz pehle (har jumla alag), phir recording usi ke hisab se ruk-ruk kar
+    segs = plan.get("segments") or [narration]
+    voices = video.make_voice(segs, v["voice"], str(OUT / "voice"))
+    steps = demo.get("steps", [])
+    idx = record.narrated_indices(steps)
+    nb = max(0, len(voices) - 2)  # intro aur closing ke darmiyan ke jumle
+    holds = [None] * len(steps)
+    for k in range(min(nb, len(idx))):
+        holds[idx[k]] = voices[1 + k]["dur"] + 0.4
+    intro_hold = voices[0]["dur"] + 0.3
+    closing_hold = (voices[-1]["dur"] + 0.3) if len(voices) >= 2 else 0.0
+
     try:
-        rec_path, trim_start = record.record_demo(
-            tool, demo, str(OUT / "rec"), max_seconds=cfg["max_seconds"], repo_root=str(ROOT))
+        rec_path, trim_start, marks = record.record_demo(
+            tool, demo, str(OUT / "rec"), max_seconds=cfg["max_seconds"], repo_root=str(ROOT),
+            holds=holds, intro_hold=intro_hold, closing_hold=closing_hold)
     except record.BotCheckError as e:
         raise SystemExit("Bot-check aya, video skip: " + str(e))
     except Exception as e:
         traceback.print_exc()
         raise SystemExit("Recording fail, video skip: " + str(e))
-    print("recording:", rec_path, "trim_start:", trim_start)
+    print("recording:", rec_path, "trim_start:", trim_start, "marks:", marks)
 
-    # 4) voice-over + captions + recording = ek video (sab platforms ke liye)
-    path, secs = video.build(narration, tool["name"], v["voice"], str(OUT), cfg["max_seconds"],
-                             rec_path, trim_start)
+    # har awaaz kab shuru ho: intro = 0, beats = un steps ka shuru-waqt, closing = aakhri step ke baad
+    starts = [0.0]
+    for k in range(nb):
+        si = idx[k] if k < len(idx) else None
+        starts.append(marks["steps"][si] if si is not None and si < len(marks["steps"]) else None)
+    if len(voices) >= 2:
+        starts.append(marks["end"])
+
+    # 4) awaaz + captions + recording + aakhri CTA = ek video (sab platforms ke liye)
+    path, secs = video.build(voices, tool["name"], str(OUT), cfg["max_seconds"],
+                             rec_path, trim_start, starts)
     print(f"video ready: {secs:.0f}s")
     ok, why = video_ok(path, cfg["max_seconds"])
     if not ok:
