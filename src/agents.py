@@ -88,7 +88,9 @@ Rules:
 - Do not say or write any URL.
 - The closing sentence must not ask or tell the viewer to do anything
   (example style: "That is the {tool['name']}, a free tool that runs in the browser.").
-- Short sentences, easy to speak. Total 95-115 words (this is about 45 seconds).
+- Short sentences, easy to speak. LENGTH IS STRICT: aim for 100-115 words in total (about 45 seconds).
+  Count your words before answering. Never write more than 115 words and never fewer than 95.
+  If your draft is longer than 115 words, shorten the walk-through.
 
 Return JSON only: {{"topic": "short topic label", "narration": "the full voice-over text"}}"""
     plan = ask_json(prompt, SYSTEM, 0.9)
