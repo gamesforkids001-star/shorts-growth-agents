@@ -7,6 +7,12 @@ BANNED = [
     "shocking", "hack", "cure", "miracle", "number one", "no. 1", "best ever", "instantly",
 ]
 
+# Narration (awaaz) me ye call-to-action wale lafz nahi hone chahiye
+CTA_WORDS = [
+    "link in my profile", "link in bio", "check my profile", "my profile", "in my bio",
+    "follow me", "subscribe", "visit", "check the link", "check out",
+]
+
 # Risky lafz ki jagah safe lafz (auto-fix). Jinka replacement nahi, wo flag hi honge.
 SAFE = {
     "instantly": "quickly",
@@ -22,7 +28,7 @@ SAFE = {
 URL = re.compile(r"https?://|www\.", re.I)
 
 # 30-40 second video ke liye narration ki lambai (words mein)
-MIN_WORDS, MAX_WORDS = 45, 95
+MIN_WORDS, MAX_WORDS = 35, 80
 
 
 def sanitize(text):
@@ -125,10 +131,11 @@ def review_script(plan, policies, tool=None, demo=None, openers=None):
     for w in BANNED:
         if w in low:
             issues.append(f"remove risky phrase: {w}")
+    for w in CTA_WORDS:
+        if w in low:
+            issues.append(f"remove call to action from narration: {w}")
     if URL.search(text):
         issues.append("do not say or write any URL")
-    if "link in my profile" not in low and "profile" not in low:
-        issues.append("end with a mention that the link is in my profile")
     if too_similar(plan, openers):
         issues.append("opening is too similar to a recent video, change it")
     if issues:
@@ -149,8 +156,10 @@ Known facts about the tool and the screen recording:
 Narration: {text}
 
 Check: honest, no invented facts/stats, no superlatives, no medical/legal/financial/income claims,
-no engagement bait, no claim about privacy/security/speed unless it is in the known facts,
+no engagement bait or call to action, no claim about privacy/security/speed unless it is in the known facts,
 and the narration only describes things that are actually shown on screen.
+Typing text into the tool, clicking controls listed in the steps, and a plain closing sentence that only
+states what the tool is are all fine. Only flag real problems, not style preferences.
 Return JSON only: {{"ok": true/false, "issues": ["..."]}}"""
     r = ask_json(prompt, "Be strict but fair. Only flag real problems.", 0.2)
     return bool(r.get("ok")), r.get("issues", [])
