@@ -6,10 +6,38 @@ BANNED = [
     "like and share", "tag a friend", "tag 3", "make money", "get rich", "you won't believe",
     "shocking", "hack", "cure", "miracle", "number one", "no. 1", "best ever", "instantly",
 ]
+
+# Risky lafz ki jagah safe lafz (auto-fix). Jinka replacement nahi, wo flag hi honge.
+SAFE = {
+    "instantly": "quickly",
+    "guaranteed": "reliable",
+    "100%": "fully",
+    "best ever": "great",
+    "shocking": "surprising",
+    "miracle": "helpful",
+    "hack": "trick",
+    "you won't believe": "here is",
+}
+
 URL = re.compile(r"https?://|www\.", re.I)
 
 # 30-40 second video ke liye narration ki lambai (words mein)
 MIN_WORDS, MAX_WORDS = 45, 95
+
+
+def sanitize(text):
+    """Risky lafz ko safe lafz se badalta hai."""
+    if not isinstance(text, str):
+        return text
+    for bad, good in SAFE.items():
+        pattern = re.compile(r"(?<!\w)" + re.escape(bad) + r"(?!\w)", re.I)
+
+        def repl(m, good=good):
+            g = good.capitalize() if m.group(0)[:1].isupper() else good
+            return g
+
+        text = pattern.sub(repl, text)
+    return text
 
 
 def clean_tags(tags):
@@ -23,6 +51,11 @@ def clean_tags(tags):
 
 def hard_check(platform, m):
     """Rule-based checks (no AI). Returns list of problems."""
+    # Pehle auto-fix (title, description, caption wagera)
+    for k, v in list(m.items()):
+        if k not in ("tags", "hashtags") and isinstance(v, str):
+            m[k] = sanitize(v)
+
     issues = []
     text = " ".join(str(v) for k, v in m.items() if k not in ("tags", "hashtags")).lower()
     for w in BANNED:
@@ -78,6 +111,10 @@ def too_similar(plan, openers):
 
 def review_script(plan, policies, tool=None, demo=None, openers=None):
     """Narration ko check karta hai. Returns (ok, issues)."""
+    # Pehle auto-fix, phir check
+    if isinstance(plan.get("narration"), str):
+        plan["narration"] = sanitize(plan["narration"])
+
     text = (plan.get("narration") or "").strip()
     issues = []
     words = len(text.split())
