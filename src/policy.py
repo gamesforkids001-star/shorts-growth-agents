@@ -27,8 +27,8 @@ SAFE = {
 
 URL = re.compile(r"https?://|www\.", re.I)
 
-# 30-40 second video ke liye narration ki lambai (words mein)
-MIN_WORDS, MAX_WORDS = 35, 80
+# 45 second video ke liye narration ki lambai (words mein). Target 100-115, ye range thori khuli hai.
+MIN_WORDS, MAX_WORDS = 90, 125
 
 
 def sanitize(text):
