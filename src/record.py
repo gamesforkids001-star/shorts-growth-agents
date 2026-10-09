@@ -1,8 +1,11 @@
 """record.py - tool page ki screen recording (Playwright).
 
+Ab live site nahi khulti. Repo ke tools_local/<slug>.html se recording hoti hai.
+
 record_demo(tool, demo, out_dir) -> (recording_path, trim_start)
 """
 import os
+import re
 import time
 from pathlib import Path
 
@@ -10,37 +13,36 @@ from playwright.sync_api import sync_playwright
 
 VIEW_W, VIEW_H = 960, 1130  # video.py ke recording area se match
 
-BOT_PHRASES = [
-    "unusual traffic", "automated queries", "automated checks",
-    "verify you are human", "are you a robot", "captcha",
-    "access denied", "too many requests", "checking your browser",
-]
+LOCAL_DIR = "tools_local"
 
 
 class BotCheckError(Exception):
-    """Page par bot-check aya: video na banao, skip/retry karo."""
+    """Purana naam (main.py import kare to chal jaye). Ab use nahi hota."""
 
 
 class RecordError(Exception):
-    """Recording ke dauran koi aur masla."""
+    """Recording ke dauran koi masla."""
 
 
 def _log(msg):
     print("[record] " + str(msg), flush=True)
 
 
-def _page_text(page):
-    try:
-        return (page.inner_text("body", timeout=5000) or "").lower()
-    except Exception:
-        return ""
+def _slug(tool):
+    s = tool.get("slug") or tool.get("name") or tool.get("title") or ""
+    s = re.sub(r"[^a-z0-9]+", "-", str(s).lower()).strip("-")
+    if not s:
+        raise RecordError("tool ka slug/name nahi mila")
+    return s
 
 
-def _check_bot(page):
-    text = _page_text(page)
-    for p in BOT_PHRASES:
-        if p in text:
-            raise BotCheckError("bot-check mila: " + p)
+def _local_url(tool, repo_root):
+    """tools_local/<slug>.html ka file:// address. Na mile to error."""
+    f = Path(repo_root) / LOCAL_DIR / (_slug(tool) + ".html")
+    f = f.resolve()
+    if not f.exists():
+        raise RecordError("local html nahi mili: %s/%s.html" % (LOCAL_DIR, _slug(tool)))
+    return f.as_uri()
 
 
 def _dump_elements(page):
@@ -147,24 +149,9 @@ def _run_step(page, step, repo_root):
     page.wait_for_timeout(int(step.get("after_ms", 500)))
 
 
-def _precheck(p, url):
-    """Recording se pehle: page kholo (bina record), bot-check dekho."""
-    browser = p.chromium.launch(args=["--no-sandbox"])
-    try:
-        ctx = browser.new_context(viewport={"width": VIEW_W, "height": VIEW_H})
-        page = ctx.new_page()
-        page.goto(url, wait_until="domcontentloaded", timeout=45000)
-        page.wait_for_timeout(2500)
-        _check_bot(page)
-        _dump_elements(page)
-        ctx.close()
-    finally:
-        browser.close()
-
-
 def record_demo(tool, demo, out_dir, max_seconds=55, repo_root=".", attempts=2):
-    """Returns (recording_path, trim_start). Bot-check par BotCheckError."""
-    url = tool["url"]
+    """Returns (recording_path, trim_start)."""
+    url = _local_url(tool, repo_root)  # local file, live site nahi
     steps = demo.get("steps", []) if isinstance(demo, dict) else (demo or [])
     if not steps:
         raise RecordError("is demo mein steps nahi hain")
@@ -174,8 +161,6 @@ def record_demo(tool, demo, out_dir, max_seconds=55, repo_root=".", attempts=2):
     for n in range(1, attempts + 1):
         try:
             return _record_once(url, steps, out_dir, max_seconds, repo_root)
-        except BotCheckError:
-            raise
         except Exception as e:
             last = e
             _log("attempt %d fail: %s" % (n, e))
@@ -186,8 +171,6 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root):
     vid_dir = out_dir / ("rec_%d" % int(time.time()))
     vid_dir.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as p:
-        _precheck(p, url)  # bot-check pehle
-
         browser = p.chromium.launch(args=["--no-sandbox"])
         ctx = browser.new_context(
             viewport={"width": VIEW_W, "height": VIEW_H},
@@ -198,9 +181,8 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root):
         t0 = time.time()  # video yahin se shuru hoti hai
         trim_start = 0.0
         try:
-            page.goto(url, wait_until="domcontentloaded", timeout=45000)
-            page.wait_for_timeout(2500)
-            _check_bot(page)
+            page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_timeout(1000)
             # loading wala hissa video se kaat do
             trim_start = max(0.0, time.time() - t0 - 0.3)
             for step in steps:
