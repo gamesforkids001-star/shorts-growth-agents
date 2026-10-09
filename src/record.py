@@ -4,7 +4,8 @@ Ab live site nahi khulti. Repo ke tools_local/<slug>.html se recording hoti hai.
 
 record_demo(tool, demo, out_dir, ...) -> (recording_path, trim_start, marks)
 
-v5 (22 tools ke liye generic):
+v6 (22 tools ke liye generic):
+- tools_local/<slug>.html na ho to theme XML se build_local.py khud bana deta hai.
 - type: pehle box khali karta hai (number/date/prefilled boxes mein bhi sahi chalta hai).
 - set: range/color/date jaise inputs ki value set karta hai (input + change event ke saath).
 - upload: ek se zyada file ("files": [...]) aur samples/ ki file na ho to khud bana leta hai.
@@ -54,11 +55,21 @@ def _slug(tool):
 
 
 def _local_url(tool, repo_root):
-    """tools_local/<slug>.html ka file:// address. Na mile to error."""
-    f = Path(repo_root) / LOCAL_DIR / (_slug(tool) + ".html")
-    f = f.resolve()
+    """tools_local/<slug>.html ka file:// address. Page na ho to theme XML se khud bana leta hai."""
+    slug = _slug(tool)
+    f = (Path(repo_root) / LOCAL_DIR / (slug + ".html")).resolve()
     if not f.exists():
-        raise RecordError("local html nahi mili: %s/%s.html" % (LOCAL_DIR, _slug(tool)))
+        try:
+            try:
+                from . import build_local
+            except ImportError:
+                import build_local
+            build_local.build_all(repo_root, only=[slug], log=_log)
+        except Exception as e:
+            raise RecordError("local html nahi mili (%s/%s.html) aur bana bhi nahi saki: %s. "
+                              "Theme XML file repo mein upload karo." % (LOCAL_DIR, slug, e))
+        if not f.exists():
+            raise RecordError("local html nahi mili: %s/%s.html" % (LOCAL_DIR, slug))
     return f.as_uri()
 
 
