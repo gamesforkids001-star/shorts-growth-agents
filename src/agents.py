@@ -20,34 +20,44 @@ NO_CTA = (
 )
 
 
+def _kind(s):
+    """Step ka naam (purane 'do' aur naye 'action' dono chalte hain)."""
+    return str(s.get("do") or s.get("action") or s.get("op") or s.get("type") or "").lower()
+
+
 def _describe_demo(demo):
     """Demo ke steps ko seedhe lafzon mein likhta hai, taake narration wahi bole jo screen par ho raha hai."""
     if not demo:
         return "No fixed demo. Describe using the tool in general terms only."
     lines = []
     for s in demo.get("steps", []):
-        do = s.get("do")
-        if do == "type":
+        k = _kind(s)
+        if k == "type":
             lines.append(f'the text "{s.get("text", "")}" is typed into the tool')
-        elif do == "click":
+        elif k == "click":
             lines.append(f'the "{s.get("label") or s.get("selector", "a control")}" control is clicked')
-        elif do == "select":
+        elif k == "select":
             lines.append(f'the option "{s.get("value", "")}" is chosen')
-        elif do == "upload":
+        elif k == "upload":
             lines.append("a small sample file is added")
+        elif k in ("highlight", "focus"):
+            lines.append(f'the "{s.get("label") or "result"}" part of the tool is highlighted with a yellow frame')
+        elif k == "scroll_to":
+            lines.append(f'the view moves down to the "{s.get("label") or "next"}" part of the tool')
     return f'{demo.get("title", "")}. On screen: ' + "; then ".join(lines) + "."
 
 
 def idea_and_script(tool, info, recent, policies, site_name, v, recent_openers, issues=None):
     demo = v.get("demo")
     fix = f"\nA previous draft had these problems, fix them: {issues}\n" if issues else ""
-    prompt = f"""Write the voice-over for a 30-40 second vertical Short. The viewer sees a real screen
+    prompt = f"""Write the voice-over for a 45 second vertical Short. The viewer sees a real screen
 recording of this free browser tool being used, and hears your narration over it.
+The tool fills the whole screen, so the viewer can read it. Your job is to EXPLAIN the tool clearly.
 
 Tool: {tool['name']}
 Tool description (the ONLY source of facts): {info['text']}
 
-What happens on screen (your narration must match this exactly, and must not describe anything else):
+What happens on screen, in order (your narration follows this order):
 {_describe_demo(demo)}
 
 Recent topics (do NOT repeat the angle or wording): {recent}
@@ -59,21 +69,26 @@ Video format for THIS video: {FORMATS[v['format']]}
 Opening style: {HOOKS[v['hook']]}
 Recent opening lines used before (start differently, do not reuse their pattern): {recent_openers}
 {fix}
+Structure (one flowing piece, no headings, no list):
+1. Hook (1 sentence): a real everyday problem this tool solves, as a question or a plain statement.
+2. What it is (1 sentence): name the tool and what it is for, using only the tool description.
+3. Walk-through (5-7 sentences): go through the on-screen steps in order. When a part of the tool is
+   highlighted, say what that part is for, using only facts from the tool description.
+4. Closing (1 sentence): a plain sentence that only states what was shown.
+
 Rules:
-- Speak naturally, as one flowing piece, not a list of separate scenes.
-- Talk ONLY about the on-screen steps listed above. Do NOT list or mention any feature of the tool
-  that is not one of those on-screen steps (for example, do not say what else the tool can count or check).
+- Explain what each shown part DOES, in simple words, but never mention any feature that is not in
+  the tool description or not shown on screen.
 - Do NOT say the word "button" and do not mention clicking, unless a click step is listed above.
-- Do not read out exact results, numbers or counts, because you cannot see them. If you mention the
-  outcome at all, keep it vague, for example "and you can see the tool respond".
+- Do not read out exact results, numbers or counts, because you cannot see them.
 - No superlatives (best, #1, fastest), no stats.
 - NEVER use any of these words or phrases: {AVOID}. Use plain words like "quickly" instead of "instantly".
 - NO call to action of any kind. Never use these words or anything like them: {NO_CTA}.
   Never tell the viewer to do anything and never mention a profile, a link or a website address.
 - Do not say or write any URL.
-- End with one short, plain closing sentence that only states what was shown
-  (example style: "That is the {tool['name']}, a free tool that runs in the browser."). It must not ask or tell the viewer to do anything.
-- Total 40-65 words.
+- The closing sentence must not ask or tell the viewer to do anything
+  (example style: "That is the {tool['name']}, a free tool that runs in the browser.").
+- Short sentences, easy to speak. Total 95-115 words (this is about 45 seconds).
 
 Return JSON only: {{"topic": "short topic label", "narration": "the full voice-over text"}}"""
     plan = ask_json(prompt, SYSTEM, 0.9)
