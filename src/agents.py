@@ -30,20 +30,44 @@ def _beat_texts(demo):
         k = _norm_step(s)
         label = s.get("label") or ""
         if k == "type":
-            t = str(s.get("text", ""))
+            t = str(s.get("text", "")).replace("\n", " / ")
             t = t if len(t) <= 60 else t[:57] + "..."
-            out.append(f'the text "{t}" is typed into the tool')
+            out.append(f'the text "{t}" is typed into the {label or "tool"}')
         elif k == "click":
             out.append(f'the "{label or s.get("selector", "a control")}" control is pressed')
         elif k == "select":
-            out.append(f'the option "{s.get("value", "")}" is chosen')
+            out.append(f'the "{label or "list"}" is set to "{s.get("value", "")}"')
+        elif k == "set":
+            out.append(f'the "{label or "setting"}" is changed to {s.get("value", "")}')
         elif k == "upload":
-            out.append("a small sample file is added")
+            n = len(s.get("files") or [1])
+            what = label or "file"
+            out.append(f'a small sample file is added ({what})' if n == 1
+                       else f'{n} small sample files are added ({what})')
         elif k == "highlight":
             out.append(f'the "{label or "result"}" part of the tool is shown with a yellow frame')
         elif k == "scroll_to":
             out.append(f'the view moves down to the "{label or "next"}" part of the tool')
     return out
+
+
+def _beat_labels(demo):
+    """Har narrated step ka chhota naam (agar LLM kam jumle de to bharne ke kaam aata hai)."""
+    steps = demo.get("steps", []) if demo else []
+    out = []
+    for i in narrated_indices(steps):
+        s = steps[i]
+        out.append(str(s.get("label") or "tool"))
+    return out
+
+
+def _clean_beats(plan, n):
+    got = [" ".join(str(b).split()) for b in (plan.get("beats") or []) if str(b).strip()]
+    if n and len(got) > n:  # zyada hon to aakhri mein jod do
+        got = got[:n - 1] + [" ".join(got[n - 1:])]
+    if not n:
+        got = []
+    return got
 
 
 def idea_and_script(tool, info, recent, policies, site_name, v, recent_openers, issues=None):
@@ -52,14 +76,15 @@ def idea_and_script(tool, info, recent, policies, site_name, v, recent_openers, 
     beats = _beat_texts(demo)
     n = len(beats)
     if n:
-        bw = max(6, min(16, round((108 - 42) / n)))
+        # intro (~22) + closing (~12) = ~34 words; baqi beats mein baanto, total ~96
+        bw = max(8, min(22, round((96 - 34) / n)))
         beat_list = "\n".join(f"Beat {i + 1}: {b}" for i, b in enumerate(beats))
-        beat_rule = (f'"beats": a list of EXACTLY {n} sentences, one for each beat above, in the same order. '
-                     f"Each is ONE short sentence of about {bw} words. While that beat happens on screen, "
+        beat_rule = (f'"beats": a list of EXACTLY {n} items, one for each beat above, in the same order. '
+                     f"Each item is ONE short sentence of about {bw} words. While that beat happens on screen, "
                      "the sentence says what is happening and what that part of the tool is for.")
     else:
         beat_list = "(no separate beats)"
-        beat_rule = '"beats": an empty list []. Put the whole explanation into "intro" (5-6 sentences, about 60 words).'
+        beat_rule = '"beats": an empty list []. Put the whole explanation into "intro" (5-6 sentences, about 75 words).'
 
     prompt = f"""Write the voice-over for a 45 second vertical Short. The viewer sees a real screen
 recording of this free browser tool being used, and hears your narration over it.
@@ -82,7 +107,7 @@ Opening style: {HOOKS[v['hook']]}
 Recent opening lines used before (start differently, do not reuse their pattern): {recent_openers}
 {fix}
 Return these parts:
-- "intro": 2 sentences, about 30 words. Sentence 1 is the hook: a real everyday problem this tool solves,
+- "intro": 2 short sentences, about 22 words. Sentence 1 is the hook: a real everyday problem this tool solves,
   as a question or a plain statement. Sentence 2 names the tool and what it is for (tool description only).
   It is spoken while the tool is shown before anything moves.
 - {beat_rule}
@@ -101,21 +126,22 @@ Rules:
 - The closing sentence must not ask or tell the viewer to do anything
   (example style: "That is the {tool['name']}, a free tool that runs in the browser.").
 - Short sentences, easy to speak. LENGTH IS STRICT: intro + all beats + closing together must be
-  100-115 words. Count before answering. Never more than 115 and never fewer than 95.
+  92-102 words. Count before answering. Never more than 102 and never fewer than 92.
 
 Return JSON only: {{"topic": "short topic label", "intro": "...", "beats": ["..."], "closing": "..."}}"""
 
     plan = None
-    for _ in range(2):
+    got = []
+    for _ in range(3):
         plan = ask_json(prompt, SYSTEM, 0.9)
-        got = plan.get("beats")
-        if isinstance(got, list) and (len(got) == n or (n and got)):
+        got = _clean_beats(plan, n)
+        if len(got) == n:  # poori ginti chahiye, warna dobara
             break
-    got = [" ".join(str(b).split()) for b in (plan.get("beats") or []) if str(b).strip()]
-    if n and len(got) > n:  # zyada hon to aakhri mein jod do
-        got = got[:n - 1] + [" ".join(got[n - 1:])]
-    if not n:
-        got = []
+    # teen koshish ke baad bhi kam hon to baqi steps ke liye chhota jumla bhar do (sync na tute)
+    if n and len(got) < n:
+        labels = _beat_labels(demo)
+        for j in range(len(got), n):
+            got.append(f"Here is the {labels[j] if j < len(labels) else 'tool'}.")
     intro = " ".join(str(plan.get("intro", "")).split())
     closing = " ".join(str(plan.get("closing", "")).split())
     segments = [intro] + got + [closing]
