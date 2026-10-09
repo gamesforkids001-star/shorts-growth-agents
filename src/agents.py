@@ -6,6 +6,13 @@ SYSTEM = (
     "Be honest, original and helpful. Never invent facts, features or statistics."
 )
 
+# Ye lafz/phrases kabhi use nahi karne (policy.py ki BANNED list ke mutabiq)
+AVOID = (
+    "instantly, guaranteed, 100%, free money, giveaway, follow for follow, click here, "
+    "like and share, tag a friend, make money, get rich, you won't believe, shocking, "
+    "hack, cure, miracle, number one, best ever"
+)
+
 
 def _describe_demo(demo):
     """Demo ke steps ko seedhe lafzon mein likhta hai, taake narration wahi bole jo screen par ho raha hai."""
@@ -51,6 +58,7 @@ Rules:
 - Speak naturally, as one flowing piece, not a list of separate scenes.
 - Do not read out exact results, numbers or counts, because you cannot see them. Say things like "and the result shows up right away".
 - Only claim what the tool description supports. No superlatives (best, #1, fastest), no stats.
+- NEVER use any of these words or phrases: {AVOID}. Use plain words like "quickly" or "right away" instead of "instantly".
 - Do not say or write any URL.
 - The narration must END with exactly this sentence: "{cta}"
 - Total 55-85 words including that last sentence.
@@ -84,6 +92,8 @@ Facebook rules:
 Instagram rules:
 {policies['instagram']}
 
+NEVER use any of these words or phrases anywhere: {AVOID}.
+
 The three texts must be different in wording (not copy-paste), each in the style of its platform.
 Hashtags: words only, without the # sign, no spaces.
 
@@ -103,6 +113,7 @@ Problems found: {issues}
 Rules:
 {policies['general']}
 {policies[platform]}
+NEVER use any of these words or phrases: {AVOID}.
 Hashtags: words only, no # sign. Do not write URLs.
 
 Return JSON only with the same keys as the current text."""
