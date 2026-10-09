@@ -1,5 +1,6 @@
 from .llm import ask_json
 from .variety import FORMATS, HOOKS
+from .record import narrated_indices, _norm_step
 
 SYSTEM = (
     "You are a careful content team for a small free-tools website. "
@@ -20,45 +21,56 @@ NO_CTA = (
 )
 
 
-def _kind(s):
-    """Step ka naam (purane 'do' aur naye 'action' dono chalte hain)."""
-    return str(s.get("do") or s.get("action") or s.get("op") or s.get("type") or "").lower()
-
-
-def _describe_demo(demo):
-    """Demo ke steps ko seedhe lafzon mein likhta hai, taake narration wahi bole jo screen par ho raha hai."""
-    if not demo:
-        return "No fixed demo. Describe using the tool in general terms only."
-    lines = []
-    for s in demo.get("steps", []):
-        k = _kind(s)
+def _beat_texts(demo):
+    """Har narrated step ka seedha bayan, usi tarteeb mein jis mein screen par hota hai."""
+    steps = demo.get("steps", []) if demo else []
+    out = []
+    for i in narrated_indices(steps):
+        s = steps[i]
+        k = _norm_step(s)
+        label = s.get("label") or ""
         if k == "type":
-            lines.append(f'the text "{s.get("text", "")}" is typed into the tool')
+            t = str(s.get("text", ""))
+            t = t if len(t) <= 60 else t[:57] + "..."
+            out.append(f'the text "{t}" is typed into the tool')
         elif k == "click":
-            lines.append(f'the "{s.get("label") or s.get("selector", "a control")}" control is clicked')
+            out.append(f'the "{label or s.get("selector", "a control")}" control is pressed')
         elif k == "select":
-            lines.append(f'the option "{s.get("value", "")}" is chosen')
+            out.append(f'the option "{s.get("value", "")}" is chosen')
         elif k == "upload":
-            lines.append("a small sample file is added")
-        elif k in ("highlight", "focus"):
-            lines.append(f'the "{s.get("label") or "result"}" part of the tool is highlighted with a yellow frame')
+            out.append("a small sample file is added")
+        elif k == "highlight":
+            out.append(f'the "{label or "result"}" part of the tool is shown with a yellow frame')
         elif k == "scroll_to":
-            lines.append(f'the view moves down to the "{s.get("label") or "next"}" part of the tool')
-    return f'{demo.get("title", "")}. On screen: ' + "; then ".join(lines) + "."
+            out.append(f'the view moves down to the "{label or "next"}" part of the tool')
+    return out
 
 
 def idea_and_script(tool, info, recent, policies, site_name, v, recent_openers, issues=None):
     demo = v.get("demo")
     fix = f"\nA previous draft had these problems, fix them: {issues}\n" if issues else ""
+    beats = _beat_texts(demo)
+    n = len(beats)
+    if n:
+        bw = max(6, min(16, round((108 - 42) / n)))
+        beat_list = "\n".join(f"Beat {i + 1}: {b}" for i, b in enumerate(beats))
+        beat_rule = (f'"beats": a list of EXACTLY {n} sentences, one for each beat above, in the same order. '
+                     f"Each is ONE short sentence of about {bw} words. While that beat happens on screen, "
+                     "the sentence says what is happening and what that part of the tool is for.")
+    else:
+        beat_list = "(no separate beats)"
+        beat_rule = '"beats": an empty list []. Put the whole explanation into "intro" (5-6 sentences, about 60 words).'
+
     prompt = f"""Write the voice-over for a 45 second vertical Short. The viewer sees a real screen
 recording of this free browser tool being used, and hears your narration over it.
-The tool fills the whole screen, so the viewer can read it. Your job is to EXPLAIN the tool clearly.
+The narration is split into parts, and each part is spoken exactly while its beat is on screen.
+Your job is to EXPLAIN the tool clearly.
 
 Tool: {tool['name']}
 Tool description (the ONLY source of facts): {info['text']}
 
-What happens on screen, in order (your narration follows this order):
-{_describe_demo(demo)}
+Beats on screen, in order:
+{beat_list}
 
 Recent topics (do NOT repeat the angle or wording): {recent}
 
@@ -69,17 +81,17 @@ Video format for THIS video: {FORMATS[v['format']]}
 Opening style: {HOOKS[v['hook']]}
 Recent opening lines used before (start differently, do not reuse their pattern): {recent_openers}
 {fix}
-Structure (one flowing piece, no headings, no list):
-1. Hook (1 sentence): a real everyday problem this tool solves, as a question or a plain statement.
-2. What it is (1 sentence): name the tool and what it is for, using only the tool description.
-3. Walk-through (5-7 sentences): go through the on-screen steps in order. When a part of the tool is
-   highlighted, say what that part is for, using only facts from the tool description.
-4. Closing (1 sentence): a plain sentence that only states what was shown.
+Return these parts:
+- "intro": 2 sentences, about 30 words. Sentence 1 is the hook: a real everyday problem this tool solves,
+  as a question or a plain statement. Sentence 2 names the tool and what it is for (tool description only).
+  It is spoken while the tool is shown before anything moves.
+- {beat_rule}
+- "closing": 1 plain sentence, about 12 words, that only states what was shown.
 
 Rules:
 - Explain what each shown part DOES, in simple words, but never mention any feature that is not in
   the tool description or not shown on screen.
-- Do NOT say the word "button" and do not mention clicking, unless a click step is listed above.
+- Do NOT say the word "button" and do not mention clicking, unless a click beat is listed above.
 - Do not read out exact results, numbers or counts, because you cannot see them.
 - No superlatives (best, #1, fastest), no stats.
 - NEVER use any of these words or phrases: {AVOID}. Use plain words like "quickly" instead of "instantly".
@@ -88,23 +100,41 @@ Rules:
 - Do not say or write any URL.
 - The closing sentence must not ask or tell the viewer to do anything
   (example style: "That is the {tool['name']}, a free tool that runs in the browser.").
-- Short sentences, easy to speak. LENGTH IS STRICT: aim for 100-115 words in total (about 45 seconds).
-  Count your words before answering. Never write more than 115 words and never fewer than 95.
-  If your draft is longer than 115 words, shorten the walk-through.
+- Short sentences, easy to speak. LENGTH IS STRICT: intro + all beats + closing together must be
+  100-115 words. Count before answering. Never more than 115 and never fewer than 95.
 
-Return JSON only: {{"topic": "short topic label", "narration": "the full voice-over text"}}"""
-    plan = ask_json(prompt, SYSTEM, 0.9)
-    text = " ".join(str(plan.get("narration", "")).split())
-    plan["narration"] = text
+Return JSON only: {{"topic": "short topic label", "intro": "...", "beats": ["..."], "closing": "..."}}"""
+
+    plan = None
+    for _ in range(2):
+        plan = ask_json(prompt, SYSTEM, 0.9)
+        got = plan.get("beats")
+        if isinstance(got, list) and (len(got) == n or (n and got)):
+            break
+    got = [" ".join(str(b).split()) for b in (plan.get("beats") or []) if str(b).strip()]
+    if n and len(got) > n:  # zyada hon to aakhri mein jod do
+        got = got[:n - 1] + [" ".join(got[n - 1:])]
+    if not n:
+        got = []
+    intro = " ".join(str(plan.get("intro", "")).split())
+    closing = " ".join(str(plan.get("closing", "")).split())
+    segments = [intro] + got + [closing]
+    segments = [s for s in segments if s]
+    # beats ginti: intro aur closing ke darmiyan
+    plan["segments"] = segments
+    plan["n_beats"] = max(0, len(segments) - 2)
+    plan["narration"] = " ".join(segments)
     plan["demo_id"] = (demo or {}).get("id", "")
     return plan
 
 
-def metadata(plan, tool, policies, recent_titles=()):
+def metadata(plan, tool, policies, recent_titles=(), info=None):
+    desc = (info or {}).get("text", "") if isinstance(info, dict) else ""
     prompt = f"""Write separate, platform-specific text for the same short video.
 Video topic: {plan['topic']}
 Voice-over: {plan['narration']}
 Tool: {tool['name']}
+Tool description (the ONLY source of facts about the tool): {desc}
 Recent titles (use a different title structure and different words): {list(recent_titles)}
 
 General rules:
@@ -120,6 +150,8 @@ Instagram rules:
 {policies['instagram']}
 
 NEVER use any of these words or phrases anywhere: {AVOID}.
+Do NOT claim anything about the tool that is not in the tool description above or in the voice-over
+(for example: "no sign up", "no registration", "no download", "private", "works offline", "always free").
 
 The three texts must be different in wording (not copy-paste), each in the style of its platform.
 Hashtags: words only, without the # sign, no spaces.
