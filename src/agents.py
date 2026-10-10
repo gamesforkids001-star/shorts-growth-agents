@@ -20,8 +20,6 @@ NO_CTA = (
     "go to, head to, try it, give it a try, download"
 )
 
-_NUM_WORDS = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
-
 
 def _beat_texts(demo):
     """Har narrated step ka seedha bayan, usi tarteeb mein jis mein screen par hota hai."""
@@ -42,16 +40,10 @@ def _beat_texts(demo):
         elif k == "set":
             out.append(f'the "{label or "setting"}" is changed to {s.get("value", "")}')
         elif k == "upload":
-            # file ginti saaf likho: 1 ho to "single/one", zyada ho to poori ginti (req 9: jo screen par wohi awaaz mein)
-            n = len(s.get("files") or ([s.get("file") or s.get("path")] if (s.get("file") or s.get("path")) else [1]))
+            n = len(s.get("files") or [1])
             what = label or "file"
-            word = _NUM_WORDS.get(n, str(n))
-            if n == 1:
-                out.append(f'ONE single sample file is added ({what}); say "a single file" or "one file", '
-                           'never "files", "multiple" or "several"')
-            else:
-                out.append(f'exactly {word} sample files are added together ({what}); say "{word} files", '
-                           'never "a single file"')
+            out.append(f'a small sample file is added ({what})' if n == 1
+                       else f'{n} small sample files are added ({what})')
         elif k == "highlight":
             out.append(f'the "{label or "result"}" part of the tool is shown with a yellow frame')
         elif k == "scroll_to":
@@ -130,8 +122,6 @@ Rules:
 - NEVER use any of these words or phrases: {AVOID}. Use plain words like "quickly" instead of "instantly".
 - NO call to action of any kind. Never use these words or anything like them: {NO_CTA}.
   Never tell the viewer to do anything and never mention a profile, a link or a website address.
-- FILE COUNTS: say exactly how many files are added in a beat (one single file, or two files, and so on).
-  If a beat says ONE single file, never say "files", "multiple", "several" or "many". Say only what is on screen.
 - Do not say or write any URL.
 - The closing sentence must not ask or tell the viewer to do anything
   (example style: "That is the {tool['name']}, a free tool that runs in the browser.").

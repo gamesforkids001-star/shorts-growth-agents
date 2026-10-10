@@ -73,4 +73,4 @@ def page_info(tool):
         "description": tool["description"],
         "text": (tool["description"] + " Angle ideas (choose ONE that was not used recently): "
                  + " | ".join(tool.get("angles", [])) + ". Site facts: " + FACTS),
-}
+    }
