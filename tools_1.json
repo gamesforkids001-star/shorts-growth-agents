@@ -1,0 +1,683 @@
+[
+ {
+  "slug": "word-counter",
+  "name": "Word Counter",
+  "description": "Count words, characters, sentences and paragraphs, with reading time and keyword density.",
+  "angles": [
+   "check an essay or assignment against a word limit",
+   "check meta descriptions and social posts against character limits",
+   "estimate how long a blog post takes to read",
+   "spot overused words with keyword density",
+   "works with Urdu and Arabic text too"
+  ],
+  "demos": [
+   {
+    "id": "essay-check",
+    "title": "Checking the length of a short essay",
+    "steps": [
+     {
+      "do": "wait",
+      "seconds": 2
+     },
+     {
+      "do": "highlight",
+      "selector": "#wc-in",
+      "label": "text box",
+      "hold_ms": 3000
+     },
+     {
+      "do": "click",
+      "selector": "#wc-in"
+     },
+     {
+      "do": "type",
+      "selector": "#wc-in",
+      "text": "Reading every day is a small habit that can make a big difference. Even ten minutes before bed helps you relax and learn something new.",
+      "delay": 50
+     },
+     {
+      "do": "wait",
+      "seconds": 6
+     },
+     {
+      "do": "scroll",
+      "y": 450
+     },
+     {
+      "do": "wait",
+      "seconds": 7
+     },
+     {
+      "do": "highlight",
+      "selector": "#wc-stop",
+      "label": "ignore common words option",
+      "hold_ms": 3000
+     },
+     {
+      "do": "wait",
+      "seconds": 5.5
+     }
+    ]
+   },
+   {
+    "id": "social-post",
+    "title": "Checking a short social media caption",
+    "steps": [
+     {
+      "do": "wait",
+      "seconds": 2
+     },
+     {
+      "do": "highlight",
+      "selector": "#wc-in",
+      "label": "text box",
+      "hold_ms": 3000
+     },
+     {
+      "do": "click",
+      "selector": "#wc-in"
+     },
+     {
+      "do": "type",
+      "selector": "#wc-in",
+      "text": "New week, new goals. Start small, stay consistent and keep going.",
+      "delay": 55
+     },
+     {
+      "do": "wait",
+      "seconds": 8
+     },
+     {
+      "do": "scroll",
+      "y": 450
+     },
+     {
+      "do": "wait",
+      "seconds": 8
+     },
+     {
+      "do": "highlight",
+      "selector": "#wc-stop",
+      "label": "ignore common words option",
+      "hold_ms": 3000
+     },
+     {
+      "do": "wait",
+      "seconds": 5.5
+     }
+    ]
+   },
+   {
+    "id": "description-length",
+    "title": "Checking a product description length",
+    "steps": [
+     {
+      "do": "wait",
+      "seconds": 2
+     },
+     {
+      "do": "highlight",
+      "selector": "#wc-in",
+      "label": "text box",
+      "hold_ms": 3000
+     },
+     {
+      "do": "click",
+      "selector": "#wc-in"
+     },
+     {
+      "do": "type",
+      "selector": "#wc-in",
+      "text": "A simple notebook with a hard cover and plain pages, great for notes, lists and daily planning.",
+      "delay": 50
+     },
+     {
+      "do": "wait",
+      "seconds": 7
+     },
+     {
+      "do": "scroll",
+      "y": 450
+     },
+     {
+      "do": "wait",
+      "seconds": 8
+     },
+     {
+      "do": "highlight",
+      "selector": "#wc-stop",
+      "label": "ignore common words option",
+      "hold_ms": 3000
+     },
+     {
+      "do": "wait",
+      "seconds": 5.5
+     }
+    ]
+   },
+   {
+    "id": "sample-keywords",
+    "title": "Loading sample text and reading the keyword density table",
+    "steps": [
+     {
+      "do": "wait",
+      "seconds": 2
+     },
+     {
+      "do": "highlight",
+      "selector": "#wc-sample",
+      "label": "sample text option",
+      "hold_ms": 3000
+     },
+     {
+      "do": "click",
+      "selector": "#wc-sample"
+     },
+     {
+      "do": "wait",
+      "seconds": 6.5
+     },
+     {
+      "do": "scroll",
+      "y": 450
+     },
+     {
+      "do": "wait",
+      "seconds": 8
+     },
+     {
+      "do": "highlight",
+      "selector": "#wc-stop",
+      "label": "ignore common words option",
+      "hold_ms": 3000
+     },
+     {
+      "do": "click",
+      "selector": "#wc-stop"
+     },
+     {
+      "do": "wait",
+      "seconds": 9
+     }
+    ]
+   },
+   {
+    "id": "clear-and-retry",
+    "title": "Typing a line, clearing it and trying another",
+    "steps": [
+     {
+      "do": "wait",
+      "seconds": 2
+     },
+     {
+      "do": "highlight",
+      "selector": "#wc-in",
+      "label": "text box",
+      "hold_ms": 3000
+     },
+     {
+      "do": "click",
+      "selector": "#wc-in"
+     },
+     {
+      "do": "type",
+      "selector": "#wc-in",
+      "text": "Short and sweet wins the day.",
+      "delay": 60
+     },
+     {
+      "do": "wait",
+      "seconds": 4
+     },
+     {
+      "do": "highlight",
+      "selector": "#wc-clear",
+      "label": "clear option",
+      "hold_ms": 2500
+     },
+     {
+      "do": "click",
+      "selector": "#wc-clear"
+     },
+     {
+      "do": "wait",
+      "seconds": 1.5
+     },
+     {
+      "do": "type",
+      "selector": "#wc-in",
+      "text": "Clear writing is easier to read and easier to remember.",
+      "delay": 55
+     },
+     {
+      "do": "wait",
+      "seconds": 6
+     },
+     {
+      "do": "scroll",
+      "y": 450
+     },
+     {
+      "do": "wait",
+      "seconds": 6
+     }
+    ]
+   },
+   {
+    "id": "ignore-common-words",
+    "title": "Turning common words on and off in keyword density",
+    "steps": [
+     {
+      "do": "wait",
+      "seconds": 2
+     },
+     {
+      "do": "highlight",
+      "selector": "#wc-sample",
+      "label": "sample text option",
+      "hold_ms": 2500
+     },
+     {
+      "do": "click",
+      "selector": "#wc-sample"
+     },
+     {
+      "do": "wait",
+      "seconds": 3
+     },
+     {
+      "do": "scroll",
+      "y": 500
+     },
+     {
+      "do": "wait",
+      "seconds": 6
+     },
+     {
+      "do": "highlight",
+      "selector": "#wc-stop",
+      "label": "ignore common words option",
+      "hold_ms": 3000
+     },
+     {
+      "do": "click",
+      "selector": "#wc-stop"
+     },
+     {
+      "do": "wait",
+      "seconds": 6
+     },
+     {
+      "do": "click",
+      "selector": "#wc-stop"
+     },
+     {
+      "do": "wait",
+      "seconds": 8
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "case-converter",
+  "name": "Case Converter",
+  "description": "Change text to UPPER, lower, Title, Sentence, camelCase, snake_case, kebab-case and more.",
+  "angles": [
+   "fix text typed in all caps",
+   "make Title Case headings quickly",
+   "camelCase and snake_case for coders",
+   "kebab-case for clean URLs",
+   "convert text in one tap instead of retyping"
+  ],
+  "demos": [
+   {
+    "id": "headline-title-case",
+    "title": "Turning a plain headline into Title Case",
+    "steps": [
+     {
+      "do": "highlight",
+      "selector": "#cc-in",
+      "label": "text box",
+      "hold_ms": 2500
+     },
+     {
+      "do": "type",
+      "selector": "#cc-in",
+      "text": "how to write a clear headline for your blog post",
+      "label": "text box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "button[data-m=\"title\"]",
+      "label": "Title Case option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#cc-out",
+      "label": "result box",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "code-names",
+    "title": "Changing a phrase into camelCase and snake_case",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#cc-in",
+      "text": "user profile page settings",
+      "label": "text box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "button[data-m=\"camel\"]",
+      "label": "camelCase option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#cc-out",
+      "label": "result box",
+      "hold_ms": 2500
+     },
+     {
+      "do": "click",
+      "selector": "button[data-m=\"snake\"]",
+      "label": "snake_case option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#cc-out",
+      "label": "result box",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "password-generator",
+  "name": "Password Generator",
+  "description": "Create strong random passwords with a strength meter and one-click copy.",
+  "angles": [
+   "stop reusing the same password everywhere",
+   "read the strength meter before you choose",
+   "copy a password in one click",
+   "random passwords for new accounts",
+   "generated inside your browser"
+  ],
+  "demos": [
+   {
+    "id": "generate-and-meter",
+    "title": "Generating a password and reading the strength meter",
+    "steps": [
+     {
+      "do": "highlight",
+      "selector": "#pw-out",
+      "label": "password box",
+      "hold_ms": 2500
+     },
+     {
+      "do": "click",
+      "selector": "#pw-gen",
+      "label": "Generate option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#pw-bar",
+      "label": "strength meter",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "longer-password",
+    "title": "Making the password longer with the length slider",
+    "steps": [
+     {
+      "do": "set",
+      "selector": "#pw-len",
+      "value": "24",
+      "label": "length slider"
+     },
+     {
+      "do": "click",
+      "selector": "#pw-gen",
+      "label": "Generate option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#pw-out",
+      "label": "password box",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "qr-code-generator",
+  "name": "QR Code Generator",
+  "description": "Turn any link or text into a QR code with custom colors, size and PNG or SVG download.",
+  "angles": [
+   "turn a link into a QR code",
+   "choose your own QR colors",
+   "download as PNG or SVG",
+   "share plain text with a QR code",
+   "no sign-up needed"
+  ],
+  "demos": [
+   {
+    "id": "text-to-qr",
+    "title": "Turning a short line of text into a QR code",
+    "steps": [
+     {
+      "do": "highlight",
+      "selector": "#qr-text",
+      "label": "text box",
+      "hold_ms": 2500
+     },
+     {
+      "do": "type",
+      "selector": "#qr-text",
+      "text": "Welcome to our cafe, open daily",
+      "label": "text box",
+      "delay": 55
+     },
+     {
+      "do": "highlight",
+      "selector": "#qr-cv",
+      "label": "QR code",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "colored-qr",
+    "title": "Changing the QR code color",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#qr-text",
+      "text": "Meeting room 5, second floor",
+      "label": "text box",
+      "delay": 55
+     },
+     {
+      "do": "set",
+      "selector": "#qr-fg",
+      "value": "#7c3aed",
+      "label": "QR color picker"
+     },
+     {
+      "do": "highlight",
+      "selector": "#qr-cv",
+      "label": "QR code",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "age-calculator",
+  "name": "Age Calculator",
+  "description": "Find your exact age in years, months and days, plus a countdown to your next birthday.",
+  "angles": [
+   "exact age for a form",
+   "countdown to your next birthday",
+   "age in years, months and days",
+   "check a friend's exact age",
+   "quick answer without doing the math"
+  ],
+  "demos": [
+   {
+    "id": "exact-age",
+    "title": "Finding an exact age from a birth date",
+    "steps": [
+     {
+      "do": "set",
+      "selector": "#ag-dob",
+      "value": "1995-06-15",
+      "label": "birth date field"
+     },
+     {
+      "do": "click",
+      "selector": "#ag-go",
+      "label": "calculate option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#ag-res",
+      "label": "result",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "another-date",
+    "title": "Trying a different birth date",
+    "steps": [
+     {
+      "do": "set",
+      "selector": "#ag-dob",
+      "value": "2000-12-25",
+      "label": "birth date field"
+     },
+     {
+      "do": "click",
+      "selector": "#ag-go",
+      "label": "calculate option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#ag-res",
+      "label": "result",
+      "hold_ms": 2500
+     },
+     {
+      "do": "click",
+      "selector": "#ag-reset",
+      "label": "reset option"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "bmi-calculator",
+  "name": "BMI Calculator",
+  "description": "Calculate body mass index in metric or imperial units with a clear category and healthy range.",
+  "angles": [
+   "metric or imperial, your choice",
+   "a clear category result",
+   "see the healthy range",
+   "quick check in seconds (say it is only a general guide, not medical advice)",
+   "private, nothing leaves your device"
+  ],
+  "demos": [
+   {
+    "id": "metric-check",
+    "title": "Checking BMI with metric units",
+    "steps": [
+     {
+      "do": "click",
+      "selector": "#bm-t-m",
+      "label": "metric units tab"
+     },
+     {
+      "do": "type",
+      "selector": "#bm-cm",
+      "text": "170",
+      "label": "height in centimeters",
+      "delay": 55
+     },
+     {
+      "do": "type",
+      "selector": "#bm-kg",
+      "text": "65",
+      "label": "weight in kilograms",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "#bm-go",
+      "label": "calculate option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#bm-res",
+      "label": "result",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "imperial-check",
+    "title": "Checking BMI with imperial units",
+    "steps": [
+     {
+      "do": "click",
+      "selector": "#bm-t-i",
+      "label": "imperial units tab"
+     },
+     {
+      "do": "type",
+      "selector": "#bm-ft",
+      "text": "5",
+      "label": "height in feet",
+      "delay": 55
+     },
+     {
+      "do": "type",
+      "selector": "#bm-in",
+      "text": "7",
+      "label": "height in inches",
+      "delay": 55
+     },
+     {
+      "do": "type",
+      "selector": "#bm-lb",
+      "text": "150",
+      "label": "weight in pounds",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "#bm-go",
+      "label": "calculate option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#bm-res",
+      "label": "result",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ }
+]

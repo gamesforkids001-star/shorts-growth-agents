@@ -1,0 +1,352 @@
+[
+ {
+  "slug": "remove-duplicate-lines",
+  "name": "Remove Duplicate Lines",
+  "description": "Paste a list and instantly remove repeated lines, with optional case-insensitive matching.",
+  "angles": [
+   "clean a list with repeated lines",
+   "case-insensitive matching option",
+   "tidy a list of names or emails",
+   "instant result after you paste",
+   "text stays in your browser"
+  ],
+  "demos": [
+   {
+    "id": "fruit-list",
+    "title": "Removing repeated lines from a short list",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#dl-in",
+      "text": "apple\nbanana\napple\ncherry\nbanana\ndate",
+      "label": "list box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "#dl-go",
+      "label": "remove duplicates option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#dl-out",
+      "label": "result box",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "ignore-case",
+    "title": "Matching repeated names regardless of letter case",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#dl-in",
+      "text": "Alice\nbob\nALICE\nCarol\nBob",
+      "label": "list box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "#dl-ci",
+      "label": "case-insensitive option"
+     },
+     {
+      "do": "click",
+      "selector": "#dl-go",
+      "label": "remove duplicates option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#dl-out",
+      "label": "result box",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "sort-text-lines",
+  "name": "Text Sorter",
+  "description": "Sort a list alphabetically, by length or numerically, with optional dedupe.",
+  "angles": [
+   "sort a list A to Z",
+   "sort by line length",
+   "sort numbers in order",
+   "remove duplicates while sorting",
+   "text stays in your browser"
+  ],
+  "demos": [
+   {
+    "id": "a-to-z",
+    "title": "Sorting a list from A to Z",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#ts-in",
+      "text": "pear\napple\nbanana\ncherry",
+      "label": "list box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "button[data-m=\"az\"]",
+      "label": "A to Z option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#ts-out",
+      "label": "result box",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "numbers",
+    "title": "Sorting numbers in order",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#ts-in",
+      "text": "10\n2\n33\n4\n21",
+      "label": "list box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "button[data-m=\"numeric\"]",
+      "label": "Numeric option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#ts-out",
+      "label": "result box",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "by-length",
+    "title": "Sorting lines from shortest to longest",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#ts-in",
+      "text": "kiwi\nwatermelon\nfig\nbanana",
+      "label": "list box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "button[data-m=\"shortlong\"]",
+      "label": "Shortest first option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#ts-out",
+      "label": "result box",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "random-number-generator",
+  "name": "Random Number Generator",
+  "description": "Generate one or many random numbers in a range you choose, with optional unique values and decimals.",
+  "angles": [
+   "pick a random number in your range",
+   "generate many numbers at once",
+   "unique values only option",
+   "decimals option",
+   "fair picks for games and giveaways"
+  ],
+  "demos": [
+   {
+    "id": "one-number",
+    "title": "Picking one random number in a range",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#rn-min",
+      "text": "1",
+      "label": "minimum box",
+      "delay": 55
+     },
+     {
+      "do": "type",
+      "selector": "#rn-max",
+      "text": "50",
+      "label": "maximum box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "#rn-go",
+      "label": "generate option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#rn-out",
+      "label": "result box",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "unique-numbers",
+    "title": "Picking several unique numbers",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#rn-count",
+      "text": "5",
+      "label": "how many box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "#rn-unique",
+      "label": "unique values option"
+     },
+     {
+      "do": "click",
+      "selector": "#rn-go",
+      "label": "generate option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#rn-out",
+      "label": "result box",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "file-info",
+  "name": "File Info Checker",
+  "description": "Check a file's type, extension, exact size and last-modified date before you use it.",
+  "angles": [
+   "check a file's exact size",
+   "check the file type and extension",
+   "see the last-modified date",
+   "check a file before you upload it",
+   "file is not uploaded anywhere"
+  ],
+  "demos": [
+   {
+    "id": "photo-info",
+    "title": "Checking the details of a photo",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#fi-file",
+      "files": [
+       "samples/photo.jpg"
+      ],
+      "label": "file upload",
+      "after_ms": 1200
+     },
+     {
+      "do": "highlight",
+      "selector": "#fi-list",
+      "label": "file details",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "pdf-info",
+    "title": "Checking the details of a PDF",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#fi-file",
+      "files": [
+       "samples/doc-a.pdf"
+      ],
+      "label": "file upload",
+      "after_ms": 1200
+     },
+     {
+      "do": "highlight",
+      "selector": "#fi-list",
+      "label": "file details",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "text-cleaner",
+  "name": "Text Cleaner",
+  "description": "Trim extra spaces, collapse blank lines, strip HTML tags and straighten smart quotes in one click.",
+  "angles": [
+   "remove extra spaces",
+   "collapse extra blank lines",
+   "strip HTML tags from text",
+   "straighten smart quotes",
+   "clean pasted text in one click"
+  ],
+  "demos": [
+   {
+    "id": "extra-spaces",
+    "title": "Cleaning extra spaces from pasted text",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#tc-in",
+      "text": "  Hello    world!   This   text  has   extra   spaces.  ",
+      "label": "text box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "#tc-go",
+      "label": "clean option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#tc-out",
+      "label": "result box",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "strip-html",
+    "title": "Removing HTML tags from text",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#tc-in",
+      "text": "<p>Hello <b>world</b>, this is <i>sample</i> text.</p>",
+      "label": "text box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "#tc-html",
+      "label": "strip HTML tags option"
+     },
+     {
+      "do": "click",
+      "selector": "#tc-go",
+      "label": "clean option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#tc-out",
+      "label": "result box",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ }
+]

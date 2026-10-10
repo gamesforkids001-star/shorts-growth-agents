@@ -1,0 +1,400 @@
+[
+ {
+  "slug": "unit-converter",
+  "name": "Unit Converter",
+  "description": "Convert length, weight, temperature, area, volume, speed and file sizes (KB, MB, GB, TB) with live results.",
+  "angles": [
+   "convert KB, MB, GB and TB",
+   "convert temperature",
+   "convert length and weight",
+   "convert area, volume and speed",
+   "results update live as you type"
+  ],
+  "demos": [
+   {
+    "id": "length-live",
+    "title": "Converting a length value",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#uc-val",
+      "text": "5",
+      "label": "value box",
+      "delay": 55
+     },
+     {
+      "do": "highlight",
+      "selector": "#uc-out",
+      "label": "converted result",
+      "hold_ms": 2500
+     },
+     {
+      "do": "click",
+      "selector": "#uc-swap",
+      "label": "swap option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#uc-out",
+      "label": "converted result",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "temperature-tab",
+    "title": "Switching to temperature",
+    "steps": [
+     {
+      "do": "click",
+      "selector": "button[data-c=\"temperature\"]",
+      "label": "Temperature tab"
+     },
+     {
+      "do": "type",
+      "selector": "#uc-val",
+      "text": "100",
+      "label": "value box",
+      "delay": 55
+     },
+     {
+      "do": "highlight",
+      "selector": "#uc-out",
+      "label": "converted result",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "data-tab",
+    "title": "Switching to data storage",
+    "steps": [
+     {
+      "do": "click",
+      "selector": "button[data-c=\"data\"]",
+      "label": "Data Storage tab"
+     },
+     {
+      "do": "type",
+      "selector": "#uc-val",
+      "text": "2",
+      "label": "value box",
+      "delay": 55
+     },
+     {
+      "do": "highlight",
+      "selector": "#uc-out",
+      "label": "converted result",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "json-formatter",
+  "name": "JSON Formatter",
+  "description": "Beautify, minify and validate JSON, with clear error messages showing line and column.",
+  "angles": [
+   "beautify messy JSON",
+   "minify JSON to save space",
+   "find the exact line and column of an error",
+   "validate JSON before you use it",
+   "runs in your browser"
+  ],
+  "demos": [
+   {
+    "id": "beautify-sample",
+    "title": "Beautifying sample JSON",
+    "steps": [
+     {
+      "do": "click",
+      "selector": "#js-sample",
+      "label": "sample option"
+     },
+     {
+      "do": "click",
+      "selector": "#js-beauty",
+      "label": "beautify option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#js-out",
+      "label": "formatted result",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "minify-sample",
+    "title": "Minifying sample JSON",
+    "steps": [
+     {
+      "do": "click",
+      "selector": "#js-sample",
+      "label": "sample option"
+     },
+     {
+      "do": "click",
+      "selector": "#js-min",
+      "label": "minify option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#js-out",
+      "label": "minified result",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "image-compressor",
+  "name": "Image Compressor",
+  "description": "Reduce JPG, PNG and WebP file size right in your browser, with before and after comparison.",
+  "angles": [
+   "make a photo smaller for upload limits",
+   "see a before and after comparison",
+   "works with JPG, PNG and WebP",
+   "compress without installing an app",
+   "images are not uploaded anywhere"
+  ],
+  "demos": [
+   {
+    "id": "compress-photo",
+    "title": "Adding a photo and seeing the size comparison",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#ic-file",
+      "files": [
+       "samples/photo.jpg"
+      ],
+      "label": "photo upload",
+      "after_ms": 1200
+     },
+     {
+      "do": "highlight",
+      "selector": "#ic-stats",
+      "label": "size comparison",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "lower-quality",
+    "title": "Lowering the quality slider",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#ic-file",
+      "files": [
+       "samples/photo.jpg"
+      ],
+      "label": "photo upload",
+      "after_ms": 1200
+     },
+     {
+      "do": "set",
+      "selector": "#ic-q",
+      "value": "50",
+      "label": "quality slider"
+     },
+     {
+      "do": "highlight",
+      "selector": "#ic-stats",
+      "label": "size comparison",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "color-picker",
+  "name": "Color Picker",
+  "description": "Pick a color and convert between HEX, RGB, HSL and CMYK, with palettes and contrast checks.",
+  "angles": [
+   "convert HEX to RGB",
+   "see HSL and CMYK values",
+   "build a color palette",
+   "check contrast between colors",
+   "pick a color right on your phone"
+  ],
+  "demos": [
+   {
+    "id": "hex-codes",
+    "title": "Typing a HEX color and reading the other codes",
+    "steps": [
+     {
+      "do": "type",
+      "selector": "#cp-hex",
+      "text": "#16A34A",
+      "label": "HEX box",
+      "delay": 55
+     },
+     {
+      "do": "highlight",
+      "selector": "#cp-codes",
+      "label": "color codes",
+      "hold_ms": 2500
+     }
+    ]
+   },
+   {
+    "id": "random-color",
+    "title": "Trying a random color",
+    "steps": [
+     {
+      "do": "click",
+      "selector": "#cp-rand",
+      "label": "random color option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#cp-codes",
+      "label": "color codes",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "merge-pdf",
+  "name": "Merge PDF",
+  "description": "Combine two or more PDF files into a single document, in the order you choose.",
+  "angles": [
+   "join several PDFs into one",
+   "choose the order of the files",
+   "combine documents for one email",
+   "no app to install",
+   "files stay in your browser"
+  ],
+  "demos": [
+   {
+    "id": "merge-two",
+    "title": "Joining two PDFs into one",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#mg-file",
+      "files": [
+       "samples/doc-a.pdf",
+       "samples/doc-b.pdf"
+      ],
+      "label": "two PDF files",
+      "after_ms": 1200
+     },
+     {
+      "do": "highlight",
+      "selector": "#mg-list",
+      "label": "file list",
+      "hold_ms": 2500
+     },
+     {
+      "do": "click",
+      "selector": "#mg-go",
+      "label": "merge option"
+     }
+    ]
+   },
+   {
+    "id": "merge-and-clear",
+    "title": "Adding PDFs and clearing the list",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#mg-file",
+      "files": [
+       "samples/doc-a.pdf",
+       "samples/doc-b.pdf"
+      ],
+      "label": "two PDF files",
+      "after_ms": 1200
+     },
+     {
+      "do": "highlight",
+      "selector": "#mg-list",
+      "label": "file list",
+      "hold_ms": 2500
+     },
+     {
+      "do": "click",
+      "selector": "#mg-clear",
+      "label": "clear option"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "split-pdf",
+  "name": "Split PDF",
+  "description": "Pull specific pages out of a PDF or split it into a smaller file, right in your browser.",
+  "angles": [
+   "pull out just the pages you need",
+   "make a smaller PDF from a big one",
+   "share only one part of a document",
+   "no sign-up",
+   "files stay in your browser"
+  ],
+  "demos": [
+   {
+    "id": "first-page",
+    "title": "Pulling out the first page",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#sp-file",
+      "files": [
+       "samples/doc-a.pdf"
+      ],
+      "label": "PDF file",
+      "after_ms": 1200
+     },
+     {
+      "do": "type",
+      "selector": "#sp-range",
+      "text": "1",
+      "label": "page range box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "#sp-go",
+      "label": "extract option"
+     }
+    ]
+   },
+   {
+    "id": "page-range",
+    "title": "Pulling out a page range",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#sp-file",
+      "files": [
+       "samples/doc-a.pdf"
+      ],
+      "label": "PDF file",
+      "after_ms": 1200
+     },
+     {
+      "do": "type",
+      "selector": "#sp-range",
+      "text": "1-2",
+      "label": "page range box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "#sp-go",
+      "label": "extract option"
+     }
+    ]
+   }
+  ]
+ }
+]

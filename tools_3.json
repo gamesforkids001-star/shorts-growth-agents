@@ -1,0 +1,363 @@
+[
+ {
+  "slug": "rotate-pdf",
+  "name": "Rotate PDF",
+  "description": "Fix sideways or upside-down pages by rotating some or all pages of a PDF.",
+  "angles": [
+   "fix a sideways scanned page",
+   "fix upside-down pages",
+   "rotate only some pages or all of them",
+   "quick fix on your phone",
+   "files stay in your browser"
+  ],
+  "demos": [
+   {
+    "id": "rotate-90",
+    "title": "Rotating a PDF by 90 degrees",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#rp-file",
+      "files": [
+       "samples/doc-a.pdf"
+      ],
+      "label": "PDF file",
+      "after_ms": 1200
+     },
+     {
+      "do": "select",
+      "selector": "#rp-angle",
+      "value": "90",
+      "label": "rotation angle list"
+     },
+     {
+      "do": "click",
+      "selector": "#rp-go",
+      "label": "rotate option"
+     }
+    ]
+   },
+   {
+    "id": "rotate-180",
+    "title": "Turning a PDF upside down by 180 degrees",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#rp-file",
+      "files": [
+       "samples/doc-b.pdf"
+      ],
+      "label": "PDF file",
+      "after_ms": 1200
+     },
+     {
+      "do": "select",
+      "selector": "#rp-angle",
+      "value": "180",
+      "label": "rotation angle list"
+     },
+     {
+      "do": "click",
+      "selector": "#rp-go",
+      "label": "rotate option"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "jpg-to-pdf",
+  "name": "JPG to PDF",
+  "description": "Turn one or more JPG, PNG or WebP images into a single PDF file, in the order you choose.",
+  "angles": [
+   "turn photos into one PDF",
+   "put images in the order you choose",
+   "make a PDF from a few phone photos",
+   "works with JPG, PNG and WebP",
+   "no app to install"
+  ],
+  "demos": [
+   {
+    "id": "two-images",
+    "title": "Putting two images into one PDF",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#jp-file",
+      "files": [
+       "samples/photo.jpg",
+       "samples/photo.png"
+      ],
+      "label": "two images",
+      "after_ms": 1200
+     },
+     {
+      "do": "highlight",
+      "selector": "#jp-list",
+      "label": "image list",
+      "hold_ms": 2500
+     },
+     {
+      "do": "select",
+      "selector": "#jp-fit",
+      "value": "a4",
+      "label": "page size list"
+     },
+     {
+      "do": "click",
+      "selector": "#jp-go",
+      "label": "create PDF option"
+     }
+    ]
+   },
+   {
+    "id": "original-size",
+    "title": "Making a PDF at the image's original size",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#jp-file",
+      "files": [
+       "samples/photo.jpg"
+      ],
+      "label": "image",
+      "after_ms": 1200
+     },
+     {
+      "do": "select",
+      "selector": "#jp-fit",
+      "value": "orig",
+      "label": "page size list"
+     },
+     {
+      "do": "click",
+      "selector": "#jp-go",
+      "label": "create PDF option"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "image-resizer",
+  "name": "Image Resizer",
+  "description": "Resize a JPG, PNG or WebP image to exact dimensions or a percentage, right in your browser.",
+  "angles": [
+   "resize to exact dimensions",
+   "resize by percentage",
+   "make an image fit a size requirement",
+   "works with JPG, PNG and WebP",
+   "images are not uploaded anywhere"
+  ],
+  "demos": [
+   {
+    "id": "resize-width",
+    "title": "Resizing an image to a new width",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#rz-file",
+      "files": [
+       "samples/photo.jpg"
+      ],
+      "label": "photo upload",
+      "after_ms": 1200
+     },
+     {
+      "do": "type",
+      "selector": "#rz-w",
+      "text": "800",
+      "label": "width box",
+      "delay": 55
+     },
+     {
+      "do": "click",
+      "selector": "#rz-go",
+      "label": "resize option"
+     }
+    ]
+   },
+   {
+    "id": "resize-webp",
+    "title": "Resizing and saving as WebP",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#rz-file",
+      "files": [
+       "samples/photo.jpg"
+      ],
+      "label": "photo upload",
+      "after_ms": 1200
+     },
+     {
+      "do": "type",
+      "selector": "#rz-w",
+      "text": "500",
+      "label": "width box",
+      "delay": 55
+     },
+     {
+      "do": "select",
+      "selector": "#rz-fmt",
+      "value": "image/webp",
+      "label": "format list"
+     },
+     {
+      "do": "click",
+      "selector": "#rz-go",
+      "label": "resize option"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "image-converter",
+  "name": "Image Converter",
+  "description": "Convert JPG, PNG, WebP and other images between formats, right in your browser.",
+  "angles": [
+   "convert PNG to JPG",
+   "convert WebP to JPG or PNG",
+   "change image format in seconds",
+   "no app to install",
+   "images are not uploaded anywhere"
+  ],
+  "demos": [
+   {
+    "id": "png-to-jpg",
+    "title": "Converting a PNG to JPG",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#cv-file",
+      "files": [
+       "samples/photo.png"
+      ],
+      "label": "PNG upload",
+      "after_ms": 1200
+     },
+     {
+      "do": "select",
+      "selector": "#cv-fmt",
+      "value": "image/jpeg",
+      "label": "format list"
+     },
+     {
+      "do": "click",
+      "selector": "#cv-go",
+      "label": "convert option"
+     }
+    ]
+   },
+   {
+    "id": "jpg-to-webp",
+    "title": "Converting a JPG to WebP",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#cv-file",
+      "files": [
+       "samples/photo.jpg"
+      ],
+      "label": "JPG upload",
+      "after_ms": 1200
+     },
+     {
+      "do": "select",
+      "selector": "#cv-fmt",
+      "value": "image/webp",
+      "label": "format list"
+     },
+     {
+      "do": "click",
+      "selector": "#cv-go",
+      "label": "convert option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#cv-stats",
+      "label": "size comparison",
+      "hold_ms": 2500
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "image-crop",
+  "name": "Image Cropper",
+  "description": "Crop a JPG, PNG or WebP image to an exact area or aspect ratio, right in your browser.",
+  "angles": [
+   "crop a photo to an exact area",
+   "crop to an aspect ratio",
+   "remove the extra part of a photo",
+   "works with JPG, PNG and WebP",
+   "crop on your phone, free, no sign-up"
+  ],
+  "demos": [
+   {
+    "id": "square-crop",
+    "title": "Cropping a photo to a square",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#cp2-file",
+      "files": [
+       "samples/photo.jpg"
+      ],
+      "label": "photo upload",
+      "after_ms": 1200
+     },
+     {
+      "do": "select",
+      "selector": "#cp2-ratio",
+      "value": "1:1",
+      "label": "aspect ratio list"
+     },
+     {
+      "do": "click",
+      "selector": "#cp2-center",
+      "label": "center option"
+     },
+     {
+      "do": "click",
+      "selector": "#cp2-go",
+      "label": "crop option"
+     }
+    ]
+   },
+   {
+    "id": "wide-crop",
+    "title": "Cropping a photo to a wide 16:9 shape",
+    "steps": [
+     {
+      "do": "upload",
+      "selector": "#cp2-file",
+      "files": [
+       "samples/photo.jpg"
+      ],
+      "label": "photo upload",
+      "after_ms": 1200
+     },
+     {
+      "do": "select",
+      "selector": "#cp2-ratio",
+      "value": "16:9",
+      "label": "aspect ratio list"
+     },
+     {
+      "do": "click",
+      "selector": "#cp2-center",
+      "label": "center option"
+     },
+     {
+      "do": "click",
+      "selector": "#cp2-go",
+      "label": "crop option"
+     }
+    ]
+   }
+  ]
+ }
+]
