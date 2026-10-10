@@ -4,6 +4,8 @@ Ab live site nahi khulti. Repo ke tools_local/<slug>.html se recording hoti hai.
 
 record_demo(tool, demo, out_dir, ...) -> (recording_path, trim_start, marks)
 
+v8: nazar aane wala cursor + click ripple, dark colour-scheme, khali waqt mein cursor ki halki harkat.
+
 v6 (22 tools ke liye generic):
 - tools_local/<slug>.html na ho to theme XML se build_local.py khud bana deta hai.
 - type: pehle box khali karta hai (number/date/prefilled boxes mein bhi sahi chalta hai).
@@ -169,6 +171,128 @@ def _dump_elements(page):
         _log("dump fail: " + str(e))
 
 
+
+# ---------- nazar aane wala cursor + click ripple ----------
+# Headless Chromium mein cursor video mein nahi aata; ye apna cursor banata hai.
+CURSOR_JS = """
+(() => {
+  function setup() {
+    if (document.getElementById('__cur')) return;
+    const st = document.createElement('style');
+    st.textContent = '#__cur{position:fixed;left:0;top:0;width:34px;height:34px;z-index:2147483647;' +
+      'pointer-events:none;transition:left .09s linear,top .09s linear;}' +
+      '.__rip{position:fixed;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;' +
+      'border:4px solid #ffd54a;z-index:2147483646;pointer-events:none;' +
+      'animation:__rip .6s ease-out forwards;}' +
+      '@keyframes __rip{from{transform:scale(.4);opacity:1}to{transform:scale(3.2);opacity:0}}';
+    document.documentElement.appendChild(st);
+    const c = document.createElement('div');
+    c.id = '__cur';
+    c.innerHTML = '<svg width="34" height="34" viewBox="0 0 24 24"><path d="M3 2l7.5 19 2.6-7.6L21 10.8z" ' +
+      'fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+    c.style.display = 'none';
+    document.documentElement.appendChild(c);
+    function zoomFix() {
+      const z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+      c.style.zoom = String(1 / z);
+      return z;
+    }
+    window.__moveCur = (x, y) => { const z = zoomFix(); c.style.display = 'block';
+      c.style.left = x * 1 + 'px'; c.style.top = y * 1 + 'px'; };
+    window.__ripple = (x, y) => { zoomFix(); const r = document.createElement('div');
+      r.className = '__rip'; r.style.zoom = c.style.zoom; r.style.left = x + 'px'; r.style.top = y + 'px';
+      document.documentElement.appendChild(r); setTimeout(() => r.remove(), 700); };
+    window.addEventListener('mousemove', e => window.__moveCur(e.clientX, e.clientY), true);
+    window.addEventListener('mousedown', e => window.__ripple(e.clientX, e.clientY), true);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setup);
+  else setup();
+})();
+"""
+
+_MOUSE = {"x": VIEW_W * 0.5, "y": VIEW_H * 0.3}
+
+
+def _glide_to(page, x, y, ms=420):
+    """Cursor ko dheere se (x, y) tak le jao (nazar aane wali harkat)."""
+    x0, y0 = _MOUSE["x"], _MOUSE["y"]
+    n = max(6, int(ms / 30))
+    for k in range(1, n + 1):
+        t = k / n
+        t = t * t * (3 - 2 * t)  # smooth shuru/aakhir
+        page.mouse.move(x0 + (x - x0) * t, y0 + (y - y0) * t)
+        page.wait_for_timeout(int(ms / n))
+    _MOUSE["x"], _MOUSE["y"] = x, y
+
+
+def _glide_to_loc(page, loc, ms=420):
+    try:
+        bb = loc.bounding_box()
+        if bb and bb["width"] > 0 and bb["height"] > 0:
+            _glide_to(page, bb["x"] + bb["width"] / 2, bb["y"] + bb["height"] / 2, ms)
+            return True
+    except Exception:
+        pass
+    return False
+
+
+def _glide_to_dropzone(page, loc):
+    """Upload step: file input chhupa hota hai, is liye uske nazar aane wale dibbe par cursor + ripple."""
+    try:
+        h = loc.evaluate_handle(
+            """e => { let n = e.closest('label,[class*=drop],[class*=upload],[id*=drop],[id*=upload]') || e.parentElement;
+                      while (n && n !== document.body) { const r = n.getBoundingClientRect();
+                        if (r.width > 40 && r.height > 20) return n; n = n.parentElement; }
+                      return null; }"""
+        ).as_element()
+        if h:
+            bb = h.bounding_box()
+            if bb:
+                x, y = bb["x"] + bb["width"] / 2, bb["y"] + bb["height"] / 2
+                _glide_to(page, x, y, 500)
+                page.evaluate("([x, y]) => window.__ripple && window.__ripple(x, y)", [x, y])
+                page.wait_for_timeout(350)
+    except Exception as ex:
+        _log("dropzone glide fail: " + str(ex))
+
+
+def _idle_motion(page, ms):
+    """Khali waqt mein screen band na lage: cursor tool ke controls par dheere ghoomta hai (click nahi)."""
+    ms = int(ms)
+    if ms < 700:
+        page.wait_for_timeout(max(0, ms))
+        return
+    end = time.time() + ms / 1000.0
+    try:
+        pts = page.evaluate(
+            """() => {
+              const out = [];
+              document.querySelectorAll('input:not([type=file]):not([type=hidden]),button,select,textarea').forEach(e => {
+                const r = e.getBoundingClientRect();
+                if (r.width > 30 && r.height > 18 && r.top >= 0 && r.bottom <= innerHeight)
+                  out.push([r.left + r.width / 2, r.top + r.height / 2]);
+              });
+              return out.slice(0, 8);
+            }"""
+        )
+    except Exception:
+        pts = []
+    # CSS zoom ke saath getBoundingClientRect ka scale browser par depend karta hai, is liye
+    # sirf wahi points rakho jo viewport ke andar hon.
+    pts = [(x, y) for x, y in pts if 0 <= x <= VIEW_W and 0 <= y <= VIEW_H]
+    i = 0
+    while pts and (end - time.time()) > 1.1:
+        x, y = pts[i % len(pts)]
+        _glide_to(page, x, y, 700)
+        i += 1
+        left = end - time.time()
+        if left > 0.4:
+            page.wait_for_timeout(int(min(600, left * 1000 - 300)))
+    left = end - time.time()
+    if left > 0:
+        page.wait_for_timeout(int(left * 1000))
+
+
 def _apply_zoom(page):
     """Page ko bara karo taake tool poori screen bhare (layout dobara set hota hai)."""
     if ZOOM and abs(ZOOM - 1.0) > 0.01:
@@ -253,6 +377,7 @@ def _run_step(page, step, repo_root, target=None, fast=False):
         loc = _find(page, sel or "textarea")
         _smooth_center(loc)
         page.wait_for_timeout(250 if fast else 500)
+        _glide_to_loc(page, loc)
         loc.click()
         try:
             loc.fill("")  # pehle se bhari value hata do
@@ -285,11 +410,13 @@ def _run_step(page, step, repo_root, target=None, fast=False):
         loc = _find(page, sel)
         _smooth_center(loc)
         page.wait_for_timeout(250 if fast else 600)
+        _glide_to_loc(page, loc)
         loc.click()
     elif action == "select":
         loc = _find(page, sel)
         _smooth_center(loc)
         page.wait_for_timeout(300)
+        _glide_to_loc(page, loc)
         val = step.get("value") or step.get("option")
         try:
             loc.select_option(val)
@@ -298,6 +425,7 @@ def _run_step(page, step, repo_root, target=None, fast=False):
     elif action == "upload":
         loc = page.locator(sel or "input[type=file]").first
         loc.wait_for(state="attached", timeout=8000)
+        _glide_to_dropzone(page, loc)
         files = step.get("files")
         if not files:
             files = [step.get("file") or step.get("path")]
@@ -328,6 +456,7 @@ def _run_step(page, step, repo_root, target=None, fast=False):
         loc = _find(page, sel)
         _smooth_center(loc)
         page.wait_for_timeout(700)
+        _glide_to_loc(page, loc, 500)
         try:
             loc.evaluate(
                 """e => {
@@ -400,7 +529,10 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root, holds, intro_hold,
             record_video_dir=str(vid_dir),
             record_video_size={"width": VIEW_W, "height": VIEW_H},
             accept_downloads=True,
+            color_scheme=os.environ.get("REC_SCHEME", "dark"),
         )
+        ctx.add_init_script(CURSOR_JS)
+        _MOUSE["x"], _MOUSE["y"] = VIEW_W * 0.5, VIEW_H * 0.3
         page = ctx.new_page()
         t0 = time.time()  # video yahin se shuru hoti hai
         trim_start = 0.0
@@ -414,7 +546,7 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root, holds, intro_hold,
             base = t0 + trim_start  # trimmed video ka waqt 0 yahan hai
 
             if intro_hold and intro_hold > 0:
-                page.wait_for_timeout(int(intro_hold * 1000))
+                _idle_motion(page, intro_hold * 1000)
 
             for i, step in enumerate(steps):
                 if time.time() - base > max_seconds:
@@ -427,11 +559,11 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root, holds, intro_hold,
                 if hold:
                     left = hold - (time.time() - s0)
                     if left > 0:
-                        page.wait_for_timeout(int(left * 1000))
+                        _idle_motion(page, left * 1000)
 
             marks["end"] = round(time.time() - base, 2)
             if closing_hold and closing_hold > 0:
-                page.wait_for_timeout(int(closing_hold * 1000))
+                _idle_motion(page, closing_hold * 1000)
             page.wait_for_timeout(800)
         finally:
             video = page.video
