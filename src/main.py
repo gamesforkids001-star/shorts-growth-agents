@@ -38,10 +38,10 @@ def compose(platform, m, url, site_name):
 
 
 def demos_from_json():
-    """tools.json se har tool ke demos (slug -> list). Agar site.py demos na de to bhi chalega."""
+    """tools_parts/*.json (ya purani tools.json) se har tool ke demos (slug -> list).
+    Agar site.py demos na de to bhi chalega."""
     try:
-        data = json.loads((ROOT / "tools.json").read_text(encoding="utf-8"))
-        return {t["slug"]: t.get("demos") or [] for t in data}
+        return {t["slug"]: t.get("demos") or [] for t in site.load_all()}
     except Exception:
         return {}
 
@@ -93,15 +93,15 @@ def main():
 
     tools = site.list_tools(cfg["site_base"])
     if not tools:
-        raise SystemExit("tools.json se koi tool nahi mila")
-    # demos tool mein na hon to tools.json se jodo; sirf wohi tools lo jin ke demos hain
+        raise SystemExit("tools_parts se koi tool nahi mila")
+    # demos tool mein na hon to tools_parts se jodo; sirf wohi tools lo jin ke demos hain
     dj = demos_from_json()
     for t in tools:
         if not t.get("demos"):
             t["demos"] = dj.get(t.get("slug"), [])
     playable = [t for t in tools if t.get("demos")]
     if not playable:
-        raise SystemExit("kisi tool mein demos nahi hain (tools.json check karo)")
+        raise SystemExit("kisi tool mein demos nahi hain (tools_parts check karo)")
 
     tool = site.pick_tool(playable, history)
     info = site.page_info(tool)
