@@ -12,6 +12,10 @@ REQUIRED = {
 }
 
 
+class Skip(Exception):
+    """Video aaj skip hui, lekin ye error nahi hai (exit code 0)."""
+
+
 def load_state():
     try:
         return json.loads(STATE.read_text())
@@ -75,7 +79,7 @@ def video_ok(path, max_seconds):
     return True, ""
 
 
-def main():
+def run():
     cfg = yaml.safe_load((ROOT / "config" / "settings.yaml").read_text())
     pol = yaml.safe_load((ROOT / "config" / "policies.yaml").read_text())
     dry = (os.getenv("DRY_RUN") or str(cfg["dry_run"])).strip().lower() == "true"
@@ -86,9 +90,9 @@ def main():
     force = os.getenv("FORCE", "").strip().lower() == "true"
     slot = -1
     if not force:
-        run, slot, q, why = schedule.should_run(history, cfg)
+        should, slot, q, why = schedule.should_run(history, cfg)
         print(f"quota={q}/day slot={slot}: {why}")
-        if not run:
+        if not should:
             return
 
     tools = site.list_tools(cfg["site_base"])
@@ -114,18 +118,31 @@ def main():
     print("Tool:", tool["name"], "| demo:", demo.get("id"), "| format:", v["format"],
           "| hook:", v["hook"], "| voice:", v["voice"])
 
-    # 1) idea + narration, policy-reviewed
+    # 1) idea + narration, policy-reviewed (har retry mein pichle issues LLM ko wapas jate hain)
     plan = None
     issues = None
-    for _ in range(3):
+    for attempt in range(1, 4):
         cand = agents.idea_and_script(tool, info, recent, pol, cfg["site_name"], v, openers, issues)
         ok, issues = policy.review_script(cand, pol, tool, v["demo"], openers)
-        print("script ok:", ok, issues)
+        print(f"script attempt {attempt}/3 ok:", ok, issues)
         if ok:
             plan = cand
             break
+
     if not plan:
-        raise SystemExit("Script policy check pass nahi hua, aaj video skip")
+        # safe fallback script (agents.fallback_script, agar agents.py mein ho)
+        fb = getattr(agents, "fallback_script", None)
+        if fb:
+            try:
+                plan = fb(tool, info, demo, v, pol)
+                print("FALLBACK script use hua (3 retry fail hone ke baad)")
+            except Exception as e:
+                traceback.print_exc()
+                print("fallback script bhi fail:", e)
+                plan = None
+        if not plan:
+            raise Skip("Script policy check 3 retry ke baad pass nahi hua aur fallback nahi mila. "
+                       "Last issues: " + str(issues))
 
     narration = plan["narration"]
     demo_id = plan.get("demo_id") or demo.get("id")
@@ -167,17 +184,19 @@ def main():
         rec_result = record.record_demo(
             tool, demo, str(OUT / "rec"), max_seconds=cfg["max_seconds"], repo_root=str(ROOT),
             holds=holds, intro_hold=intro_hold, closing_hold=closing_hold)
-        
+
         if rec_result is None:
-            raise SystemExit("Recording fail: record_demo ne None return kiya hai.")
-        
+            raise Skip("Recording fail: record_demo ne None return kiya hai.")
+
         rec_path, trim_start, marks = rec_result
 
+    except Skip:
+        raise
     except record.BotCheckError as e:
-        raise SystemExit("Bot-check aya, video skip: " + str(e))
+        raise Skip("Bot-check aya, video skip: " + str(e))
     except Exception as e:
         traceback.print_exc()
-        raise SystemExit("Recording fail, video skip: " + str(e))
+        raise Skip("Recording fail, video skip: " + str(e))
     print("recording:", rec_path, "trim_start:", trim_start, "marks:", marks)
 
     # har awaaz kab shuru ho: intro = 0, beats = un steps ka shuru-waqt, closing = aakhri step ke baad
@@ -194,7 +213,7 @@ def main():
     print(f"video ready: {secs:.0f}s")
     ok, why = video_ok(path, cfg["max_seconds"])
     if not ok:
-        raise SystemExit("Video check fail, upload nahi: " + str(why))
+        raise Skip("Video check fail, upload nahi: " + str(why))
     (OUT / "metadata.json").write_text(json.dumps(final, indent=2, ensure_ascii=False))
 
     # 5) publish
@@ -226,11 +245,24 @@ def main():
                         "opener": opener_of(narration),
                         "title": final.get("youtube", {}).get("title", ""), "results": report})
         STATE.write_text(json.dumps(history[-200:], indent=2))
-    
+
     if not dry and not posted_any:
         print("Kisi platform par post nahi hui, slot done nahi maana, agla run dobara koshish karega")
-    
+
     (OUT / "report.json").write_text(json.dumps(report, indent=2))
+
+
+def main():
+    try:
+        run()
+    except Skip as e:
+        OUT.mkdir(parents=True, exist_ok=True)
+        dry = (os.getenv("DRY_RUN") or "").strip().lower() == "true"
+        tag = "SKIPPED (dry-run)" if dry else "SKIPPED"
+        print(f"\n=== {tag}: aaj video nahi bani. Wajah: {e} ===")
+        print("Ye error nahi hai, workflow exit code 0 ke saath khatam hoga.")
+        (OUT / "report.json").write_text(json.dumps({"skipped": str(e)}, indent=2))
+        # exit code 0: koi raise nahi
 
 
 if __name__ == "__main__":
