@@ -4,6 +4,13 @@ Ab live site nahi khulti. Repo ke tools_local/<slug>.html se recording hoti hai.
 
 record_demo(tool, demo, out_dir, ...) -> (recording_path, trim_start, marks)
 
+v7:
+- AUTO ZOOM: har demo ko pehle bina video ke chala kar tool (#rt-ui) ki height naapi jati hai aur
+  zoom 1.4-2.4 ke darmiyan khud chuna jata hai taake tool poori recording bhare. REC_ZOOM=1.7 jaisa
+  number dene se fixed zoom, "auto" (default) se khud-ba-khud.
+- THEME: video DARK theme mein (REC_THEME=dark default, "light" bhi chalta hai).
+- Har run par page naye theme XML se dobara banta hai.
+
 v6 (22 tools ke liye generic):
 - tools_local/<slug>.html na ho to theme XML se build_local.py khud bana deta hai.
 - type: pehle box khali karta hai (number/date/prefilled boxes mein bhi sahi chalta hai).
@@ -22,8 +29,18 @@ from playwright.sync_api import sync_playwright
 # video.py ke REC_W x REC_H se match (change mat karo)
 VIEW_W, VIEW_H = 1080, 1380
 
-# Tool ko bara karne ke liye zoom. Chota lage to 1.9, kata hua lage to 1.5.
-ZOOM = float(os.environ.get("REC_ZOOM", "1.7"))
+# Tool ko bara karne ke liye zoom. "auto" = har demo ke liye khud chuno. Number do to fixed.
+_ZOOM_ENV = os.environ.get("REC_ZOOM", "auto").strip().lower()
+ZOOM_MIN, ZOOM_MAX, ZOOM_STEP = 1.4, 2.4, 0.1
+ZOOM_FALLBACK = 1.7
+# Tool ke liye kitni height (px) milti hai (oopar/neeche thora margin chhor kar)
+FILL_H = VIEW_H - 40
+ZOOM = ZOOM_FALLBACK  # purana naam (agar koi aur file import kare)
+
+# Video ka theme: "dark" (default) ya "light"
+THEME = os.environ.get("REC_THEME", "dark").strip().lower()
+if THEME not in ("dark", "light"):
+    THEME = "dark"
 
 LOCAL_DIR = "tools_local"
 
@@ -54,22 +71,30 @@ def _slug(tool):
     return s
 
 
+_BUILT = set()  # is run mein jin slugs ke page naye XML se ban chuke
+
+
 def _local_url(tool, repo_root):
-    """tools_local/<slug>.html ka file:// address. Page na ho to theme XML se khud bana leta hai."""
+    """tools_local/<slug>.html ka file:// address. Har run mein pehli baar page theme XML se dobara banta hai
+    (taake purana hath se bana page bhi naye XML/theme se aa jaye)."""
     slug = _slug(tool)
     f = (Path(repo_root) / LOCAL_DIR / (slug + ".html")).resolve()
-    if not f.exists():
+    key = (str(Path(repo_root).resolve()), slug, THEME)
+    if key not in _BUILT:
         try:
             try:
                 from . import build_local
             except ImportError:
                 import build_local
-            build_local.build_all(repo_root, only=[slug], log=_log)
+            build_local.build_all(repo_root, only=[slug], force=True, log=_log)
+            _BUILT.add(key)
         except Exception as e:
-            raise RecordError("local html nahi mili (%s/%s.html) aur bana bhi nahi saki: %s. "
-                              "Theme XML file repo mein upload karo." % (LOCAL_DIR, slug, e))
-        if not f.exists():
-            raise RecordError("local html nahi mili: %s/%s.html" % (LOCAL_DIR, slug))
+            if not f.exists():
+                raise RecordError("local html nahi mili (%s/%s.html) aur bana bhi nahi saki: %s. "
+                                  "Theme XML file repo mein upload karo." % (LOCAL_DIR, slug, e))
+            _log("page dobara nahi bana (%s), purana page istemal ho raha hai" % e)
+    if not f.exists():
+        raise RecordError("local html nahi mili: %s/%s.html" % (LOCAL_DIR, slug))
     return f.as_uri()
 
 
@@ -169,11 +194,26 @@ def _dump_elements(page):
         _log("dump fail: " + str(e))
 
 
-def _apply_zoom(page):
+def _apply_theme(page):
+    """html par data-theme set karo (dark/light)."""
+    try:
+        page.evaluate(
+            """t => {
+              document.documentElement.setAttribute('data-theme', t);
+              try { localStorage.setItem('th', t); } catch (e) {}
+            }""",
+            THEME,
+        )
+    except Exception as e:
+        _log("theme set fail: " + str(e))
+
+
+def _apply_zoom(page, zoom, wait=400):
     """Page ko bara karo taake tool poori screen bhare (layout dobara set hota hai)."""
-    if ZOOM and abs(ZOOM - 1.0) > 0.01:
-        page.add_style_tag(content="html{zoom:%s !important;}" % ZOOM)
-        page.wait_for_timeout(400)
+    if zoom and abs(zoom - 1.0) > 0.01:
+        page.add_style_tag(content="html{zoom:%s !important;}" % zoom)
+        if wait:
+            page.wait_for_timeout(wait)
 
 
 def _norm_step(step):
@@ -361,6 +401,120 @@ def _run_step(page, step, repo_root, target=None, fast=False):
     page.wait_for_timeout(int(step.get("after_ms", 250 if fast else 500)))
 
 
+# ---------- auto zoom: tool ko poori recording par failana ----------
+
+def _tool_height(page):
+    """#rt-ui ki height (screen px, zoom ke baad)."""
+    try:
+        return float(page.evaluate(
+            """() => {
+              const e = document.getElementById('rt-ui');
+              if (!e) return 0;
+              return e.getBoundingClientRect().height;
+            }"""))
+    except Exception:
+        return 0.0
+
+
+def _run_step_dry(page, step, repo_root):
+    """Naapne ke liye: step bina intezar ke chalao (video nahi banti)."""
+    action = _norm_step(step)
+    sel = step.get("selector")
+    if action in ("wait", "highlight", "scroll_to", "scroll"):
+        return
+    if action == "type":
+        loc = _find(page, sel or "textarea", timeout=4000)
+        loc.click()
+        try:
+            loc.fill("")
+        except Exception:
+            pass
+        page.keyboard.type(str(step.get("text") or step.get("value") or ""), delay=0)
+    elif action == "set":
+        loc = _find(page, sel, timeout=4000)
+        loc.evaluate(
+            """(e, v) => {
+              e.value = v;
+              e.dispatchEvent(new Event('input', {bubbles: true}));
+              e.dispatchEvent(new Event('change', {bubbles: true}));
+            }""",
+            str(step.get("value", "")),
+        )
+    elif action == "click":
+        _find(page, sel, timeout=4000).click()
+    elif action == "select":
+        loc = _find(page, sel, timeout=4000)
+        val = step.get("value") or step.get("option")
+        try:
+            loc.select_option(val)
+        except Exception:
+            loc.select_option(label=val)
+    elif action == "upload":
+        loc = page.locator(sel or "input[type=file]").first
+        loc.wait_for(state="attached", timeout=4000)
+        files = step.get("files") or [step.get("file") or step.get("path")]
+        paths = []
+        for f in files:
+            fp = Path(f)
+            if not fp.is_absolute():
+                fp = Path(repo_root) / f
+            _ensure_sample(fp)
+            paths.append(str(fp))
+        loc.set_input_files(paths)
+        page.wait_for_timeout(min(int(step.get("after_ms", 600)), 1500))
+    page.wait_for_timeout(120)
+
+
+def _probe_height(browser, url, steps, repo_root, zoom):
+    """Is zoom par demo chala kar tool ki sab se bari height (px) lautao."""
+    ctx = browser.new_context(viewport={"width": VIEW_W, "height": VIEW_H}, accept_downloads=True)
+    try:
+        page = ctx.new_page()
+        page.goto(url, wait_until="domcontentloaded", timeout=30000)
+        page.wait_for_timeout(500)
+        _apply_theme(page)
+        _apply_zoom(page, zoom, wait=300)
+        best = _tool_height(page)
+        for step in steps:
+            try:
+                _run_step_dry(page, step, repo_root)
+            except Exception as e:
+                _log("zoom naap: step skip (%s)" % str(e).splitlines()[0][:80])
+            best = max(best, _tool_height(page))
+        return best
+    finally:
+        ctx.close()
+
+
+def pick_zoom(url, steps, repo_root="."):
+    """Is demo ke liye zoom chuno: sab se bara zoom (1.4-2.4) jis par tool poori recording ke andar aaye."""
+    if _ZOOM_ENV != "auto":
+        try:
+            return float(_ZOOM_ENV)
+        except ValueError:
+            return ZOOM_FALLBACK
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(args=["--no-sandbox"])
+            try:
+                z = ZOOM_MAX
+                while z >= ZOOM_MIN - 1e-6:
+                    h = _probe_height(browser, url, steps, repo_root, round(z, 2))
+                    _log("zoom naap: zoom %.1f -> tool height %.0fpx (hadd %dpx)" % (z, h, FILL_H))
+                    if h <= 0:
+                        return ZOOM_FALLBACK
+                    if h <= FILL_H:
+                        return round(z, 2)
+                    z -= ZOOM_STEP
+                _log("tool 1.4 zoom par bhi lamba hai, 1.4 istemal ho raha hai")
+                return ZOOM_MIN
+            finally:
+                browser.close()
+    except Exception as e:
+        _log("zoom naapna fail (%s), %.1f istemal ho raha hai" % (e, ZOOM_FALLBACK))
+        return ZOOM_FALLBACK
+
+
 def record_demo(tool, demo, out_dir, max_seconds=55, repo_root=".", attempts=2,
                 holds=None, intro_hold=0.0, closing_hold=0.0):
     """Returns (recording_path, trim_start, marks).
@@ -373,72 +527,4 @@ def record_demo(tool, demo, out_dir, max_seconds=55, repo_root=".", attempts=2,
     """
     url = _local_url(tool, repo_root)  # local file, live site nahi
     steps = demo.get("steps", []) if isinstance(demo, dict) else (demo or [])
-    if not steps:
-        raise RecordError("is demo mein steps nahi hain")
-    out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    last = None
-    for n in range(1, attempts + 1):
-        try:
-            return _record_once(url, steps, out_dir, max_seconds, repo_root,
-                                holds, intro_hold, closing_hold)
-        except Exception as e:
-            last = e
-            _log("attempt %d fail: %s" % (n, e))
-    raise RecordError(str(last))
-
-
-def _record_once(url, steps, out_dir, max_seconds, repo_root, holds, intro_hold, closing_hold):
-    vid_dir = out_dir / ("rec_%d" % int(time.time()))
-    vid_dir.mkdir(parents=True, exist_ok=True)
-    marks = {"steps": [], "end": 0.0}
-    fast = holds is not None
-    with sync_playwright() as p:
-        browser = p.chromium.launch(args=["--no-sandbox"])
-        ctx = browser.new_context(
-            viewport={"width": VIEW_W, "height": VIEW_H},
-            record_video_dir=str(vid_dir),
-            record_video_size={"width": VIEW_W, "height": VIEW_H},
-            accept_downloads=True,
-        )
-        page = ctx.new_page()
-        t0 = time.time()  # video yahin se shuru hoti hai
-        trim_start = 0.0
-        try:
-            page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            page.wait_for_timeout(600)
-            _apply_zoom(page)
-            page.wait_for_timeout(600)
-            # loading wala hissa video se kaat do
-            trim_start = max(0.0, time.time() - t0 - 0.3)
-            base = t0 + trim_start  # trimmed video ka waqt 0 yahan hai
-
-            if intro_hold and intro_hold > 0:
-                page.wait_for_timeout(int(intro_hold * 1000))
-
-            for i, step in enumerate(steps):
-                if time.time() - base > max_seconds:
-                    _log("max_seconds poore, steps rok diye")
-                    break
-                s0 = time.time()
-                marks["steps"].append(round(s0 - base, 2))
-                hold = holds[i] if holds and i < len(holds) else None
-                _run_step(page, step, repo_root, target=hold, fast=fast)
-                if hold:
-                    left = hold - (time.time() - s0)
-                    if left > 0:
-                        page.wait_for_timeout(int(left * 1000))
-
-            marks["end"] = round(time.time() - base, 2)
-            if closing_hold and closing_hold > 0:
-                page.wait_for_timeout(int(closing_hold * 1000))
-            page.wait_for_timeout(800)
-        finally:
-            video = page.video
-            ctx.close()  # video file yahan save hoti hai
-            path = video.path() if video else None
-            browser.close()
-    if not path or not os.path.exists(path):
-        raise RecordError("recording file nahi bani")
-    _log("recording ok: %s (trim_start=%.2fs) marks=%s" % (path, trim_start, marks))
-    return str(path), round(trim_start, 2), marks
+  
