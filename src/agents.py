@@ -104,9 +104,17 @@ def _repeated_phrases(text, size=5):
     return found[:3]
 
 
-def _local_problems(text):
+def _local_problems(text, intro=None, has_beats=True):
     """Agents ke andar hi lambai aur repetition check (LLM ko wapas dikhane ke liye)."""
     probs = []
+    if intro is not None and has_beats:
+        iw = _wc(intro)
+        if iw > 28:
+            probs.append(f"The intro is {iw} words, too LONG (about 10+ seconds of silence on screen). "
+                         "The intro must be 2 short sentences, 18-26 words. Move the extra explanation "
+                         "into the beat sentences.")
+        elif iw < 14:
+            probs.append(f"The intro is only {iw} words. It must be 2 short sentences, 18-26 words.")
     w = _wc(text)
     if w < TARGET_MIN:
         probs.append(f"Total length is {w} words, too SHORT. It must be {TARGET_MIN}-{TARGET_MAX} words "
@@ -209,7 +217,7 @@ Return JSON only: {{"topic": "short topic label", "intro": "...", "beats": ["...
             continue
         intro = " ".join(str(plan.get("intro", "")).split())
         closing = " ".join(str(plan.get("closing", "")).split())
-        probs = _local_problems(" ".join([intro] + got + [closing]))
+        probs = _local_problems(" ".join([intro] + got + [closing]), intro, n > 0)
         if not probs:
             break
         local = ("\nYour last attempt was rejected for these exact reasons. Fix every one of them:\n"

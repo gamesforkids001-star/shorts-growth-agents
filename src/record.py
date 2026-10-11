@@ -60,13 +60,13 @@ def _local_url(tool, repo_root):
     """tools_local/<slug>.html ka file:// address. Page na ho to theme XML se khud bana leta hai."""
     slug = _slug(tool)
     f = (Path(repo_root) / LOCAL_DIR / (slug + ".html")).resolve()
-    if not f.exists():
+    if True:  # har recording se pehle page dobara banao (purana safed page kabhi use na ho)
         try:
             try:
                 from . import build_local
             except ImportError:
                 import build_local
-            build_local.build_all(repo_root, only=[slug], log=_log)
+            build_local.build_all(repo_root, only=[slug], force=True, log=_log)
         except Exception as e:
             raise RecordError("local html nahi mili (%s/%s.html) aur bana bhi nahi saki: %s. "
                               "Theme XML file repo mein upload karo." % (LOCAL_DIR, slug, e))
