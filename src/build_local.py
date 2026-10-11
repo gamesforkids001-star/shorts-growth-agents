@@ -6,10 +6,15 @@ Maujood page kabhi overwrite nahi hota (force=True na ho to).
 Theme file repo mein kahin bhi ho sakti hai: naam mein 'theme' aur '.xml' ho
 (jaise easyfileonlinetools-theme-adsense-seo-final-1.xml).
 """
+import os
 import re
 from pathlib import Path
 
 LOCAL_DIR = "tools_local"
+# Recording ka theme: "dark" (site ka neela/navy look) ya "light". Badalna ho to REC_THEME env set karo.
+THEME = os.environ.get("REC_THEME", "dark").strip().lower()
+if THEME not in ("dark", "light"):
+    THEME = "dark"
 
 # Recording ke liye sirf tool dikhao: header, breadcrumb, article, sidebar, ads, footer chhupao
 FOCUS_CSS = """
@@ -85,22 +90,24 @@ def _page(slug, css, core, tools):
 </main>
 <div class="toast" id="toast" role="status"></div>
 """
-    out = ["<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">",
+    out = ["<!DOCTYPE html>\n<html lang=\"en\" data-theme=\"%s\"><head><meta charset=\"utf-8\">" % THEME,
            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
            "<title>%s</title>" % slug,
            "<style>%s</style>" % css,
            "<style>%s</style>" % FOCUS_CSS,
            "</head><body class=\"pt-static_page\">", body,
+           "<script>try{localStorage.setItem('th','%s');}catch(e){}</script>" % THEME,
            "<script>window.__SLUG=%r;</script>" % slug,
            "<script>%s</script>" % core]
     for t in tools:
         out.append("<script>%s</script>" % t)
-    out.append("<script>try{window.TH.boot();}catch(e){console.error(e);}</script>")
+    out.append("<script>try{window.TH.boot();}catch(e){console.error(e);}"
+               "document.documentElement.setAttribute('data-theme','%s');</script>" % THEME)
     out.append("</body></html>")
     return "\n".join(out)
 
 
-def build_all(repo_root=".", only=None, force=False, log=print):
+def build_all(repo_root=".", only=None, force=True, log=print):
     """Missing pages banata hai. only = slug ki list ya None (sab). Returns bani hui slugs."""
     theme = find_theme(repo_root)
     if not theme:
