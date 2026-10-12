@@ -1,4 +1,4 @@
-import asyncio, colorsys, json, math, os, random, re, subprocess
+import asyncio, json, math, os, re, subprocess
 from PIL import Image, ImageDraw, ImageFont
 
 W, H = 1080, 1920
@@ -9,19 +9,18 @@ REC_Y = 170          # recording kahan se shuru ho
 REC_MAX_W = 1080     # record.py ke VIEW_W se match
 REC_MAX_H = 1380     # record.py ke VIEW_H se match (170 + 1380 = 1550 tak)
 CAP_CY = 1730        # captions/CTA ka center
-CAP_WORDS = 7        # ek caption mein zyada se zyada itne alfaaz
+CAP_WORDS = 9        # ek caption mein zyada se zyada itne alfaaz
 
 CTA_TEXT = "Link in description & profile"
 CTA_SECS = 2.0       # aakhri itne second on-screen CTA
 
 MIN_SECONDS = 40.0   # video 40s se chhoti na ho (chhoti ho to aakhri frame ruka kar 40s kar do)
 
-
-def random_palette():
-    h = random.random()
-    c1 = colorsys.hsv_to_rgb(h, random.uniform(0.5, 0.8), random.uniform(0.15, 0.3))
-    c2 = colorsys.hsv_to_rgb((h + random.uniform(0.05, 0.2)) % 1, random.uniform(0.5, 0.8), random.uniform(0.4, 0.62))
-    return tuple(int(x * 255) for x in c1), tuple(int(x * 255) for x in c2)
+# Rang: recording ka asal background (dark navy) - patti isi rang ki hai, is liye alag nazar nahi aati
+BG_TOP = (12, 16, 31)
+BG_BOTTOM = (10, 17, 31)
+ACCENT = (37, 99, 235)       # site ka neela rang (pill, CTA border)
+CAP_BOX = (20, 30, 56, 240)  # caption ka dark-blue dabba
 
 
 def _font(size):
@@ -31,11 +30,9 @@ def _font(size):
         return ImageFont.load_default()
 
 
-def _gradient(c1, c2, flip=False):
+def _gradient(c1, c2):
     img = Image.new("RGB", (W, H))
     d = ImageDraw.Draw(img)
-    if flip:
-        c1, c2 = c2, c1
     for y in range(H):
         t = y / H
         d.line([(0, y), (W, y)], fill=tuple(int(c1[i] + (c2[i] - c1[i]) * t) for i in range(3)))
@@ -56,50 +53,88 @@ def _wrap(draw, text, font, max_w):
     return lines
 
 
+# Caption kahan se na kate: in lafzon par caption khatam nahi hona chahiye
+_BAD_END = {"a", "an", "the", "of", "to", "in", "on", "at", "for", "with", "from", "by", "and", "or",
+            "but", "is", "are", "was", "were", "be", "your", "my", "our", "its", "this", "that",
+            "these", "those", "can", "will", "get", "gets", "into", "than", "as", "so", "very",
+            "quite", "just", "any", "every", "each", "no", "not", "you", "it", "we", "they"}
+# In lafzon se naya caption shuru ho to achha lagta hai
+_GOOD_START = {"and", "but", "so", "or", "with", "without", "for", "from", "that", "which", "when",
+               "while", "because", "before", "after", "then", "instead", "using", "just"}
+
+
+def _cut_score(words, i, ideal):
+    """words[:i] aur words[i:] ke beech cut ka score (zyada = behtar)."""
+    prev, nxt = words[i - 1], words[i]
+    s = -1.0 * abs(i - ideal)
+    if prev.endswith((",", ";", ":")):
+        s += 4
+    if nxt.lower().strip(",.") in _GOOD_START:
+        s += 2
+    if prev.lower().strip(",.;:") in _BAD_END:
+        s -= 5
+    return s
+
+
+def _split_sentence(words, max_words):
+    n = len(words)
+    if n <= max_words:
+        return [" ".join(words)]
+    k = math.ceil(n / max_words)
+    cuts, last = [], 0
+    for j in range(1, k):
+        ideal = round(j * n / k)
+        lo = max(last + 2, ideal - 3)
+        hi = min(n - 2, ideal + 3)
+        # baki hisse max_words se bade na ho jayen
+        lo = max(lo, n - (k - j) * max_words)
+        hi = min(hi, last + max_words)
+        if lo > hi:
+            best = min(max(ideal, last + 1), n - 1)
+        else:
+            best = max(range(lo, hi + 1), key=lambda i: _cut_score(words, i, ideal))
+        cuts.append(best)
+        last = best
+    parts, a = [], 0
+    for c in cuts + [n]:
+        parts.append(" ".join(words[a:c]))
+        a = c
+    return parts
+
+
 def split_chunks(text, max_words=CAP_WORDS):
-    """Narration ko caption tukron mein todta hai: pehle jumle, phir comma, phir barabar hisson mein.
-    Jumle ke beech mein bekaar jagah nahi katta."""
+    """Narration ko caption tukron mein todta hai. Pehle jumle, phir lambe jumle ko
+    comma / conjunction ki hadd par; 'the', 'to', 'of' jaise lafz par kabhi nahi katta."""
     chunks = []
     for sent in re.split(r"(?<=[.!?])\s+", text.strip()):
         words = sent.split()
         if not words:
             continue
-        parts, cur = [], []
-        for w in words:
-            cur.append(w)
-            if w.endswith((",", ";", ":")) and len(cur) >= 3 and len(words) > max_words:
-                parts.append(cur)
-                cur = []
-        if cur:
-            parts.append(cur)
-        for p in parts:
-            n = math.ceil(len(p) / max_words)
-            size = math.ceil(len(p) / n)
-            for i in range(0, len(p), size):
-                chunks.append(" ".join(p[i:i + size]))
+        chunks.extend(_split_sentence(words, max_words))
     return chunks
 
 
-def make_caption(text, tool_name, pal, path):
-    """Ek PNG: oopar tool ka naam, neeche caption."""
+def make_caption(text, tool_name, path):
+    """Ek PNG: oopar tool ka naam (neeli pill), neeche caption (dark-blue dabba)."""
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     f_small = _font(46)
     tw = d.textlength(tool_name, font=f_small)
     py = 40
-    d.rounded_rectangle([(W - tw) / 2 - 40, py, (W + tw) / 2 + 40, py + 90], radius=45, fill=(255, 255, 255, 255))
-    d.text(((W - tw) / 2, py + 15), tool_name, font=f_small, fill=pal[0] + (255,))
+    d.rounded_rectangle([(W - tw) / 2 - 40, py, (W + tw) / 2 + 40, py + 90], radius=45, fill=ACCENT + (255,))
+    d.text(((W - tw) / 2, py + 15), tool_name, font=f_small, fill=(255, 255, 255, 255))
     size = 70
     font = _font(size)
     lines = _wrap(d, text, font, W - 200)
-    while len(lines) > 3 and size > 48:
-        size -= 6
+    while len(lines) > 3 and size > 44:
+        size -= 4
         font = _font(size)
         lines = _wrap(d, text, font, W - 200)
     lh = int(size * 1.3)
     th = lh * len(lines)
     top = CAP_CY - th // 2 - 40
-    d.rounded_rectangle([60, top, W - 60, top + th + 80], radius=40, fill=(0, 0, 0, 175))
+    d.rounded_rectangle([60, top, W - 60, top + th + 80], radius=40, fill=CAP_BOX,
+                        outline=ACCENT + (255,), width=3)
     y = CAP_CY - th // 2
     for ln in lines:
         w = d.textlength(ln, font=font)
@@ -210,10 +245,8 @@ def build(voices, tool_name, out_dir, max_seconds=60, recording=None, trim_start
     if not voices:
         raise RuntimeError("awaaz nahi mili")
     os.makedirs(out_dir, exist_ok=True)
-    pal = random_palette()
-    flip = random.random() < 0.5
     bg = f"{out_dir}/bg.png"
-    _gradient(*pal, flip=flip).save(bg)
+    _gradient(BG_TOP, BG_BOTTOM).save(bg)
 
     # 1) har awaaz ka shuru-waqt (kabhi overlap nahi)
     st, prev_end = [], 0.0
@@ -241,7 +274,7 @@ def build(voices, tool_name, out_dir, max_seconds=60, recording=None, trim_start
         for c, (s, e) in zip(chunks, spans):
             caps.append((c, st[i] + s, st[i] + e))
     for i, (c, s, e) in enumerate(caps):
-        make_caption(c, tool_name, pal, f"{out_dir}/c{i}.png")
+        make_caption(c, tool_name, f"{out_dir}/c{i}.png")
     cta_png = f"{out_dir}/cta.png"
     make_cta(CTA_TEXT, cta_png)
     nc, ns = len(caps), len(voices)

@@ -51,22 +51,22 @@ def _beat_texts(demo):
         if k == "type":
             t = str(s.get("text", "")).replace("\n", " / ")
             t = t if len(t) <= 60 else t[:57] + "..."
-            out.append(f'the text "{t}" is typed into the {label or "tool"}')
+            out.append(f'you type "{t}" into the {label or "box"}')
         elif k == "click":
-            out.append(f'the "{label or s.get("selector", "a control")}" control is pressed')
+            out.append(f'you tap {label or "the button"}')
         elif k == "select":
-            out.append(f'the "{label or "list"}" is set to "{s.get("value", "")}"')
+            out.append(f'you choose {s.get("value", "")} for {label or "the option"}')
         elif k == "set":
-            out.append(f'the "{label or "setting"}" is changed to {s.get("value", "")}')
+            out.append(f'you set {label or "the option"} to {s.get("value", "")}')
         elif k == "upload":
             n = len(s.get("files") or [1])
             what = label or "file"
-            out.append(f'a small sample file is added ({what})' if n == 1
-                       else f'{n} small sample files are added ({what})')
+            out.append(f'you add a file ({what})' if n == 1
+                       else f'you add {n} files ({what})')
         elif k == "highlight":
-            out.append(f'the "{label or "result"}" part of the tool is shown with a yellow frame')
+            out.append(f'you see the {label or "result"} right away')
         elif k == "scroll_to":
-            out.append(f'the view moves down to the "{label or "next"}" part of the tool')
+            out.append(f'you scroll to {label or "the next part"}')
     return out
 
 
