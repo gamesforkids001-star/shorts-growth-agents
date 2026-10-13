@@ -256,6 +256,12 @@
       "selector": "#fi-list",
       "label": "file details",
       "hold_ms": 2500
+     },
+     {
+      "do": "highlight",
+      "selector": "#fi-actions",
+      "label": "copy and clear options",
+      "hold_ms": 2500
      }
     ]
    },
@@ -276,6 +282,12 @@
       "do": "highlight",
       "selector": "#fi-list",
       "label": "file details",
+      "hold_ms": 2500
+     },
+     {
+      "do": "highlight",
+      "selector": "#fi-actions",
+      "label": "copy and clear options",
       "hold_ms": 2500
      }
     ]

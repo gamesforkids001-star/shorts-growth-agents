@@ -88,6 +88,30 @@
       "hold_ms": 2500
      }
     ]
+   },
+   {
+    "id": "weight-tab",
+    "title": "Switching to weight",
+    "steps": [
+     {
+      "do": "click",
+      "selector": "button[data-c=\"weight\"]",
+      "label": "Weight tab"
+     },
+     {
+      "do": "type",
+      "selector": "#uc-val",
+      "text": "5",
+      "label": "value box",
+      "delay": 55
+     },
+     {
+      "do": "highlight",
+      "selector": "#uc-out",
+      "label": "converted result",
+      "hold_ms": 2500
+     }
+    ]
    }
   ]
  },
@@ -176,6 +200,12 @@
      },
      {
       "do": "highlight",
+      "selector": "#ic-panel",
+      "label": "quality and format settings",
+      "hold_ms": 2500
+     },
+     {
+      "do": "highlight",
       "selector": "#ic-stats",
       "label": "size comparison",
       "hold_ms": 2500
@@ -236,6 +266,12 @@
      },
      {
       "do": "highlight",
+      "selector": "#cp-sw",
+      "label": "color preview",
+      "hold_ms": 2500
+     },
+     {
+      "do": "highlight",
       "selector": "#cp-codes",
       "label": "color codes",
       "hold_ms": 2500
@@ -250,6 +286,12 @@
       "do": "click",
       "selector": "#cp-rand",
       "label": "random color option"
+     },
+     {
+      "do": "highlight",
+      "selector": "#cp-sw",
+      "label": "color preview",
+      "hold_ms": 2500
      },
      {
       "do": "highlight",
