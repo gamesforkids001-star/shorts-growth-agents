@@ -345,7 +345,9 @@ def build(voices, tool_name, out_dir, max_seconds=60, recording=None, trim_start
         else:
             fc += f"[{a0 + k}:a]aresample=44100,aformat=channel_layouts=mono[a{k}];"
     fc += "".join(f"[a{k}]" for k in range(ns))
-    fc += f"concat=n={ns}:v=0:a=1,apad=whole_dur={total:.2f}[aout]"
+    # loudnorm: awaaz hamesha ek jaisi (mean -23..-16 dB ke andar) aur peak -2 dB se neeche (clipping nahi)
+    fc += (f"concat=n={ns}:v=0:a=1,loudnorm=I=-17:TP=-2:LRA=7,aresample=44100,"
+           f"aformat=channel_layouts=mono,apad=whole_dur={total:.2f}[aout]")
 
     final = f"{out_dir}/short.mp4"
     cmd += ["-filter_complex", fc, "-map", "[vout]", "-map", "[aout]",
