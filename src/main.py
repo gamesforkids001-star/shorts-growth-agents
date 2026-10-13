@@ -1,5 +1,5 @@
 import os, json, datetime, pathlib, traceback, yaml
-from . import site, agents, policy, video, publish, schedule, variety, record
+from . import site, agents, policy, video, publish, schedule, variety, record, llm
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "output"
@@ -39,6 +39,32 @@ def compose(platform, m, url, site_name):
     if platform == "facebook":
         return {"caption": f"{m['caption'].strip()}\n\nFree tool: {url}\n\n{hs}"}
     return {"caption": f"{m['caption'].strip()}\n\nLink in bio: {site_name}\n\n{hs}"}
+
+
+def _snip(text, limit):
+    """text ko limit ke andar, poore jumle par kaato."""
+    text = " ".join(str(text).split())
+    if len(text) <= limit:
+        return text
+    cut = text[:limit]
+    i = max(cut.rfind(". "), cut.rfind("."))
+    return (cut[:i + 1] if i > 40 else cut.rsplit(" ", 1)[0]).strip()
+
+
+def fallback_meta(platform, plan, tool):
+    """Gemini na chale to bina LLM ke safe text: sirf tool ka naam aur wohi narration jo pehle policy se guzri."""
+    name = str(tool.get("name", "")).strip()
+    own = "".join(ch for ch in name if ch.isalnum())
+    narr = _snip(plan.get("narration", ""), 300)
+    tags = [own, own + "Online", "OnlineTool", "BrowserTool", "WebTool", "EasyFileOnlineTools"]
+    hashtags = [own, "OnlineTool", "BrowserTool"]
+    if platform == "youtube":
+        return {"title": f"{name} - free online tool demo"[:70],
+                "description": f"{name}, a free tool for the browser. {narr}"[:590],
+                "tags": tags, "hashtags": hashtags}
+    if platform == "facebook":
+        return {"caption": f"{name} walkthrough: {_snip(narr, 300)}"[:390], "hashtags": hashtags}
+    return {"caption": f"{name} in the browser. {_snip(narr, 300)}"[:390], "hashtags": hashtags}
 
 
 def demos_from_json():
@@ -130,8 +156,17 @@ def run():
     issues = None
     script_log = []
     for attempt in range(1, 4):
-        cand = agents.idea_and_script(tool, info, recent, pol, cfg["site_name"], v, openers, issues)
-        ok, issues = policy.review_script(cand, pol, tool, v["demo"], openers)
+        try:
+            cand = agents.idea_and_script(tool, info, recent, pol, cfg["site_name"], v, openers, issues)
+            ok, issues = policy.review_script(cand, pol, tool, v["demo"], openers)
+        except llm.LLMError as e:
+            # Gemini nahi chala: crash nahi, seedha fallback script par
+            print("Gemini fail, fallback script par ja rahe:", e)
+            script_log.append({"attempt": attempt, "ok": False,
+                               "issues": ["Gemini: " + str(e)[:300]], "narration": ""})
+            OUT.mkdir(parents=True, exist_ok=True)
+            (OUT / "script_log.json").write_text(json.dumps(script_log, indent=2, ensure_ascii=False))
+            break
         print(f"script attempt {attempt}/3 ok:", ok, issues)
         script_log.append({"attempt": attempt, "ok": ok, "issues": issues,
                            "narration": cand.get("narration", "")})
@@ -164,19 +199,32 @@ def run():
     # 2) separate metadata per platform, each policy-checked
     platforms = [p for p, on in cfg["platforms"].items() if on]
     titles = [h.get("title") for h in history[-12:] if h.get("title")]
-    meta = agents.metadata(plan, tool, pol, titles, info)
+    try:
+        meta = agents.metadata(plan, tool, pol, titles, info)
+    except llm.LLMError as e:
+        print("Gemini fail (metadata), safe text use ho raha hai:", e)
+        meta = {}
     final, report = {}, {}
     for p in platforms:
-        m = meta.get(p, {})
+        m = meta.get(p) or fallback_meta(p, plan, tool)
         for _ in range(3):
             issues = policy.hard_check(p, m)
             if not issues:
-                issues = policy.ai_check(p, plan, m, pol)
+                try:
+                    issues = policy.ai_check(p, plan, m, pol)
+                except llm.LLMError as e:
+                    # AI check nahi chala: LLM ka likha text bhej nahi sakte, safe text lo
+                    print(p, "AI check nahi chala, safe text use:", e)
+                    m = fallback_meta(p, plan, tool)
+                    issues = policy.hard_check(p, m)
             if not issues:
                 final[p] = compose(p, m, tool["url"], cfg["site_name"])
                 break
             print(p, "issues:", issues)
-            m = agents.fix_metadata(p, plan, m, issues, pol)
+            try:
+                m = agents.fix_metadata(p, plan, m, issues, pol)
+            except llm.LLMError:
+                m = fallback_meta(p, plan, tool)
         else:
             report[p] = "skipped: policy check pass nahi hua"
 
