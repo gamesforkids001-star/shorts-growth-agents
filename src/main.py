@@ -108,6 +108,13 @@ def run():
         raise SystemExit("kisi tool mein demos nahi hain (tools_parts check karo)")
 
     tool = site.pick_tool(playable, history)
+    # ONLY_TOOL=<slug> ho to wahi tool (22 tools ki matrix dry run ke liye); khali ho to pehle jaisa
+    only = os.getenv("ONLY_TOOL", "").strip()
+    if only:
+        match = [t for t in playable if t.get("slug") == only]
+        if not match:
+            raise SystemExit("ONLY_TOOL ka tool nahi mila: " + only)
+        tool = match[0]
     info = site.page_info(tool)
     recent = [h.get("topic") for h in history[-30:]]
     v = variety.choose(history, tool)
@@ -175,6 +182,9 @@ def run():
 
     # 3) awaaz pehle (har jumla alag), phir recording usi ke hisab se ruk-ruk kar
     segs = plan.get("segments") or [narration]
+    # banned lafz (jaise "instantly") segments mein reh jate the: awaaz aur caption se pehle saaf karo
+    segs = [policy.sanitize(x) for x in segs]
+    narration = " ".join(segs)
     voices = video.make_voice(segs, v["voice"], str(OUT / "voice"))
     steps = demo.get("steps", [])
     idx = record.narrated_indices(steps)

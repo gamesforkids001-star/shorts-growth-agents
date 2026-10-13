@@ -1,4 +1,7 @@
-"""agents.py v11 - narration + metadata (sab 22 tools ke liye generic).
+"""agents.py v12 - narration + metadata (sab 22 tools ke liye generic).
+
+v12: narration mein "kyun chahiye" wale claims (secure, safety, protect, guess...) tabhi chalte hain jab tool description
+ya demo mein hon. Har beat ki lambai ki had (padding band). Prompt mein bhi mana.
 
 v11: fallback_script naye sire se: koi generic filler (_PAD) nahi. Har jumla demo ke asal step se banta hai
 (step + screen par kya dikhta hai + recap). Upload beat ab 'you add a file in the <label> area'.
@@ -34,6 +37,10 @@ AVOID = ", ".join(policy.BANNED)
 ABSTRACT = ["parameter", "parameters", "density", "visual item", "visual outcome", "data volume",
             "actively", "utilize", "leverage", "seamless", "robust", "streamline", "workflow"]
 ABSTRACT_TXT = ", ".join(ABSTRACT)
+
+# "Kyun chahiye" wale claims: tabhi allowed jab tool description / demo mein khud likhe hon
+CLAIM_WORDS = ["secure", "security", "safe", "safety", "protect", "private", "privacy", "hacker", "hackers",
+               "guess", "guard", "prevent", "unwanted", "trust", "trusted", "reliable", "accurate", "perfect"]
 
 # doosre tools ke kaam: tag/hashtag mein tabhi jo video mein dikhe
 TASK_WORDS = ["resize", "resizing", "crop", "convert", "merge", "split", "rotate", "compress", "edit", "watermark"]
@@ -160,7 +167,7 @@ def _repeated_phrases(text, size=5):
     return found[:3]
 
 
-def _local_problems(text, intro=None, has_beats=True, tool_name=None):
+def _local_problems(text, intro=None, has_beats=True, tool_name=None, allowed=""):
     """Agents ke andar hi lambai, repetition aur risky lafz ka check (LLM ko wapas dikhane ke liye)."""
     probs = []
     if intro is not None and has_beats:
@@ -193,6 +200,12 @@ def _local_problems(text, intro=None, has_beats=True, tool_name=None):
                          "(for example: you move the slider, the size goes down).")
     for c in policy.find_cta(text):
         probs.append(f'Remove the call to action "{c}".')
+    allow = (allowed or "").lower()
+    for cw in CLAIM_WORDS:
+        if re.search(r"\b" + cw, low) and cw[:5] not in allow:
+            probs.append(f'Remove the word "{cw}": the tool description does not make that claim. Do not explain why '
+                         "the viewer might need the result (security, safety, protection, accounts). "
+                         "Only say what happens on screen.")
     return probs
 
 
@@ -269,6 +282,8 @@ Rules:
 - Use plain, literal words that a child could follow. Say what the beat says (for example: you move the
   quality slider to fifty). Never use vague or technical-sounding words such as: {ABSTRACT_TXT}.
   Do not describe effects that the screen does not show.
+- Do NOT say why the viewer might want the result (security, safety, protection, accounts, websites).
+  Only describe what happens on screen and what the tool part is, using facts from the description.
 - No superlatives (best, #1, fastest), no stats.
 - No claims about speed or time saved, and no claims about how often or how much a problem happens.
   NEVER use any of these words or phrases: {AVOID}.
@@ -302,7 +317,13 @@ Return JSON only: {{"topic": "short topic label", "intro": "...", "beats": ["...
             local = f"\nYou returned {len(got)} beats but EXACTLY {n} are required.\n"
             continue
         intro = " ".join(str(plan.get("intro", "")).split())
-        probs = _local_problems(" ".join([intro] + got + [closing]), intro, n > 0, name)
+        probs = _local_problems(" ".join([intro] + got + [closing]), intro, n > 0, name,
+                                allowed=f"{desc} {shown} {name}")
+        if n:
+            for bi, b in enumerate(got, 1):
+                if _wc(b) > bw + 10:
+                    probs.append(f"Beat {bi} has {_wc(b)} words, too LONG. Keep every beat near {bw} words "
+                                 "and say only what happens on screen in that beat.")
         if not probs:
             break
         local = ("\nYour last attempt was rejected for these exact reasons. Fix every one of them:\n"
