@@ -45,6 +45,12 @@ def bright_fraction(video, t, crop):
     return sum(1 for b in data if b > EDGE_LUMA) / len(data)
 
 
+def make_sheet(video, dest, dur):
+    """Har 4 second ka ek chhota frame, 4 columns wali ek tasveer (video dekhe bina masla samajhne ke liye)."""
+    sh(["ffmpeg", "-v", "error", "-y", "-i", str(video), "-vf",
+        "fps=1/4,scale=216:-1,tile=4x4", "-frames:v", "1", "-q:v", "4", str(dest)])
+
+
 def edge_cut(video, dur):
     """Recording ke upar/neeche/daayen/baayen kinare par tool ka roshan hissa ho to wo kata hua hai."""
     times = [t for t in (2, 8, 14, 20, 26, 32, 38, 44) if t < dur - 3]
@@ -87,6 +93,7 @@ def check_one(out, slug):
             res["fail"].append(f"awaaz ki loudness mean {mean} dB (-23 se -16 chahiye)")
         if peak is not None and peak > PEAK_MAX:
             res["fail"].append(f"awaaz peak {peak} dB (clipping ka khatra)")
+    make_sheet(video, out / "sheet.jpg", dur)
     cut = edge_cut(video, dur)
     if cut:
         res["fail"].append("tool kata hua lagta hai: " + ", ".join(cut))
