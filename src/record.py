@@ -324,28 +324,39 @@ def _idle_motion(page, ms, anchor=None):
 
 def _apply_zoom(page):
     """Page ko bara karo taake tool poori screen bhare (layout dobara set hota hai).
-    Chhota tool (upload/calculator) ho to usay screen ke beech mein la do taake neeche khali jagah na rahe."""
-    if ZOOM and abs(ZOOM - 1.0) > 0.01:
-        page.add_style_tag(content="html{zoom:%s !important;}" % ZOOM)
+    1) Tool screen se lamba ho to zoom thoda ghatao (min 1.0) taake upar/neeche se na kate.
+    2) Chhota tool ho to usay thoda neeche (max screen ka 20%) le aao; neeche jagah chhodo kyunke result/preview
+       aane par tool barhta hai."""
+    box_js = """() => {
+        const e = document.querySelector('.tool-box') || document.querySelector('#rt-ui');
+        if (!e) return null;
+        const r = e.getBoundingClientRect();
+        return {top: r.top + window.scrollY, h: r.height};
+    }"""
+    z = ZOOM if ZOOM and ZOOM > 0 else 1.0
+    if abs(z - 1.0) > 0.01:
+        page.add_style_tag(content="html{zoom:%s !important;}" % z)
         page.wait_for_timeout(400)
     try:
-        box = page.evaluate("""() => {
-            const e = document.querySelector('.tool-box') || document.querySelector('#rt-ui');
-            if (!e) return null;
-            const r = e.getBoundingClientRect();
-            return {top: r.top + window.scrollY, h: r.height};
-        }""")
+        for _ in range(3):                      # lamba tool: zoom ghatao
+            box = page.evaluate(box_js)
+            if not box:
+                return
+            need = box["top"] + box["h"]
+            if need <= VIEW_H * 0.96 or z <= 1.0:
+                break
+            z = max(1.0, z * (VIEW_H * 0.96) / need)
+            page.add_style_tag(content="html{zoom:%.3f !important;}" % z)
+            page.wait_for_timeout(300)
+        box = page.evaluate(box_js)
         if box and box["h"] > 0:
-            # tool baad mein (result aane par) thoda barhta hai: 1.25x ki gunjaish ke saath center karo
-            target = VIEW_H * 0.46
-            delta = target - (box["top"] + box["h"] * 1.25 / 2)
-            delta = min(delta, VIEW_H * 0.36)
-            if delta > 30:
-                z = ZOOM if ZOOM and ZOOM > 0 else 1.0
+            top_goal = VIEW_H * 0.20            # isse neeche mat lao: growth ke liye jagah
+            delta = min(top_goal - box["top"], VIEW_H * 0.36)
+            if delta > 30 and box["top"] + box["h"] * 1.5 + delta < VIEW_H:
                 page.add_style_tag(content=".tool-box,#rt-ui{margin-top:%dpx !important;}" % int(delta / z))
                 page.wait_for_timeout(300)
     except Exception as ex:
-        _log("center fix skip: %s" % ex)
+        _log("zoom/center fix skip: %s" % ex)
 
 
 def _norm_step(step):

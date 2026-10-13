@@ -278,6 +278,14 @@ def main():
         print("Ye error nahi hai, workflow exit code 0 ke saath khatam hoga.")
         (OUT / "report.json").write_text(json.dumps({"skipped": str(e)}, indent=2))
         # exit code 0: koi raise nahi
+    except (Exception, SystemExit) as e:
+        # kisi aur wajah se crash: asli sabab report.json aur error.txt mein likho (test summary mein dikhega)
+        OUT.mkdir(parents=True, exist_ok=True)
+        tb = traceback.format_exc()
+        (OUT / "error.txt").write_text(tb)
+        last = (str(e) or tb.strip().splitlines()[-1])[:300]
+        (OUT / "report.json").write_text(json.dumps({"skipped": "CRASH: " + type(e).__name__ + ": " + last}, indent=2))
+        raise
 
 
 if __name__ == "__main__":
