@@ -1,0 +1,94 @@
+name: test-all-tools
+
+# Sirf check ke liye: 22 tools ki dry-run video ek saath. Upload kabhi nahi hota.
+# Roz wala daily-shorts.yml alag hai aur is se bilkul nahi chhedta.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-shorts
+  cancel-in-progress: false
+
+jobs:
+  video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false      # ek tool fail ho to baqi chalte rahen
+      max-parallel: 3       # LLM rate limit se bachne ke liye
+      matrix:
+        slug:
+          - word-counter
+          - case-converter
+          - json-formatter
+          - remove-duplicate-lines
+          - sort-text-lines
+          - text-cleaner
+          - password-generator
+          - qr-code-generator
+          - age-calculator
+          - bmi-calculator
+          - unit-converter
+          - random-number-generator
+          - color-picker
+          - image-compressor
+          - merge-pdf
+          - split-pdf
+          - rotate-pdf
+          - jpg-to-pdf
+          - image-resizer
+          - image-converter
+          - image-crop
+          - file-info
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install system packages
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - name: Install python packages
+        run: pip install -r requirements.txt
+      - name: Install browser for screen recording
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+      - name: Run agents (dry run, one tool)
+        run: python -m src.main
+        env:
+          DRY_RUN: "true"
+          FORCE: "true"
+          ONLY_TOOL: ${{ matrix.slug }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          META_PAGE_ID: ${{ secrets.META_PAGE_ID }}
+          META_PAGE_TOKEN: ${{ secrets.META_PAGE_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      - name: Check video
+        if: always()
+        run: python check_video.py output ${{ matrix.slug }}
+      - name: Save output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: short-output-${{ matrix.slug }}
+          path: output/
+          retention-days: 3
+
+  summary:
+    needs: video
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: short-output-*
+          path: all
+      - name: Summary table
+        run: python check_video.py --summary all >> "$GITHUB_STEP_SUMMARY"
