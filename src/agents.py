@@ -1,4 +1,6 @@
-"""agents.py v9 - narration + metadata (sab 22 tools ke liye generic).
+"""agents.py v10 - narration + metadata (sab 22 tools ke liye generic).
+
+v10: vague lafz (parameters, density...) mana, doosre tool ke tags filter, 'This video shows' mana.
 
 v9 badlav:
 - Angles ab LLM ko nahi diye jate (pehle info['text'] mein 'Angle ideas' jati thi, isi se video mein
@@ -24,6 +26,15 @@ SYSTEM = (
 
 # Ye lafz/phrases kabhi use nahi karne: policy.BANNED se seedha liya jata hai (dono hamesha barabar rahen)
 AVOID = ", ".join(policy.BANNED)
+
+# vague / technical-sounding lafz jo narration ko ghalat ya samajh se bahar bana dete hain
+ABSTRACT = ["parameter", "parameters", "density", "visual item", "visual outcome", "data volume",
+            "actively", "utilize", "leverage", "seamless", "robust", "streamline", "workflow"]
+ABSTRACT_TXT = ", ".join(ABSTRACT)
+
+# doosre tools ke kaam: tag/hashtag mein tabhi jo video mein dikhe
+TASK_WORDS = ["resize", "resizing", "crop", "convert", "merge", "split", "rotate", "compress", "edit", "watermark"]
+GENERIC_TAGS = {"tools", "tool", "free", "online", "viral", "trending", "fyp", "math", "photo", "browser"}
 
 # Narration me kisi bhi tarah ki call-to-action nahi honi chahiye
 NO_CTA = (
@@ -172,6 +183,11 @@ def _local_problems(text, intro=None, has_beats=True, tool_name=None):
                      "in the whole narration and use different words everywhere else.")
     for b in policy.find_banned(text):
         probs.append(f'Remove the risky phrase "{b}" (speed, time-saving and frequency claims are not allowed).')
+    low = " " + re.sub(r"[^a-z ]", " ", text.lower()) + " "
+    for a in ABSTRACT:
+        if re.search(r"\b" + re.escape(a), low):
+            probs.append(f'Replace the vague word "{a}" with plain everyday words that say exactly what the screen shows '
+                         "(for example: you move the slider, the size goes down).")
     for c in policy.find_cta(text):
         probs.append(f'Remove the call to action "{c}".')
     return probs
@@ -225,6 +241,7 @@ Talk ONLY about what the beats show. Never name a category, option, unit type, f
 from the description that does not appear in the beats (example: if the video only converts length,
 do not say it converts weight or anything else). If you need to say what the tool is, use a general
 phrase such as "a free {name}".
+Also never mention another task (resizing, cropping, converting, merging, editing...) unless a beat shows it.
 
 Recent topics (do NOT repeat the angle or wording): {recent}
 
@@ -246,6 +263,9 @@ Rules:
   phrases from the tool description.
 - Do NOT say the word "button" and do not mention clicking, unless a click beat is listed above.
 - Do not read out exact results, numbers or counts, because you cannot see them.
+- Use plain, literal words that a child could follow. Say what the beat says (for example: you move the
+  quality slider to fifty). Never use vague or technical-sounding words such as: {ABSTRACT_TXT}.
+  Do not describe effects that the screen does not show.
 - No superlatives (best, #1, fastest), no stats.
 - No claims about speed or time saved, and no claims about how often or how much a problem happens.
   NEVER use any of these words or phrases: {AVOID}.
@@ -359,6 +379,32 @@ def fallback_script(tool, info, demo, v, policies):
     }
 
 
+def _clean_tags(meta, plan, tool, shown=""):
+    """Galat/doosre-tool ke tags hatao; tool ka apna naam-tag zaroor rakho."""
+    yt = meta.get("youtube", {}) if isinstance(meta, dict) else {}
+    allowed = " ".join([str(plan.get("narration", "")), str(shown), str(tool.get("name", "")),
+                        str(yt.get("title", ""))]).lower()
+    own = re.sub(r"[^A-Za-z0-9]", "", str(tool.get("name", "")))
+
+    def ok(t):
+        tl = str(t).strip().lstrip("#").lower()
+        if not tl or tl in GENERIC_TAGS:
+            return False
+        return not any(w in tl and w not in allowed for w in TASK_WORDS)
+
+    for plat in ("youtube", "facebook", "instagram"):
+        d = meta.get(plat)
+        if not isinstance(d, dict):
+            continue
+        for key in ("tags", "hashtags"):
+            if isinstance(d.get(key), list):
+                kept = [str(t).strip().lstrip("#") for t in d[key] if ok(t)]
+                if own and own.lower() not in [k.lower() for k in kept]:
+                    kept.insert(0, own)
+                d[key] = kept
+    return meta
+
+
 def metadata(plan, tool, policies, recent_titles=(), info=None):
     desc = tool.get("description") or ((info or {}).get("description", "") if isinstance(info, dict) else "")
     demo = _resolve_demo(tool, plan.get("demo_id"))
@@ -391,6 +437,8 @@ file format or mode that is not in the "actually shows" line above (example: if 
 never say it converts weight). Describe what is shown with plain verbs (convert, count, merge, resize...).
 Do NOT claim anything about the tool that is not in the tool description above or in the voice-over
 (for example: "no sign up", "no registration", "no download", "private", "works offline", "always free").
+Do not start any text with "This video shows", "In this video" or "Watch". Talk about the task itself.
+Tags and hashtags must never name another task (resize, crop, convert, merge, edit...) unless the video shows it.
 Tags and hashtags: at least two must name this tool or what is shown (for example the tool name without spaces
 and the main action). Do not use generic tags such as tools, free, online, math, viral, trending, fyp.
 
@@ -401,7 +449,11 @@ Return JSON only:
 {{"youtube": {{"title": "", "description": "", "tags": ["..."], "hashtags": ["..."]}},
   "facebook": {{"caption": "", "hashtags": ["..."]}},
   "instagram": {{"caption": "", "hashtags": ["..."]}}}}"""
-    return ask_json(prompt, SYSTEM, 0.8)
+    meta = ask_json(prompt, SYSTEM, 0.8)
+    try:
+        return _clean_tags(meta, plan, tool, shown)
+    except Exception:
+        return meta
 
 
 def fix_metadata(platform, plan, current, issues, policies):
