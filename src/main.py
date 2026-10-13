@@ -121,10 +121,15 @@ def run():
     # 1) idea + narration, policy-reviewed (har retry mein pichle issues LLM ko wapas jate hain)
     plan = None
     issues = None
+    script_log = []
     for attempt in range(1, 4):
         cand = agents.idea_and_script(tool, info, recent, pol, cfg["site_name"], v, openers, issues)
         ok, issues = policy.review_script(cand, pol, tool, v["demo"], openers)
         print(f"script attempt {attempt}/3 ok:", ok, issues)
+        script_log.append({"attempt": attempt, "ok": ok, "issues": issues,
+                           "narration": cand.get("narration", "")})
+        OUT.mkdir(parents=True, exist_ok=True)
+        (OUT / "script_log.json").write_text(json.dumps(script_log, indent=2, ensure_ascii=False))
         if ok:
             plan = cand
             break

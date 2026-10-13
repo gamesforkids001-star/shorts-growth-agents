@@ -1,4 +1,7 @@
-"""agents.py v10 - narration + metadata (sab 22 tools ke liye generic).
+"""agents.py v11 - narration + metadata (sab 22 tools ke liye generic).
+
+v11: fallback_script naye sire se: koi generic filler (_PAD) nahi. Har jumla demo ke asal step se banta hai
+(step + screen par kya dikhta hai + recap). Upload beat ab 'you add a file in the <label> area'.
 
 v10: vague lafz (parameters, density...) mana, doosre tool ke tags filter, 'This video shows' mana.
 
@@ -105,8 +108,8 @@ def _beat_texts(demo):
         elif k == "upload":
             n = len(s.get("files") or [1])
             what = label or "file"
-            out.append(f'you add a file ({what})' if n == 1
-                       else f'you add {n} files ({what})')
+            out.append(f'you add a file in the {what} area' if n == 1
+                       else f'you add {n} files in the {what} area')
         elif k == "highlight":
             out.append(f'you look at the {label or "result"}')
         elif k == "scroll_to":
@@ -322,53 +325,64 @@ Return JSON only: {{"topic": "short topic label", "intro": "...", "beats": ["...
     return plan
 
 
-# Safe fallback: koi LLM nahi, koi risky lafz nahi, koi CTA nahi, koi repetition nahi, koi meta lafz nahi.
+# Safe fallback: LLM script policy mein fail ho to ye chalta hai. Koi LLM nahi, koi generic filler nahi.
+# Har jumla demo ke asal step se banta hai (kya hua + screen par kya dikhta hai), phir ek recap.
 _CONNECT = ["First,", "Next,", "Then,", "After that,", "Now,", "Here,", "Finally,"]
-_PAD = [
-    "Each part of the page has one clear job.",
-    "The result appears in its own area of the page.",
-    "Everything happens on one page.",
-    "The controls are grouped so they are easy to find.",
-    "Each step builds on the one before it.",
-    "The input and the result stay close together.",
-    "Each control is labeled so it is clear what it does.",
-    "The layout stays the same from start to finish.",
-    "Nothing else on the page gets in the way.",
-]
+
+
+def _effect(step):
+    """Step ke baad screen par jo sach mein dikhta hai (har tool par sach, koi naya claim nahi)."""
+    k = _norm_step(step)
+    label = step.get("label") or ""
+    if k == "type":
+        return f"The text appears in the {label or 'box'}."
+    if k == "click":
+        return "You can see the page change."
+    if k in ("select", "set"):
+        return f"The {label or 'option'} now shows {step.get('value', '')}."
+    if k == "upload":
+        return "The file appears on the page."
+    if k == "highlight":
+        return f"The highlight marks the {label or 'result'}."
+    if k == "scroll_to":
+        return f"The page moves to the {label or 'next part'}."
+    return ""
 
 
 def fallback_script(tool, info, demo, v, policies):
-    """Agar LLM script 3 retry ke baad bhi policy pass na kare, to ye safe script chalta hai."""
+    """Agar LLM script retry ke baad bhi policy pass na kare, to ye safe script chalta hai."""
     demo = _resolve_demo(tool, demo)
     name = tool.get("name", "this tool")
+    steps = (demo or {}).get("steps", [])
+    idx = narrated_indices(steps)
     beats = _beat_texts(demo)
     n = len(beats)
+    title = str((demo or {}).get("title", "")).strip().rstrip(".")
 
-    intro = f"This is the {name}, ready to use on one simple page."
+    intro = f"{title} with the {name}. Here is how it works." if title else f"This is the {name}. Here is how it works."
     closing = make_closing(tool, demo)
 
-    def build(texts):
-        return [f"{_CONNECT[i % len(_CONNECT)]} {t}." for i, t in enumerate(texts)]
+    def build(with_effect):
+        segs = []
+        for j, (i, t) in enumerate(zip(idx, beats)):
+            seg = f"{_CONNECT[j % len(_CONNECT)] if n <= len(_CONNECT) else ('Finally,' if j == n - 1 else 'Then,')} {t}."
+            if with_effect:
+                e = _effect(steps[i])
+                if e:
+                    seg += " " + e
+            segs.append(seg)
+        return segs
 
-    segs = build(beats)
-    total = _wc(intro) + _wc(closing) + sum(_wc(s) for s in segs)
-    if n and total > 120:  # bahut lambi ho to steps ko chhota karo
-        short = [f"the {lbl} part of the tool is shown" for lbl in _beat_labels(demo)]
-        segs = build(short)
-
-    middle = list(segs)
-    used = 0
-    while used < len(_PAD):
-        total = _wc(intro) + _wc(closing) + sum(_wc(s) for s in middle)
-        if total >= TARGET_MIN:
-            break
-        if n:
-            middle[used % n] += " " + _PAD[used]
-        else:
-            intro += " " + _PAD[used]
-        used += 1
-
-    segments = [intro] + middle + [closing]
+    recap = ("To recap: " + ", ".join(beats[:-1]) + (", and " if len(beats) > 1 else "") + beats[-1] + "."
+             if beats else "")
+    segs = build(True)
+    tail = (recap + " " + closing).strip()
+    # bahut lambi ho to pehle recap, phir effects hatao (video 60s se upar na jaye)
+    if n and _wc(intro) + sum(_wc(s) for s in segs) + _wc(tail) > TARGET_MAX:
+        tail = closing
+    if n and _wc(intro) + sum(_wc(s) for s in segs) + _wc(tail) > TARGET_MAX:
+        segs = build(False)
+    segments = [intro] + segs + [tail]
     return {
         "topic": f"{name} basic walkthrough",
         "segments": segments,

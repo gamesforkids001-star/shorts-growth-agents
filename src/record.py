@@ -323,10 +323,29 @@ def _idle_motion(page, ms, anchor=None):
 
 
 def _apply_zoom(page):
-    """Page ko bara karo taake tool poori screen bhare (layout dobara set hota hai)."""
+    """Page ko bara karo taake tool poori screen bhare (layout dobara set hota hai).
+    Chhota tool (upload/calculator) ho to usay screen ke beech mein la do taake neeche khali jagah na rahe."""
     if ZOOM and abs(ZOOM - 1.0) > 0.01:
         page.add_style_tag(content="html{zoom:%s !important;}" % ZOOM)
         page.wait_for_timeout(400)
+    try:
+        box = page.evaluate("""() => {
+            const e = document.querySelector('.tool-box') || document.querySelector('#rt-ui');
+            if (!e) return null;
+            const r = e.getBoundingClientRect();
+            return {top: r.top + window.scrollY, h: r.height};
+        }""")
+        if box and box["h"] > 0:
+            # tool baad mein (result aane par) thoda barhta hai: 1.25x ki gunjaish ke saath center karo
+            target = VIEW_H * 0.46
+            delta = target - (box["top"] + box["h"] * 1.25 / 2)
+            delta = min(delta, VIEW_H * 0.36)
+            if delta > 30:
+                z = ZOOM if ZOOM and ZOOM > 0 else 1.0
+                page.add_style_tag(content=".tool-box,#rt-ui{margin-top:%dpx !important;}" % int(delta / z))
+                page.wait_for_timeout(300)
+    except Exception as ex:
+        _log("center fix skip: %s" % ex)
 
 
 def _norm_step(step):
