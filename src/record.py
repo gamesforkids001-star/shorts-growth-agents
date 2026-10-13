@@ -4,6 +4,11 @@ Ab live site nahi khulti. Repo ke tools_local/<slug>.html se recording hoti hai.
 
 record_demo(tool, demo, out_dir, ...) -> (recording_path, trim_start, marks)
 
+v9 (sab 22 tools ke liye generic):
+- khali waqt mein cursor tabs/buttons par ghoomta nahi: intro mein pehle step ke target ki taraf jata hai,
+  baad mein wahin ruka rehta hai (sirf halki si harkat).
+- scroll sirf tab hota hai jab element screen mein poora na dikhe (bekar scroll nahi).
+
 v8: nazar aane wala cursor + click ripple, dark colour-scheme, khali waqt mein cursor ki halki harkat.
 
 v6 (22 tools ke liye generic):
@@ -14,6 +19,7 @@ v6 (22 tools ke liye generic):
 - Narrated mode mein 'wait' max 0.4s, type/highlight/scroll_to/set awaaz ke jumle ke hisab se chalte hain.
 - Jis click ke foran baad usi selector par type ho, us par alag narration nahi.
 """
+import math
 import os
 import re
 import time
@@ -236,8 +242,8 @@ def _glide_to_loc(page, loc, ms=420):
     return False
 
 
-def _glide_to_dropzone(page, loc):
-    """Upload step: file input chhupa hota hai, is liye uske nazar aane wale dibbe par cursor + ripple."""
+def _dropzone_point(loc):
+    """Upload step: file input chhupa hota hai, uska nazar aane wala dibba dhoondo. (x, y) ya None."""
     try:
         h = loc.evaluate_handle(
             """e => { let n = e.closest('label,[class*=drop],[class*=upload],[id*=drop],[id*=upload]') || e.parentElement;
@@ -248,46 +254,69 @@ def _glide_to_dropzone(page, loc):
         if h:
             bb = h.bounding_box()
             if bb:
-                x, y = bb["x"] + bb["width"] / 2, bb["y"] + bb["height"] / 2
-                _glide_to(page, x, y, 500)
-                page.evaluate("([x, y]) => window.__ripple && window.__ripple(x, y)", [x, y])
-                page.wait_for_timeout(350)
+                return bb["x"] + bb["width"] / 2, bb["y"] + bb["height"] / 2
     except Exception as ex:
-        _log("dropzone glide fail: " + str(ex))
+        _log("dropzone point fail: " + str(ex))
+    return None
 
 
-def _idle_motion(page, ms):
-    """Khali waqt mein screen band na lage: cursor tool ke controls par dheere ghoomta hai (click nahi)."""
+def _glide_to_dropzone(page, loc):
+    """Upload step: nazar aane wale dibbe par cursor + ripple."""
+    pt = _dropzone_point(loc)
+    if pt:
+        x, y = pt
+        _glide_to(page, x, y, 500)
+        page.evaluate("([x, y]) => window.__ripple && window.__ripple(x, y)", [x, y])
+        page.wait_for_timeout(350)
+
+
+def _first_anchor(page, steps):
+    """Pehle asli step ke target ka (x, y) jo abhi screen mein dikhta ho. Intro mein cursor wahin jata hai."""
+    for step in steps:
+        a = _norm_step(step)
+        if a in ("wait", "scroll"):
+            continue
+        sel = step.get("selector")
+        try:
+            if a == "upload":
+                loc = page.locator(sel or "input[type=file]").first
+                loc.wait_for(state="attached", timeout=4000)
+                pt = _dropzone_point(loc)
+            else:
+                if not sel:
+                    return None
+                loc = page.locator(sel).first
+                loc.wait_for(state="visible", timeout=4000)
+                bb = loc.bounding_box()
+                pt = (bb["x"] + bb["width"] / 2, bb["y"] + bb["height"] / 2) if bb else None
+            if pt and 0 <= pt[0] <= VIEW_W and 0 <= pt[1] <= VIEW_H:
+                return pt
+        except Exception:
+            pass
+        return None  # sirf pehle asli step ko dekho
+    return None
+
+
+def _idle_motion(page, ms, anchor=None):
+    """Khali waqt mein screen band na lage. Cursor tabs/buttons par ghoomta NAHI.
+    anchor=(x, y) ho to cursor pehle wahan jata hai (intro mein pehle step ka target); phir wahin ruka
+    rehta hai aur sirf halki si harkat karta hai (click nahi)."""
     ms = int(ms)
-    if ms < 700:
+    if ms < 500:
         page.wait_for_timeout(max(0, ms))
         return
     end = time.time() + ms / 1000.0
-    try:
-        pts = page.evaluate(
-            """() => {
-              const out = [];
-              document.querySelectorAll('input:not([type=file]):not([type=hidden]),button,select,textarea').forEach(e => {
-                const r = e.getBoundingClientRect();
-                if (r.width > 30 && r.height > 18 && r.top >= 0 && r.bottom <= innerHeight)
-                  out.push([r.left + r.width / 2, r.top + r.height / 2]);
-              });
-              return out.slice(0, 8);
-            }"""
-        )
-    except Exception:
-        pts = []
-    # CSS zoom ke saath getBoundingClientRect ka scale browser par depend karta hai, is liye
-    # sirf wahi points rakho jo viewport ke andar hon.
-    pts = [(x, y) for x, y in pts if 0 <= x <= VIEW_W and 0 <= y <= VIEW_H]
-    i = 0
-    while pts and (end - time.time()) > 1.1:
-        x, y = pts[i % len(pts)]
-        _glide_to(page, x, y, 700)
-        i += 1
+    if anchor and ms >= 1000:
+        _glide_to(page, anchor[0], anchor[1], int(min(800, ms * 0.5)))
+    bx, by = _MOUSE["x"], _MOUSE["y"]
+    k = 0
+    while (end - time.time()) > 0.9:
+        k += 1
+        _glide_to(page, bx + 9 * math.sin(k * 1.3), by + 6 * math.cos(k * 1.1), 380)
         left = end - time.time()
-        if left > 0.4:
-            page.wait_for_timeout(int(min(600, left * 1000 - 300)))
+        if left > 0.5:
+            page.wait_for_timeout(int(min(450, left * 1000 - 300)))
+    _glide_to(page, bx, by, 200)
     left = end - time.time()
     if left > 0:
         page.wait_for_timeout(int(left * 1000))
@@ -350,8 +379,20 @@ def _find(page, selector, timeout=8000):
     raise RecordError("selector nahi mila: " + str(selector))
 
 
+def _in_view(loc, margin=30):
+    """Element screen mein poora dikhta hai?"""
+    try:
+        bb = loc.bounding_box()
+        return bool(bb and bb["width"] > 0 and bb["height"] > 0
+                    and bb["y"] >= margin and bb["y"] + bb["height"] <= VIEW_H - margin)
+    except Exception:
+        return False
+
+
 def _smooth_center(loc):
-    """Element ko screen ke beech mein smooth scroll karo."""
+    """Element ko screen ke beech mein smooth scroll karo, lekin sirf tab jab wo poora dikhta na ho."""
+    if _in_view(loc):
+        return
     try:
         loc.evaluate(
             "e => e.scrollIntoView({behavior: 'smooth', block: 'center'})"
@@ -546,7 +587,7 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root, holds, intro_hold,
             base = t0 + trim_start  # trimmed video ka waqt 0 yahan hai
 
             if intro_hold and intro_hold > 0:
-                _idle_motion(page, intro_hold * 1000)
+                _idle_motion(page, intro_hold * 1000, _first_anchor(page, steps))
 
             for i, step in enumerate(steps):
                 if time.time() - base > max_seconds:

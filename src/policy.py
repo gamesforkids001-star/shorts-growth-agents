@@ -5,6 +5,11 @@ BANNED = [
     "guaranteed", "100%", "free money", "giveaway", "follow for follow", "f4f", "click here",
     "like and share", "tag a friend", "tag 3", "make money", "get rich", "you won't believe",
     "shocking", "hack", "cure", "miracle", "number one", "no. 1", "best ever", "instantly",
+    "many assume", "many people think", "most people", "everyone knows", "everyone assumes",
+    # speed / time-saving / frequency claims (tool description mein na hon to jhoot ban sakte hain)
+    "immediately", "right away", "without any delay", "without delay", "in seconds",
+    "within seconds", "in no time", "quickly", "fast", "saves time", "save time",
+    "a lot of time", "every single day", "every day",
 ]
 
 # Narration (awaaz) me ye call-to-action wale lafz nahi hone chahiye
@@ -15,7 +20,7 @@ CTA_WORDS = [
 
 # Risky lafz ki jagah safe lafz (auto-fix). Jinka replacement nahi, wo flag hi honge.
 SAFE = {
-    "instantly": "quickly",
+    "instantly": "",
     "guaranteed": "reliable",
     "100%": "fully",
     "best ever": "great",
@@ -27,8 +32,22 @@ SAFE = {
 
 URL = re.compile(r"https?://|www\.", re.I)
 
-# 45 second video ke liye narration ki lambai (words mein). Target 100-115, ye range thori khuli hai.
-MIN_WORDS, MAX_WORDS = 90, 125
+
+def _has(text, phrase):
+    """phrase poora lafz/phrase ho to True ('secure' mein 'cure' nahi milta)."""
+    return re.search(r"(?<![a-z0-9])" + re.escape(phrase) + r"(?![a-z0-9])", text.lower()) is not None
+
+
+def find_banned(text):
+    """text mein jo BANNED phrases hain unki list."""
+    return [w for w in BANNED if _has(text, w)]
+
+
+def find_cta(text):
+    return [w for w in CTA_WORDS if _has(text, w)]
+
+# 45-60 second video ke liye narration ki lambai (words mein). agents.py ka target 104-118.
+MIN_WORDS, MAX_WORDS = 100, 125
 
 
 def sanitize(text):
@@ -43,6 +62,8 @@ def sanitize(text):
             return g
 
         text = pattern.sub(repl, text)
+    text = re.sub(r"[ \t]{2,}", " ", text)
+    text = re.sub(r"\s+([,.;!?])", r"\1", text)
     return text
 
 
@@ -64,9 +85,8 @@ def hard_check(platform, m):
 
     issues = []
     text = " ".join(str(v) for k, v in m.items() if k not in ("tags", "hashtags")).lower()
-    for w in BANNED:
-        if w in text:
-            issues.append(f"remove risky phrase: {w}")
+    for w in find_banned(text):
+        issues.append(f"remove risky phrase: {w}")
     if URL.search(text):
         issues.append("do not write any URL")
     n = len(clean_tags(m.get("hashtags")))
@@ -97,10 +117,15 @@ Rules:
 Video narration (this is what the viewer hears while a real screen recording of the tool plays):
 {plan['narration']}
 
+What the screen recording actually shows (nothing else is shown): {plan.get('shown', '')}
+
 Proposed text: {m}
 
 Check: misleading or clickbait? unsupported claims? engagement bait? spammy or irrelevant tags?
-Does the text honestly match the narration and the screen recording? Return JSON only: {{"ok": true/false, "issues": ["..."]}}"""
+Does the text honestly match the narration and the screen recording? It must NOT name any feature, option,
+unit type, file format or mode that the recording does not show (for example, if only length is converted,
+the text must not say it converts weight). Tags and hashtags must relate to this tool or to what is shown.
+Return JSON only: {{"ok": true/false, "issues": ["..."]}}"""
     r = ask_json(prompt, "Be strict but fair. Only flag real problems.", 0.2)
     return [] if r.get("ok") else (r.get("issues") or ["policy problem"])
 
@@ -128,12 +153,10 @@ def review_script(plan, policies, tool=None, demo=None, openers=None):
     if not MIN_WORDS <= words <= MAX_WORDS:
         issues.append(f"narration must be {MIN_WORDS}-{MAX_WORDS} words (now {words})")
     low = text.lower()
-    for w in BANNED:
-        if w in low:
-            issues.append(f"remove risky phrase: {w}")
-    for w in CTA_WORDS:
-        if w in low:
-            issues.append(f"remove call to action from narration: {w}")
+    for w in find_banned(low):
+        issues.append(f"remove risky phrase: {w}")
+    for w in find_cta(low):
+        issues.append(f"remove call to action from narration: {w}")
     if URL.search(text):
         issues.append("do not say or write any URL")
     if too_similar(plan, openers):
@@ -146,6 +169,8 @@ def review_script(plan, policies, tool=None, demo=None, openers=None):
         facts = f"Tool: {tool.get('name')} - {tool.get('description')}\n"
     if demo:
         facts += f"What is shown on screen: {demo.get('title', '')} | steps: {demo.get('steps', '')}\n"
+    if plan.get("shown"):
+        facts += f"Plain-words list of what is shown, in order: {plan['shown']}\n"
 
     prompt = f"""You are a strict policy reviewer for short videos on YouTube, Facebook and Instagram.
 Rules:
@@ -158,6 +183,10 @@ Narration: {text}
 Check: honest, no invented facts/stats, no superlatives, no medical/legal/financial/income claims,
 no engagement bait or call to action, no claim about privacy/security/speed unless it is in the known facts,
 and the narration only describes things that are actually shown on screen.
+The tool description may list more features than the video shows. The narration must NOT name any feature,
+option, unit type, file format or mode that is not shown in the steps (for example, if only length is
+converted, saying it also converts weight is a problem). Also flag claims about how often or how much a
+problem happens (every day, a lot of time, most people) and any speed or time-saving claim.
 Typing text into the tool, clicking controls listed in the steps, and a plain closing sentence that only
 states what the tool is are all fine. Only flag real problems, not style preferences.
 Return JSON only: {{"ok": true/false, "issues": ["..."]}}"""

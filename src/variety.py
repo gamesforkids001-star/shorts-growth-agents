@@ -4,11 +4,11 @@ import random
 
 FORMATS = {
     "quick_tip": "A practical quick tip: hook with a real everyday problem, then show how the tool helps while the demo plays.",
-    "myth_vs_fact": "Start with a common wrong assumption people have about this kind of task, then gently correct it while the demo plays.",
+    "myth_vs_fact": "Start with a small everyday mistake or problem in this kind of task (never say what many/most people or everyone think), then show the simple fix while the demo plays.",
     "question": "Open with a relatable question, then answer it step by step as the demo plays on screen.",
     "mini_story": "A tiny 'imagine this' everyday situation (no fake names, no fake people), then show how the tool solves it on screen.",
     "three_steps": "Explain how to use the tool in 3 simple steps, matching exactly what is happening on screen.",
-    "before_after": "Contrast the slow, annoying old way of doing the task with the simpler way shown on screen.",
+    "before_after": "Contrast the old manual way of doing the task with the simpler way shown on screen.",
     "mistake_to_avoid": "Point out a common mistake people make with this task, then the safer way shown on screen.",
     "checklist": "A short 'before you do this, check these things' list, then the tool as the easy way to finish.",
     "when_to_use": "Mention 2-3 real situations when this tool is handy while the demo plays.",
@@ -21,7 +21,7 @@ HOOKS = {
     "if_you": "Open with 'If you ever ...' style line.",
     "quick_one": "Open with a casual 'Quick one:' or 'Small tip:' style line.",
     "imagine": "Open with 'Imagine ...' and a relatable moment.",
-    "fact": "Open with a calm, true statement taken from the tool description.",
+    "fact": "Open with a calm, true statement taken from the tool description that this video actually shows.",
 }
 
 CTAS = [
@@ -68,4 +68,4 @@ def choose(history, tool=None):
         "cta": _pick(CTAS, [h.get("cta") for h in history], 3),
         "voice": _pick(VOICES, [h.get("voice") for h in history], 2),
         "demo": _pick_demo(tool, history),
-}
+    }

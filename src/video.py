@@ -9,12 +9,17 @@ REC_Y = 170          # recording kahan se shuru ho
 REC_MAX_W = 1080     # record.py ke VIEW_W se match
 REC_MAX_H = 1380     # record.py ke VIEW_H se match (170 + 1380 = 1550 tak)
 CAP_CY = 1730        # captions/CTA ka center
-CAP_WORDS = 9        # ek caption mein zyada se zyada itne alfaaz
+CAP_WORDS = 11       # ek caption mein zyada se zyada itne alfaaz
+CAP_FONT = 62        # sab captions ka ek jaisa font size (pehle kabhi kabhi chhota ho jata tha)
+CAP_MAX_LINES = 3    # caption dabbe mein zyada se zyada itni lines
 
 CTA_TEXT = "Link in description & profile"
 CTA_SECS = 2.0       # aakhri itne second on-screen CTA
 
-MIN_SECONDS = 40.0   # video 40s se chhoti na ho (chhoti ho to aakhri frame ruka kar 40s kar do)
+MIN_SECONDS = 45.0   # video 45s se chhoti na ho (chhoti ho to aakhri frame ruka kar 45s kar do)
+
+# edge-tts ki raftaar. "+0%" = normal. (+8% karne se 100 words bhi 45s se chhoti video dete hain, is liye normal)
+TTS_RATE = "+0%"
 
 # Rang: recording ka asal background (dark navy) - patti isi rang ki hai, is liye alag nazar nahi aati
 BG_TOP = (12, 16, 31)
@@ -53,6 +58,14 @@ def _wrap(draw, text, font, max_w):
     return lines
 
 
+_MEASURE = ImageDraw.Draw(Image.new("RGB", (4, 4)))
+
+
+def _fits(text):
+    """Ye text CAP_FONT par CAP_MAX_LINES lines ke andar aata hai?"""
+    return len(_wrap(_MEASURE, text, _font(CAP_FONT), W - 200)) <= CAP_MAX_LINES
+
+
 # Caption kahan se na kate: in lafzon par caption khatam nahi hona chahiye
 _BAD_END = {"a", "an", "the", "of", "to", "in", "on", "at", "for", "with", "from", "by", "and", "or",
             "but", "is", "are", "was", "were", "be", "your", "my", "our", "its", "this", "that",
@@ -70,17 +83,15 @@ def _cut_score(words, i, ideal):
     if prev.endswith((",", ";", ":")):
         s += 4
     if nxt.lower().strip(",.") in _GOOD_START:
-        s += 2
+        s += 3.5
     if prev.lower().strip(",.;:") in _BAD_END:
         s -= 5
     return s
 
 
-def _split_sentence(words, max_words):
+def _split_k(words, k, max_words):
+    """words ko k tukron mein todta hai (acchi hadd par: comma, 'so', 'and' se pehle)."""
     n = len(words)
-    if n <= max_words:
-        return [" ".join(words)]
-    k = math.ceil(n / max_words)
     cuts, last = [], 0
     for j in range(1, k):
         ideal = round(j * n / k)
@@ -102,9 +113,23 @@ def _split_sentence(words, max_words):
     return parts
 
 
+def _split_sentence(words, max_words):
+    n = len(words)
+    if n <= max_words and _fits(" ".join(words)):
+        return [" ".join(words)]
+    k0 = max(2, math.ceil(n / max_words))
+    parts = None
+    for k in range(k0, max(k0, n // 2) + 1):
+        parts = _split_k(words, k, max_words)
+        if all(p and _fits(p) for p in parts):
+            return parts
+    return parts or [" ".join(words)]
+
+
 def split_chunks(text, max_words=CAP_WORDS):
     """Narration ko caption tukron mein todta hai. Pehle jumle, phir lambe jumle ko
-    comma / conjunction ki hadd par; 'the', 'to', 'of' jaise lafz par kabhi nahi katta."""
+    comma / conjunction ki hadd par; 'the', 'to', 'of' jaise lafz par kabhi nahi katta.
+    Har tukra CAP_FONT par CAP_MAX_LINES lines mein fit hota hai (font hamesha ek jaisa)."""
     chunks = []
     for sent in re.split(r"(?<=[.!?])\s+", text.strip()):
         words = sent.split()
@@ -123,10 +148,10 @@ def make_caption(text, tool_name, path):
     py = 40
     d.rounded_rectangle([(W - tw) / 2 - 40, py, (W + tw) / 2 + 40, py + 90], radius=45, fill=ACCENT + (255,))
     d.text(((W - tw) / 2, py + 15), tool_name, font=f_small, fill=(255, 255, 255, 255))
-    size = 70
+    size = CAP_FONT
     font = _font(size)
     lines = _wrap(d, text, font, W - 200)
-    while len(lines) > 3 and size > 44:
+    while len(lines) > CAP_MAX_LINES and size > 44:  # sirf bahut hi anokhi halat mein chhota
         size -= 4
         font = _font(size)
         lines = _wrap(d, text, font, W - 200)
@@ -165,10 +190,16 @@ def make_cta(text, path):
 async def _edge(text, voice, path):
     """Awaaz banata hai aur har lafz ka waqt (word timing) bhi wapas deta hai."""
     import edge_tts
+    kw = {}
+    if TTS_RATE and TTS_RATE != "+0%":
+        kw["rate"] = TTS_RATE
     try:
-        comm = edge_tts.Communicate(text, voice, boundary="WordBoundary")
+        comm = edge_tts.Communicate(text, voice, boundary="WordBoundary", **kw)
     except TypeError:
-        comm = edge_tts.Communicate(text, voice)
+        try:
+            comm = edge_tts.Communicate(text, voice, **kw)
+        except TypeError:
+            comm = edge_tts.Communicate(text, voice)
     words = []
     with open(path, "wb") as f:
         async for ch in comm.stream():
@@ -237,8 +268,8 @@ def build(voices, tool_name, out_dir, max_seconds=60, recording=None, trim_start
     """voices: make_voice() ka result (intro, har step ka jumla, closing).
     starts: har voice kab shuru ho (record.py ke marks se); None ho to jumle ek ke baad ek.
     recording: record.py ki recording. trim_start: shuru ke kitne second kaatne hain.
-    Video ki length MIN_SECONDS (40s) se max_seconds (60s) ke darmiyan rehti hai:
-    chhoti ho to 40s tak barh jati hai, 60s se lambi ho to error.
+    Video ki length MIN_SECONDS (45s) se max_seconds (60s) ke darmiyan rehti hai:
+    chhoti ho to 45s tak barh jati hai, 60s se lambi ho to error.
     Aakhri CTA_SECS second mein on-screen CTA aata hai."""
     if not recording or not os.path.exists(recording):
         raise RuntimeError("screen recording nahi mili, video nahi banegi")
@@ -273,6 +304,12 @@ def build(voices, tool_name, out_dir, max_seconds=60, recording=None, trim_start
         spans = _caption_spans(chunks, vc["text"], vc["words"], vc["dur"], vc["dur"])
         for c, (s, e) in zip(chunks, spans):
             caps.append((c, st[i] + s, st[i] + e))
+    # har caption agle caption ke shuru tak (aakhri CTA ke shuru tak) dikhta rahe: beech mein khali nahi
+    held = []
+    for i, (c, s, e) in enumerate(caps):
+        nxt = caps[i + 1][1] if i + 1 < len(caps) else total - CTA_SECS
+        held.append((c, s, max(e, nxt)))
+    caps = held
     for i, (c, s, e) in enumerate(caps):
         make_caption(c, tool_name, f"{out_dir}/c{i}.png")
     cta_png = f"{out_dir}/cta.png"
