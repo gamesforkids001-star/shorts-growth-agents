@@ -92,3 +92,19 @@ jobs:
           path: all
       - name: Summary table
         run: python check_video.py --summary all >> "$GITHUB_STEP_SUMMARY"
+      - name: Collect contact sheets (ek hi zip mein sab tools)
+        if: always()
+        run: |
+          mkdir -p sheets
+          for d in all/*/; do
+            n=$(basename "$d" | sed 's/^short-output-//')
+            [ -f "$d/sheet.jpg" ] && cp "$d/sheet.jpg" "sheets/$n.jpg" || true
+            [ -f "$d/error.txt" ] && cp "$d/error.txt" "sheets/$n.error.txt" || true
+          done
+      - name: Save contact sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contact-sheets
+          path: sheets/
+          retention-days: 3
