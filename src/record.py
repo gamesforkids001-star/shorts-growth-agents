@@ -1,5 +1,9 @@
 """record.py - tool page ki screen recording (Playwright).
 
+v10: har step ke baad _fit(): natija aane se tool barh jaye to zoom khud ghat jata hai (min 0.8) aur page
+upar scroll hota hai, to tool kabhi neeche/upar se nahi katta. Tool shuru mein ab upar (5%) se shuru hota hai
+(pehle 20% neeche tha, upar bekar khali jagah thi).
+
 Ab live site nahi khulti. Repo ke tools_local/<slug>.html se recording hoti hai.
 
 record_demo(tool, demo, out_dir, ...) -> (recording_path, trim_start, marks)
@@ -32,6 +36,17 @@ VIEW_W, VIEW_H = 1080, 1380
 
 # Tool ko bara karne ke liye zoom. Chota lage to 1.9, kata hua lage to 1.5.
 ZOOM = float(os.environ.get("REC_ZOOM", "1.7"))
+
+# v10: natija aane par tool barhe to zoom is hadd tak ghatta hai taake tool neeche/upar se na kate
+MIN_ZOOM = 0.8
+_CUR = {"z": 1.0}   # abhi ka zoom (_apply_zoom aur _fit update karte hain)
+
+BOX_JS = """() => {
+    const e = document.querySelector('.tool-box') || document.querySelector('#rt-ui');
+    if (!e) return null;
+    const r = e.getBoundingClientRect();
+    return {top: r.top + window.scrollY, h: r.height, sy: window.scrollY};
+}"""
 
 LOCAL_DIR = "tools_local"
 
@@ -334,6 +349,7 @@ def _apply_zoom(page):
         return {top: r.top + window.scrollY, h: r.height};
     }"""
     z = ZOOM if ZOOM and ZOOM > 0 else 1.0
+    _CUR["z"] = z
     if abs(z - 1.0) > 0.01:
         page.add_style_tag(content="html{zoom:%s !important;}" % z)
         page.wait_for_timeout(400)
@@ -347,16 +363,43 @@ def _apply_zoom(page):
                 break
             z = max(1.0, z * (VIEW_H * 0.96) / need)
             page.add_style_tag(content="html{zoom:%.3f !important;}" % z)
+            _CUR["z"] = z
             page.wait_for_timeout(300)
         box = page.evaluate(box_js)
         if box and box["h"] > 0:
-            top_goal = VIEW_H * 0.20            # isse neeche mat lao: growth ke liye jagah
+            top_goal = VIEW_H * 0.05            # tool upar se shuru (v10): neeche natija ke liye zyada jagah
             delta = min(top_goal - box["top"], VIEW_H * 0.36)
             if delta > 30 and box["top"] + box["h"] * 1.5 + delta < VIEW_H:
                 page.add_style_tag(content=".tool-box,#rt-ui{margin-top:%dpx !important;}" % int(delta / z))
                 page.wait_for_timeout(300)
     except Exception as ex:
         _log("zoom/center fix skip: %s" % ex)
+    _CUR["z"] = z
+
+
+def _fit(page):
+    """Tool (natija ke saath) poori screen mein na aaye to zoom ghatao; aa jaye to page upar le jao."""
+    try:
+        page.wait_for_timeout(150)
+        for _ in range(2):
+            box = page.evaluate(BOX_JS)
+            if not box or box["h"] <= 0:
+                return
+            need = box["top"] + box["h"]
+            z = _CUR["z"]
+            if need <= VIEW_H * 0.97 or z <= MIN_ZOOM + 0.01:
+                break
+            z = max(MIN_ZOOM, z * (VIEW_H * 0.96) / need)
+            page.add_style_tag(content="html{zoom:%.3f !important;}" % z)
+            _CUR["z"] = z
+            _log("tool barh gaya, zoom -> %.2f" % z)
+            page.wait_for_timeout(250)
+        box = page.evaluate(BOX_JS)
+        if box and box["sy"] > 5 and box["top"] + box["h"] <= VIEW_H * 0.97:
+            page.evaluate("window.scrollTo({top: 0, behavior: 'smooth'})")  # poora dikhta hai to upar le jao
+            page.wait_for_timeout(300)
+    except Exception as ex:
+        _log("fit skip: %s" % ex)
 
 
 def _norm_step(step):
@@ -627,6 +670,9 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root, holds, intro_hold,
                 marks["steps"].append(round(s0 - base, 2))
                 hold = holds[i] if holds and i < len(holds) else None
                 _run_step(page, step, repo_root, target=hold, fast=fast)
+                if _norm_step(step) not in ("wait", "scroll"):
+                    page.wait_for_timeout(300)   # natija banne do
+                    _fit(page)
                 if hold:
                     left = hold - (time.time() - s0)
                     if left > 0:

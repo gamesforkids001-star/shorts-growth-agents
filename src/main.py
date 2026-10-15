@@ -7,8 +7,8 @@ STATE = ROOT / "state" / "history.json"
 
 REQUIRED = {
     "youtube": ["YT_CLIENT_ID", "YT_CLIENT_SECRET", "YT_REFRESH_TOKEN"],
-    "facebook": ["META_PAGE_ID", "META_PAGE_TOKEN"],
-    "instagram": ["IG_USER_ID", "META_PAGE_TOKEN"],
+    "facebook": ["FB_PAGE_ID", "FB_PAGE_ACCESS_TOKEN"],
+    "instagram": ["IG_USER_ID", "IG_ACCESS_TOKEN"],
 }
 
 

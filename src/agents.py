@@ -1,4 +1,6 @@
-"""agents.py v12 - narration + metadata (sab 22 tools ke liye generic).
+"""agents.py v13 - narration + metadata (sab 22 tools ke liye generic).
+
+v13: intro mein koi control/setting nahi (screen par abhi nazar nahi aati); quote wali value jaisi hai waisi boli jaye.
 
 v12: narration mein "kyun chahiye" wale claims (secure, safety, protect, guess...) tabhi chalte hain jab tool description
 ya demo mein hon. Har beat ki lambai ki had (padding band). Prompt mein bhi mana.
@@ -232,7 +234,8 @@ def idea_and_script(tool, info, recent, policies, site_name, v, recent_openers, 
                       "Sentence 1 is the hook: a plain everyday problem this tool helps with, as a statement or "
                       "a question (no claim about how often or how much it happens). "
                       f'Sentence 2 names the tool exactly as "{name}". It is spoken while the tool is shown '
-                      "before anything moves, so it must stay short.")
+                      "before anything moves, so it must stay short. The intro must NOT mention any control, "
+                      "setting, slider, option or action from the beats (they are not on screen yet).")
     else:
         beat_list = "(no separate beats)"
         beat_rule = '"beats": an empty list [].'
@@ -279,6 +282,8 @@ Rules:
   phrases from the tool description.
 - Do NOT say the word "button" and do not mention clicking, unless a click beat is listed above.
 - Do not read out exact results, numbers or counts, because you cannot see them.
+- If a beat contains a value in quotes (for example "12/25/2000"), say that value exactly as it is written;
+  never rewrite it as words (for example never "in the year two thousand").
 - Use plain, literal words that a child could follow. Say what the beat says (for example: you move the
   quality slider to fifty). Never use vague or technical-sounding words such as: {ABSTRACT_TXT}.
   Do not describe effects that the screen does not show.

@@ -1,6 +1,7 @@
 import os, time, json, subprocess, requests
 
-G = "https://graph.facebook.com/v21.0"
+G = "https://graph.facebook.com/v21.0"          # Facebook Page
+GI = "https://graph.instagram.com/v21.0"        # Instagram (Instagram Login token)
 
 
 def check_video(path, max_seconds=60):
@@ -84,40 +85,47 @@ def youtube(video, m, privacy):
     return _retry(lambda: _youtube_once(video, m, privacy))
 
 
-def _upload_binary(url, token, path):
+def _ok(r, what):
+    """HTTP error ho to Meta ka asli error text dikhao (sirf 400 nahi)."""
+    if r.status_code >= 400:
+        raise RuntimeError(f"{what}: HTTP {r.status_code} {r.text[:500]}")
+    return r
+
+
+def _upload_binary(url, token, path, what="upload"):
     size = os.path.getsize(path)
     with open(path, "rb") as f:
         r = requests.post(url, headers={
             "Authorization": f"OAuth {token}", "offset": "0", "file_size": str(size)},
             data=f, timeout=900)
-    r.raise_for_status()
+    _ok(r, what)
 
 
 def facebook(video, caption):
-    page, tok = os.environ["META_PAGE_ID"], os.environ["META_PAGE_TOKEN"]
-    r = requests.post(f"{G}/{page}/video_reels",
-                      data={"upload_phase": "start", "access_token": tok}, timeout=60)
-    r.raise_for_status()
+    page, tok = os.environ["FB_PAGE_ID"], os.environ["FB_PAGE_ACCESS_TOKEN"]
+    r = _ok(requests.post(f"{G}/{page}/video_reels",
+                          data={"upload_phase": "start", "access_token": tok}, timeout=60), "Facebook start")
     j = r.json()
-    _upload_binary(j["upload_url"], tok, video)
-    r = requests.post(f"{G}/{page}/video_reels", data={
+    _upload_binary(j["upload_url"], tok, video, "Facebook upload")
+    _ok(requests.post(f"{G}/{page}/video_reels", data={
         "upload_phase": "finish", "video_id": j["video_id"],
-        "video_state": "PUBLISHED", "description": caption, "access_token": tok}, timeout=120)
-    r.raise_for_status()
+        "video_state": "PUBLISHED", "description": caption, "access_token": tok}, timeout=120),
+        "Facebook finish")
     return j["video_id"]
 
 
 def instagram(video, caption):
-    ig, tok = os.environ["IG_USER_ID"], os.environ["META_PAGE_TOKEN"]
-    r = requests.post(f"{G}/{ig}/media", data={
+    ig, tok = os.environ["IG_USER_ID"], os.environ["IG_ACCESS_TOKEN"]
+    r = _ok(requests.post(f"{GI}/{ig}/media", data={
         "media_type": "REELS", "upload_type": "resumable", "caption": caption,
-        "share_to_feed": "true", "access_token": tok}, timeout=60)
-    r.raise_for_status()
+        "share_to_feed": "true", "access_token": tok}, timeout=60), "Instagram container")
     j = r.json()
     cid = j["id"]
-    _upload_binary(j.get("uri") or f"https://rupload.facebook.com/ig-api-upload/v21.0/{cid}", tok, video)
+    _upload_binary(j.get("uri") or f"https://rupload.facebook.com/ig-api-upload/v21.0/{cid}",
+                   tok, video, "Instagram upload")
     for _ in range(40):  # up to ~6 minutes
-        s = requests.get(f"{G}/{cid}", params={"fields": "status_code", "access_token": tok}, timeout=60).json()
+        s = requests.get(f"{GI}/{cid}", params={"fields": "status_code", "access_token": tok},
+                         timeout=60).json()
         if s.get("status_code") == "FINISHED":
             break
         if s.get("status_code") == "ERROR":
@@ -125,7 +133,6 @@ def instagram(video, caption):
         time.sleep(10)
     else:
         raise RuntimeError("Instagram processing timeout")
-    r = requests.post(f"{G}/{ig}/media_publish",
-                      data={"creation_id": cid, "access_token": tok}, timeout=60)
-    r.raise_for_status()
+    r = _ok(requests.post(f"{GI}/{ig}/media_publish",
+                          data={"creation_id": cid, "access_token": tok}, timeout=60), "Instagram publish")
     return r.json().get("id")
