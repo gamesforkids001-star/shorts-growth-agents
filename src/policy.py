@@ -28,6 +28,16 @@ SAFE = {
     "miracle": "helpful",
     "hack": "trick",
     "you won't believe": "here is",
+    # speed lafz: sirf hata do (bina inke bhi jumla theek rehta hai)
+    "quickly": "",
+    "fast": "",
+    "immediately": "",
+    "right away": "",
+    "without any delay": "",
+    "without delay": "",
+    "in seconds": "",
+    "within seconds": "",
+    "in no time": "",
 }
 
 URL = re.compile(r"https?://|www\.", re.I)
@@ -162,6 +172,7 @@ def review_script(plan, policies, tool=None, demo=None, openers=None):
     if too_similar(plan, openers):
         issues.append("opening is too similar to a recent video, change it")
     if issues:
+        print("[policy] script rule-check fail:", issues, flush=True)
         return False, issues
 
     facts = ""
@@ -191,4 +202,7 @@ Typing text into the tool, clicking controls listed in the steps, and a plain cl
 states what the tool is are all fine. Only flag real problems, not style preferences.
 Return JSON only: {{"ok": true/false, "issues": ["..."]}}"""
     r = ask_json(prompt, "Be strict but fair. Only flag real problems.", 0.2)
-    return bool(r.get("ok")), r.get("issues", [])
+    ok = bool(r.get("ok"))
+    if not ok:
+        print("[policy] script AI-check fail:", r.get("issues", []), flush=True)
+    return ok, r.get("issues", [])
