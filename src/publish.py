@@ -114,15 +114,38 @@ def facebook(video, caption):
     return j["video_id"]
 
 
+def _public_url(path):
+    """Instagram ko video_url chahiye: video ko 1 ghante ke liye public link par rakho (litterbox)."""
+    with open(path, "rb") as f:
+        r = requests.post("https://litterbox.catbox.moe/resources/internals/api.php",
+                          data={"reqtype": "fileupload", "time": "1h"},
+                          files={"fileToUpload": f}, timeout=300)
+    url = r.text.strip()
+    if r.status_code != 200 or not url.startswith("https://"):
+        raise RuntimeError(f"public link nahi bana: HTTP {r.status_code} {r.text[:200]}")
+    return url
+
+
 def instagram(video, caption):
     ig, tok = os.environ["IG_USER_ID"], os.environ["IG_ACCESS_TOKEN"]
-    r = _ok(requests.post(f"{GI}/{ig}/media", data={
-        "media_type": "REELS", "upload_type": "resumable", "caption": caption,
-        "share_to_feed": "true", "access_token": tok}, timeout=60), "Instagram container")
-    j = r.json()
-    cid = j["id"]
-    _upload_binary(j.get("uri") or f"https://rupload.facebook.com/ig-api-upload/v21.0/{cid}",
-                   tok, video, "Instagram upload")
+    base = {"media_type": "REELS", "caption": caption,
+            "share_to_feed": "true", "access_token": tok}
+    try:
+        r = _ok(requests.post(f"{GI}/{ig}/media", data={**base, "upload_type": "resumable"},
+                              timeout=60), "Instagram container")
+        j = r.json()
+        cid = j["id"]
+        _upload_binary(j.get("uri") or f"https://rupload.facebook.com/ig-api-upload/v21.0/{cid}",
+                       tok, video, "Instagram upload")
+    except RuntimeError as e:
+        # 17 Oct: "video_url is required" aaya, yani resumable is account par kaam nahi karta
+        if "video_url" not in str(e):
+            raise
+        print("Instagram resumable kaam nahi kiya, video_url tareeqa:", str(e)[:150])
+        url = _public_url(video)
+        r = _ok(requests.post(f"{GI}/{ig}/media", data={**base, "video_url": url},
+                              timeout=60), "Instagram container (video_url)")
+        cid = r.json()["id"]
     for _ in range(40):  # up to ~6 minutes
         s = requests.get(f"{GI}/{cid}", params={"fields": "status_code", "access_token": tok},
                          timeout=60).json()
