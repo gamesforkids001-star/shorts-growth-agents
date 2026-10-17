@@ -1,0 +1,20 @@
+[
+  {
+    "date": "2026-10-17",
+    "slot": -1,
+    "tool": "jpg-to-pdf",
+    "demo": "original-size",
+    "topic": "creating a single PDF file from original size images",
+    "format": "mini_story",
+    "hook": "if_you",
+    "cta": "Find it free on {site}, link in my profile.",
+    "voice": "en-US-AriaNeural",
+    "opener": "If you ever need to combine",
+    "title": "How to make a PDF from an image at original size",
+    "results": {
+      "youtube": "posted id=XwdwiY6DaGo",
+      "facebook": "FAILED: Facebook start: HTTP 400 {\"error\":{\"message\":\"Invalid OAuth access token - Cannot parse access token\",\"type\":\"OAuthException\",\"code\":190,\"fbtrace_id\":\"AhqxFVI7ahEfDBZsxti8hJp\"}}",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"The parameter video_url is required\",\"type\":\"IGApiException\",\"code\":100,\"fbtrace_id\":\"ArqbaaPv0ktQ76Hd5sONVCP\"}}"
+    }
+  }
+]
