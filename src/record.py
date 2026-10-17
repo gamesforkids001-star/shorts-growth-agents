@@ -1,5 +1,11 @@
 """record.py - tool page ki screen recording (Playwright).
 
+v11 (stability): video kabhi theek kabhi kharab hone ki wajah dur karne ke liye:
+- _settle(): har step ke baad natija aane tak ruko (tool ki height 450ms na badle), phir zoom fit.
+- _smooth_center(): scroll ruk jane tak ruko, tab cursor/click (pehle scroll ke beech mein cursor galat jagah jata tha).
+- click fail ho to JS click se dobara koshish; page load + fonts ready ka intezar; attempts 3.
+- aakhir mein tool kat raha ho to log mein WARNING + last_frame.png save.
+
 v10: har step ke baad _fit(): natija aane se tool barh jaye to zoom khud ghat jata hai (min 0.8) aur page
 upar scroll hota hai, to tool kabhi neeche/upar se nahi katta. Tool shuru mein ab upar (5%) se shuru hota hai
 (pehle 20% neeche tha, upar bekar khali jagah thi).
@@ -377,6 +383,48 @@ def _apply_zoom(page):
     _CUR["z"] = z
 
 
+def _settle(page, max_ms=3500):
+    """Natija aane tak ruko: tool ki height aur scroll 450ms tak na badle to aage barho."""
+    end = time.time() + max_ms / 1000.0
+    last = "init"
+    stable = 0
+    while time.time() < end:
+        try:
+            box = page.evaluate(BOX_JS)
+        except Exception:
+            return
+        cur = (round(box["h"]), round(box["sy"])) if box else None
+        if cur == last:
+            stable += 1
+            if stable >= 3:
+                return
+        else:
+            stable = 0
+            last = cur
+        page.wait_for_timeout(150)
+
+
+def _wait_scroll_stop(page, max_ms=2500):
+    """Smooth scroll khatam hone tak ruko."""
+    page.wait_for_timeout(150)
+    end = time.time() + max_ms / 1000.0
+    last = None
+    stable = 0
+    while time.time() < end:
+        try:
+            y = page.evaluate("window.scrollY")
+        except Exception:
+            return
+        if y == last:
+            stable += 1
+            if stable >= 3:
+                return
+        else:
+            stable = 0
+            last = y
+        page.wait_for_timeout(120)
+
+
 def _fit(page):
     """Tool (natija ke saath) poori screen mein na aaye to zoom ghatao; aa jaye to page upar le jao."""
     try:
@@ -470,6 +518,7 @@ def _smooth_center(loc):
         loc.evaluate(
             "e => e.scrollIntoView({behavior: 'smooth', block: 'center'})"
         )
+        _wait_scroll_stop(loc.page)
     except Exception:
         loc.scroll_into_view_if_needed()
 
@@ -525,7 +574,11 @@ def _run_step(page, step, repo_root, target=None, fast=False):
         _smooth_center(loc)
         page.wait_for_timeout(250 if fast else 600)
         _glide_to_loc(page, loc)
-        loc.click()
+        try:
+            loc.click(timeout=6000)
+        except Exception as ex:
+            _log("click fail, JS click try: %s" % str(ex)[:120])
+            loc.evaluate("e => e.click()")
     elif action == "select":
         loc = _find(page, sel)
         _smooth_center(loc)
@@ -604,7 +657,7 @@ def _run_step(page, step, repo_root, target=None, fast=False):
     page.wait_for_timeout(int(step.get("after_ms", 250 if fast else 500)))
 
 
-def record_demo(tool, demo, out_dir, max_seconds=55, repo_root=".", attempts=2,
+def record_demo(tool, demo, out_dir, max_seconds=55, repo_root=".", attempts=3,
                 holds=None, intro_hold=0.0, closing_hold=0.0):
     """Returns (recording_path, trim_start, marks).
 
@@ -652,6 +705,11 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root, holds, intro_hold,
         trim_start = 0.0
         try:
             page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            try:
+                page.wait_for_load_state("load", timeout=8000)
+                page.evaluate("document.fonts && document.fonts.ready")
+            except Exception:
+                pass
             page.wait_for_timeout(600)
             _apply_zoom(page)
             page.wait_for_timeout(600)
@@ -671,14 +729,22 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root, holds, intro_hold,
                 hold = holds[i] if holds and i < len(holds) else None
                 _run_step(page, step, repo_root, target=hold, fast=fast)
                 if _norm_step(step) not in ("wait", "scroll"):
-                    page.wait_for_timeout(300)   # natija banne do
+                    _settle(page)                # natija aane tak ruko
                     _fit(page)
+                    _settle(page, 1200)
                 if hold:
                     left = hold - (time.time() - s0)
                     if left > 0:
                         _idle_motion(page, left * 1000)
 
             marks["end"] = round(time.time() - base, 2)
+            try:
+                box = page.evaluate(BOX_JS)
+                if box and box["top"] - box["sy"] + box["h"] > VIEW_H:
+                    _log("WARNING: aakhir mein tool neeche se kat raha hai (%s)" % box)
+                page.screenshot(path=str(out_dir / "last_frame.png"))
+            except Exception as ex:
+                _log("final check skip: %s" % ex)
             if closing_hold and closing_hold > 0:
                 _idle_motion(page, closing_hold * 1000)
             page.wait_for_timeout(800)
