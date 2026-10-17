@@ -16,5 +16,23 @@
       "facebook": "FAILED: Facebook start: HTTP 400 {\"error\":{\"message\":\"Invalid OAuth access token - Cannot parse access token\",\"type\":\"OAuthException\",\"code\":190,\"fbtrace_id\":\"AhqxFVI7ahEfDBZsxti8hJp\"}}",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"The parameter video_url is required\",\"type\":\"IGApiException\",\"code\":100,\"fbtrace_id\":\"ArqbaaPv0ktQ76Hd5sONVCP\"}}"
     }
+  },
+  {
+    "date": "2026-10-17",
+    "slot": 4,
+    "tool": "age-calculator",
+    "demo": "another-date",
+    "topic": "Age Calculator exact birth date",
+    "format": "when_to_use",
+    "hook": "quick_one",
+    "cta": "Try it free on {site}. Link in my profile.",
+    "voice": "en-GB-RyanNeural",
+    "opener": "When you need to fill out",
+    "title": "Calculate exact age by entering a birth date in a browser tool",
+    "results": {
+      "youtube": "posted id=8a3Lx5hf0Hc",
+      "facebook": "FAILED: Facebook start: HTTP 400 {\"error\":{\"message\":\"Invalid OAuth access token - Cannot parse access token\",\"type\":\"OAuthException\",\"code\":190,\"fbtrace_id\":\"AlEhJWQ0DtzGXfIT458YH_j\"}}",
+      "instagram": "FAILED: public link nahi bana: HTTP 412 <html>\r\n<head><title>412 Precondition Failed</title></head>\r\n<body>\r\n<center><h1>412 Precondition Failed</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"
+    }
   }
 ]
