@@ -1,5 +1,7 @@
 """record.py - tool page ki screen recording (Playwright).
 
+v12: marks["cut"]=True ho to main.py video ko Private rakhta hai.
+
 v11 (stability): video kabhi theek kabhi kharab hone ki wajah dur karne ke liye:
 - _settle(): har step ke baad natija aane tak ruko (tool ki height 450ms na badle), phir zoom fit.
 - _smooth_center(): scroll ruk jane tak ruko, tab cursor/click (pehle scroll ke beech mein cursor galat jagah jata tha).
@@ -740,7 +742,9 @@ def _record_once(url, steps, out_dir, max_seconds, repo_root, holds, intro_hold,
             marks["end"] = round(time.time() - base, 2)
             try:
                 box = page.evaluate(BOX_JS)
-                if box and box["top"] - box["sy"] + box["h"] > VIEW_H:
+                marks["cut"] = False
+                if box and box["top"] - box["sy"] + box["h"] > VIEW_H * 1.03:
+                    marks["cut"] = True   # main.py: aisi video Public nahi hogi
                     _log("WARNING: aakhir mein tool neeche se kat raha hai (%s)" % box)
                 page.screenshot(path=str(out_dir / "last_frame.png"))
             except Exception as ex:

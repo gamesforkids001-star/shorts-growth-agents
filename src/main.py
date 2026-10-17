@@ -1,3 +1,4 @@
+"""v12: record.py marks["cut"] ho to YouTube par Private, Facebook/Instagram par skip."""
 import os, json, datetime, pathlib, traceback, yaml
 from . import site, agents, policy, video, publish, schedule, variety, record, llm
 
@@ -252,6 +253,7 @@ def run():
             raise Skip("Recording fail: record_demo ne None return kiya hai.")
 
         rec_path, trim_start, marks = rec_result
+        cut = bool(marks.get("cut"))   # tool kat raha ho to video Public nahi hogi
 
     except Skip:
         raise
@@ -286,10 +288,14 @@ def run():
             report[p] = "dry-run: post nahi kiya"
         elif missing:
             report[p] = f"skipped: secrets missing {missing}"
+        elif cut and p != "youtube":
+            report[p] = "skipped: video kat rahi thi (quality flag), sirf YouTube Private par gayi"
         else:
             try:
                 if p == "youtube":
-                    report[p] = "posted id=" + publish.youtube(path, m, cfg["youtube_privacy"])
+                    privacy = "private" if cut else cfg["youtube_privacy"]
+                    report[p] = ("posted id=" + str(publish.youtube(path, m, privacy))
+                                 + (" [PRIVATE: quality flag]" if cut else ""))
                 elif p == "facebook":
                     report[p] = "posted id=" + str(publish.facebook(path, m["caption"]))
                 else:
