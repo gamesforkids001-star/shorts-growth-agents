@@ -70,5 +70,23 @@
       "facebook": "posted id=948628751270814",
       "instagram": "posted id=18356850151169932"
     }
+  },
+  {
+    "date": "2026-10-18",
+    "slot": 4,
+    "tool": "case-converter",
+    "demo": "headline-title-case",
+    "topic": "turning a headline into Title Case using Case Converter",
+    "format": "three_steps",
+    "hook": "fact",
+    "cta": "You can open it on {site}. Check my profile for the link.",
+    "voice": "en-US-GuyNeural",
+    "opener": "Sometimes your typed text needs a",
+    "title": "Converting a headline into Title Case with a browser tool",
+    "results": {
+      "youtube": "posted id=ggy8sDAznW0",
+      "facebook": "posted id=1099761339436461",
+      "instagram": "posted id=17884215954625486"
+    }
   }
 ]
