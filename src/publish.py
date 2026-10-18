@@ -114,16 +114,81 @@ def facebook(video, caption):
     return j["video_id"]
 
 
-def _public_url(path):
-    """Instagram ko video_url chahiye: video ko 1 ghante ke liye public link par rakho (litterbox)."""
+UA = {"User-Agent": "Mozilla/5.0 (compatible; shorts-growth-agents/1.0)"}
+
+
+def _host_litterbox(path):
     with open(path, "rb") as f:
         r = requests.post("https://litterbox.catbox.moe/resources/internals/api.php",
                           data={"reqtype": "fileupload", "time": "1h"},
-                          files={"fileToUpload": f}, timeout=300)
-    url = r.text.strip()
-    if r.status_code != 200 or not url.startswith("https://"):
-        raise RuntimeError(f"public link nahi bana: HTTP {r.status_code} {r.text[:200]}")
-    return url
+                          files={"fileToUpload": f}, headers=UA, timeout=300)
+    return r.status_code, r.text.strip()
+
+
+def _host_catbox(path):
+    with open(path, "rb") as f:
+        r = requests.post("https://catbox.moe/user/api.php",
+                          data={"reqtype": "fileupload"},
+                          files={"fileToUpload": f}, headers=UA, timeout=300)
+    return r.status_code, r.text.strip()
+
+
+def _host_uguu(path):
+    with open(path, "rb") as f:
+        r = requests.post("https://uguu.se/upload", files={"files[]": f},
+                          headers=UA, timeout=300)
+    try:
+        return r.status_code, r.json()["files"][0]["url"]
+    except Exception:
+        return r.status_code, r.text.strip()
+
+
+def _host_tmpfiles(path):
+    with open(path, "rb") as f:
+        r = requests.post("https://tmpfiles.org/api/v1/upload", files={"file": f},
+                          headers=UA, timeout=300)
+    try:
+        u = r.json()["data"]["url"]
+        return r.status_code, u.replace("tmpfiles.org/", "tmpfiles.org/dl/", 1).replace("http://", "https://")
+    except Exception:
+        return r.status_code, r.text.strip()
+
+
+def _host_0x0(path):
+    with open(path, "rb") as f:
+        r = requests.post("https://0x0.st", files={"file": f},
+                          headers=UA, timeout=300)
+    return r.status_code, r.text.strip()
+
+
+def _link_works(url):
+    """Link sach mein video de raha hai ya nahi (Instagram ke liye zaroori)."""
+    try:
+        r = requests.get(url, headers=UA, stream=True, timeout=60, allow_redirects=True)
+        ctype = r.headers.get("Content-Type", "")
+        r.close()
+        return r.status_code == 200 and ("video" in ctype or "octet-stream" in ctype)
+    except Exception:
+        return False
+
+
+def _public_url(path):
+    """Instagram ko video_url chahiye: video ko public link par rakho.
+    Ek host fail ho to agla try hota hai (litterbox 17 Oct ko 412 de raha tha)."""
+    hosts = [("litterbox", _host_litterbox), ("catbox", _host_catbox),
+             ("uguu", _host_uguu), ("tmpfiles", _host_tmpfiles), ("0x0", _host_0x0)]
+    errors = []
+    for name, fn in hosts:
+        try:
+            code, url = fn(path)
+            if code == 200 and url.startswith("https://") and _link_works(url):
+                print(f"public link bana ({name}): {url}")
+                return url
+            errors.append(f"{name}: HTTP {code} {url[:80]}")
+        except Exception as e:
+            errors.append(f"{name}: {str(e)[:80]}")
+        print("public link host fail:", errors[-1])
+    raise RuntimeError("public link nahi bana, sab hosts fail: " + " | ".join(errors))
 
 
 def instagram(video, caption):
