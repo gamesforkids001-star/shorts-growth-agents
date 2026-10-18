@@ -52,5 +52,23 @@
       "facebook": "posted id=1777860847400680",
       "instagram": "FAILED: public link nahi bana: HTTP 412 <html>\r\n<head><title>412 Precondition Failed</title></head>\r\n<body>\r\n<center><h1>412 Precondition Failed</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"
     }
+  },
+  {
+    "date": "2026-10-18",
+    "slot": -1,
+    "tool": "color-picker",
+    "demo": "random-color",
+    "topic": "testing a random color with the browser tool",
+    "format": "mistake_to_avoid",
+    "hook": "stop",
+    "cta": "Free on {site}. Tap the link in my profile to try it.",
+    "voice": "en-US-AriaNeural",
+    "opener": "Guessing random shades by trial and",
+    "title": "Testing a random color with the browser tool",
+    "results": {
+      "youtube": "posted id=WORXnqcjWLQ",
+      "facebook": "posted id=948628751270814",
+      "instagram": "posted id=18356850151169932"
+    }
   }
 ]
