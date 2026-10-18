@@ -34,5 +34,23 @@
       "facebook": "FAILED: Facebook start: HTTP 400 {\"error\":{\"message\":\"Invalid OAuth access token - Cannot parse access token\",\"type\":\"OAuthException\",\"code\":190,\"fbtrace_id\":\"AlEhJWQ0DtzGXfIT458YH_j\"}}",
       "instagram": "FAILED: public link nahi bana: HTTP 412 <html>\r\n<head><title>412 Precondition Failed</title></head>\r\n<body>\r\n<center><h1>412 Precondition Failed</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"
     }
+  },
+  {
+    "date": "2026-10-18",
+    "slot": -1,
+    "tool": "image-compressor",
+    "demo": "compress-photo",
+    "topic": "reducing photo file size in the browser",
+    "format": "quick_tip",
+    "hook": "question",
+    "cta": "It is free to use on {site}. The link is in my profile.",
+    "voice": "en-AU-NatashaNeural",
+    "opener": "Have you ever needed to make",
+    "title": "Reduce photo file size using the browser Image Compressor",
+    "results": {
+      "youtube": "posted id=xjCQGaeEYA8",
+      "facebook": "posted id=1777860847400680",
+      "instagram": "FAILED: public link nahi bana: HTTP 412 <html>\r\n<head><title>412 Precondition Failed</title></head>\r\n<body>\r\n<center><h1>412 Precondition Failed</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"
+    }
   }
 ]
