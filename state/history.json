@@ -88,5 +88,23 @@
       "facebook": "posted id=1099761339436461",
       "instagram": "posted id=17884215954625486"
     }
+  },
+  {
+    "date": "2026-10-19",
+    "slot": 4,
+    "tool": "image-resizer",
+    "demo": "resize-width",
+    "topic": "Image Resizer basic walkthrough",
+    "format": "question",
+    "hook": "problem",
+    "cta": "Try it free on {site}. Link in my profile.",
+    "voice": "en-US-JennyNeural",
+    "opener": "Resizing an image to a new",
+    "title": "Changing image width with the browser Image Resizer",
+    "results": {
+      "youtube": "posted id=4D91zSMjOIk",
+      "facebook": "posted id=1599180841906235",
+      "instagram": "posted id=18132651058740401"
+    }
   }
 ]
