@@ -106,5 +106,23 @@
       "facebook": "posted id=1599180841906235",
       "instagram": "posted id=18132651058740401"
     }
+  },
+  {
+    "date": "2026-10-20",
+    "slot": 4,
+    "tool": "password-generator",
+    "demo": "longer-password",
+    "topic": "Password Generator length slider adjustment",
+    "format": "when_to_use",
+    "hook": "imagine",
+    "cta": "Give it a try on {site}. My profile has the link.",
+    "voice": "en-GB-SoniaNeural",
+    "opener": "Imagine making a new profile and",
+    "title": "Adjusting length on the browser Password Generator",
+    "results": {
+      "youtube": "posted id=KOel9hDDPKM",
+      "facebook": "posted id=1424652995866561",
+      "instagram": "posted id=17889292341478519"
+    }
   }
 ]
