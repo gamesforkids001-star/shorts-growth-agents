@@ -124,5 +124,23 @@
       "facebook": "posted id=1424652995866561",
       "instagram": "posted id=17889292341478519"
     }
+  },
+  {
+    "date": "2026-10-21",
+    "slot": 4,
+    "tool": "image-converter",
+    "demo": "png-to-jpg",
+    "topic": "Image Converter basic walkthrough",
+    "format": "before_after",
+    "hook": "stop",
+    "cta": "It is free to use on {site}. The link is in my profile.",
+    "voice": "en-US-DavisNeural",
+    "opener": "Converting a PNG to JPG with",
+    "title": "Converting a PNG to JPG using the browser Image Converter",
+    "results": {
+      "youtube": "posted id=zB5Qucptkv4",
+      "facebook": "posted id=4538687486277488",
+      "instagram": "posted id=18014036189759452"
+    }
   }
 ]
