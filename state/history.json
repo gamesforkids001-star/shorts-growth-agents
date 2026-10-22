@@ -142,5 +142,23 @@
       "facebook": "posted id=4538687486277488",
       "instagram": "posted id=18014036189759452"
     }
+  },
+  {
+    "date": "2026-10-22",
+    "slot": 4,
+    "tool": "bmi-calculator",
+    "demo": "metric-check",
+    "topic": "BMI Calculator metric units walkthrough",
+    "format": "mistake_to_avoid",
+    "hook": "fact",
+    "cta": "Free on {site}. Tap the link in my profile to try it.",
+    "voice": "en-GB-RyanNeural",
+    "opener": "Checking body mass index can often",
+    "title": "Calculating body mass index in metric units",
+    "results": {
+      "youtube": "posted id=_EPAZEX1x9g",
+      "facebook": "posted id=3401968126630932",
+      "instagram": "posted id=18128864998859491"
+    }
   }
 ]
