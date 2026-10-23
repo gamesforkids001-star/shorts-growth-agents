@@ -160,5 +160,23 @@
       "facebook": "posted id=3401968126630932",
       "instagram": "posted id=18128864998859491"
     }
+  },
+  {
+    "date": "2026-10-23",
+    "slot": 4,
+    "tool": "file-info",
+    "demo": "pdf-info",
+    "topic": "File Info Checker basic walkthrough",
+    "format": "mini_story",
+    "hook": "if_you",
+    "cta": "You can open it on {site}. Check my profile for the link.",
+    "voice": "en-AU-NatashaNeural",
+    "opener": "When you need to verify a",
+    "title": "Checking PDF document details with the browser tool",
+    "results": {
+      "youtube": "posted id=FO_wMOkSG38",
+      "facebook": "posted id=918219054558577",
+      "instagram": "posted id=18436839358178573"
+    }
   }
 ]
