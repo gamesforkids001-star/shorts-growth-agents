@@ -178,5 +178,23 @@
       "facebook": "posted id=918219054558577",
       "instagram": "posted id=18436839358178573"
     }
+  },
+  {
+    "date": "2026-10-24",
+    "slot": 4,
+    "tool": "word-counter",
+    "demo": "ignore-common-words",
+    "topic": "keyword density word counter adjustment",
+    "format": "myth_vs_fact",
+    "hook": "question",
+    "cta": "Give it a try on {site}. My profile has the link.",
+    "voice": "en-US-DavisNeural",
+    "opener": "Can filler words hide your main",
+    "title": "Filtering common words in keyword density",
+    "results": {
+      "youtube": "posted id=vYU6zOS4oBg",
+      "facebook": "posted id=2877649372599957",
+      "instagram": "posted id=18565829479072815"
+    }
   }
 ]
