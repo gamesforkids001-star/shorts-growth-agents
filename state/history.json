@@ -196,5 +196,23 @@
       "facebook": "posted id=2877649372599957",
       "instagram": "posted id=18565829479072815"
     }
+  },
+  {
+    "date": "2026-10-25",
+    "slot": 4,
+    "tool": "split-pdf",
+    "demo": "first-page",
+    "topic": "extracting the first page of a document with Split PDF",
+    "format": "three_steps",
+    "hook": "imagine",
+    "cta": "Try it free on {site}. Link in my profile.",
+    "voice": "en-US-JennyNeural",
+    "opener": "Imagine needing just a single page",
+    "title": "Extracting the first page of a document with Split PDF",
+    "results": {
+      "youtube": "posted id=feVxZBiT_RU",
+      "facebook": "posted id=1819778102690749",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AMd7MPtiIEdAmM5ZUlg7zWb\"}}"
+    }
   }
 ]
