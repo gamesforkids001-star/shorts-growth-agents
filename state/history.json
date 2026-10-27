@@ -232,5 +232,23 @@
       "facebook": "posted id=2360835918069657",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AQ7IQTlKp0rrviyiVZskSEu\"}}"
     }
+  },
+  {
+    "date": "2026-10-27",
+    "slot": 4,
+    "tool": "text-cleaner",
+    "demo": "strip-html",
+    "topic": "Text Cleaner basic walkthrough",
+    "format": "quick_tip",
+    "hook": "if_you",
+    "cta": "Free on {site}. Tap the link in my profile to try it.",
+    "voice": "en-GB-SoniaNeural",
+    "opener": "Removing HTML tags from text with",
+    "title": "Clearing HTML tags from text using the browser tool",
+    "results": {
+      "youtube": "posted id=WmMtZZEpoJY",
+      "facebook": "posted id=2400695783801191",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AMwyH1Em-JlWtxAosz2o8rc\"}}"
+    }
   }
 ]
