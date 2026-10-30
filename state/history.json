@@ -286,5 +286,23 @@
       "facebook": "posted id=1085854790929408",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AVqsySrlrzmGcwS0QQn4gjp\"}}"
     }
+  },
+  {
+    "date": "2026-10-30",
+    "slot": 4,
+    "tool": "json-formatter",
+    "demo": "minify-sample",
+    "topic": "minifying sample JSON",
+    "format": "mini_story",
+    "hook": "imagine",
+    "cta": "Find it free on {site}, link in my profile.",
+    "voice": "en-IN-NeerjaNeural",
+    "opener": "Imagine cleaning up bulky code lines.",
+    "title": "Minifying sample JSON with the browser tool",
+    "results": {
+      "youtube": "posted id=B1eJPq9v4R0",
+      "facebook": "posted id=1553635813454887",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"Am5eC80xXKHHhJ4lrI1LYPM\"}}"
+    }
   }
 ]
