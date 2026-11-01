@@ -322,5 +322,23 @@
       "facebook": "posted id=2509963942832703",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A3PGhlfF1tzHtuHhvcc7RJr\"}}"
     }
+  },
+  {
+    "date": "2026-11-01",
+    "slot": 2,
+    "tool": "rotate-pdf",
+    "demo": "rotate-90",
+    "topic": "fixing sideways pages with Rotate PDF",
+    "format": "when_to_use",
+    "hook": "fact",
+    "cta": "It is free to use on {site}. The link is in my profile.",
+    "voice": "en-AU-NatashaNeural",
+    "opener": "Are your documents facing the wrong",
+    "title": "Rotating a PDF document by 90 degrees",
+    "results": {
+      "youtube": "posted id=ORErrqSG_ck",
+      "facebook": "posted id=2326806731493705",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AJqyErXZdnEHknTOkXiRyCt\"}}"
+    }
   }
 ]
