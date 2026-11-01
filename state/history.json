@@ -340,5 +340,23 @@
       "facebook": "posted id=2326806731493705",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AJqyErXZdnEHknTOkXiRyCt\"}}"
     }
+  },
+  {
+    "date": "2026-11-01",
+    "slot": 4,
+    "tool": "qr-code-generator",
+    "demo": "text-to-qr",
+    "topic": "turning text into a QR code",
+    "format": "checklist",
+    "hook": "question",
+    "cta": "Give it a try on {site}. My profile has the link.",
+    "voice": "en-US-GuyNeural",
+    "opener": "Need a way to share words",
+    "title": "How to convert a line of text into a QR code",
+    "results": {
+      "youtube": "posted id=6ALk2JFvW_Q",
+      "facebook": "posted id=1133792792361327",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AfwlxCT_4DP8m2UEqafJdCj\"}}"
+    }
   }
 ]
