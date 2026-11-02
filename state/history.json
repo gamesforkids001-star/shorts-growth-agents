@@ -358,5 +358,23 @@
       "facebook": "posted id=1133792792361327",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AfwlxCT_4DP8m2UEqafJdCj\"}}"
     }
+  },
+  {
+    "date": "2026-11-02",
+    "slot": 2,
+    "tool": "sort-text-lines",
+    "demo": "a-to-z",
+    "topic": "Sorting a list alphabetically with Text Sorter",
+    "format": "mistake_to_avoid",
+    "hook": "imagine",
+    "cta": "You can open it on {site}. Check my profile for the link.",
+    "voice": "en-IN-NeerjaNeural",
+    "opener": "Imagine sorting a messy list by",
+    "title": "Alphabetical text sorting with the browser list organizer",
+    "results": {
+      "youtube": "posted id=GB-TOpJMNKU",
+      "facebook": "posted id=4702734206659928",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"Au1vP-kxJvcxC2Cz7m98h_K\"}}"
+    }
   }
 ]
