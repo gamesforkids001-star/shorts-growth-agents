@@ -394,5 +394,23 @@
       "facebook": "posted id=940675448925825",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AhmdT43WjwuVyDQt5fNtlUB\"}}"
     }
+  },
+  {
+    "date": "2026-11-03",
+    "slot": 4,
+    "tool": "image-converter",
+    "demo": "jpg-to-webp",
+    "topic": "Image Converter basic walkthrough",
+    "format": "myth_vs_fact",
+    "hook": "problem",
+    "cta": "Find it free on {site}, link in my profile.",
+    "voice": "en-US-AriaNeural",
+    "opener": "Converting a JPG to WebP with",
+    "title": "Converting a JPG to WebP with Image Converter",
+    "results": {
+      "youtube": "posted id=QojsBHwNOBQ",
+      "facebook": "posted id=1669539144883459",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AWsGxZcd2i2kOwlLmuZe2-D\"}}"
+    }
   }
 ]
