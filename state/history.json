@@ -376,5 +376,23 @@
       "facebook": "posted id=4702734206659928",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"Au1vP-kxJvcxC2Cz7m98h_K\"}}"
     }
+  },
+  {
+    "date": "2026-11-03",
+    "slot": 2,
+    "tool": "remove-duplicate-lines",
+    "demo": "ignore-case",
+    "topic": "Remove Duplicate Lines case-insensitive matching",
+    "format": "quick_tip",
+    "hook": "if_you",
+    "cta": "Free on {site}. Tap the link in my profile to try it.",
+    "voice": "en-GB-SoniaNeural",
+    "opener": "If you ever need to clean",
+    "title": "Removing repeated text lines with case-insensitive matching",
+    "results": {
+      "youtube": "posted id=OfzrD_OmuL4",
+      "facebook": "posted id=940675448925825",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AhmdT43WjwuVyDQt5fNtlUB\"}}"
+    }
   }
 ]
