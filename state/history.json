@@ -412,5 +412,23 @@
       "facebook": "posted id=1669539144883459",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AWsGxZcd2i2kOwlLmuZe2-D\"}}"
     }
+  },
+  {
+    "date": "2026-11-04",
+    "slot": 2,
+    "tool": "rotate-pdf",
+    "demo": "rotate-180",
+    "topic": "turning a PDF upside down by 180 degrees",
+    "format": "when_to_use",
+    "hook": "quick_one",
+    "cta": "It is free to use on {site}. The link is in my profile.",
+    "voice": "en-GB-RyanNeural",
+    "opener": "Dealing with upside down documents on",
+    "title": "Flipping an upside down PDF by 180 degrees",
+    "results": {
+      "youtube": "posted id=qRkMQNXr-I0",
+      "facebook": "posted id=922447650953510",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"Ap3OzZEI_AutXmefkE6vSd2\"}}"
+    }
   }
 ]
