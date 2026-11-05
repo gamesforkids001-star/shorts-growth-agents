@@ -466,5 +466,23 @@
       "facebook": "posted id=1149472104475171",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A05x6ooBoDW921J100qUFyl\"}}"
     }
+  },
+  {
+    "date": "2026-11-05",
+    "slot": 4,
+    "tool": "word-counter",
+    "demo": "description-length",
+    "topic": "checking a product description length with Word Counter",
+    "format": "question",
+    "hook": "problem",
+    "cta": "Try it free on {site}. Link in my profile.",
+    "voice": "en-US-DavisNeural",
+    "opener": "Writing a product description often takes",
+    "title": "Checking a product description length with Word Counter",
+    "results": {
+      "youtube": "posted id=lqltuaVKCsA",
+      "facebook": "posted id=1767323847872774",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"Az3KeWYq2Ikj3xxYk4Q8POQ\"}}"
+    }
   }
 ]
