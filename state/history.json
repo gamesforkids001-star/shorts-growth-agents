@@ -448,5 +448,23 @@
       "facebook": "posted id=1127200999711079",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AICuzu-YQznnJxEGsxmQ_Pq\"}}"
     }
+  },
+  {
+    "date": "2026-11-05",
+    "slot": 2,
+    "tool": "password-generator",
+    "demo": "generate-and-meter",
+    "topic": "Password Generator basic walkthrough",
+    "format": "before_after",
+    "hook": "fact",
+    "cta": "You can open it on {site}. Check my profile for the link.",
+    "voice": "en-US-AriaNeural",
+    "opener": "Generating a password and reading the",
+    "title": "Password Generator - free online tool demo",
+    "results": {
+      "youtube": "posted id=N3kWh5yqkik",
+      "facebook": "posted id=1149472104475171",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A05x6ooBoDW921J100qUFyl\"}}"
+    }
   }
 ]
