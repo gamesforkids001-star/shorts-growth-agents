@@ -502,5 +502,23 @@
       "facebook": "posted id=3023317708023269",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AzKEn-oGxzUv9MtwrtVsdaA\"}}"
     }
+  },
+  {
+    "date": "2026-11-06",
+    "slot": 4,
+    "tool": "image-crop",
+    "demo": "square-crop",
+    "topic": "Image Cropper basic walkthrough",
+    "format": "quick_tip",
+    "hook": "if_you",
+    "cta": "Give it a try on {site}. My profile has the link.",
+    "voice": "en-US-AriaNeural",
+    "opener": "Cropping a photo to a square",
+    "title": "Cropping a photo to a square using Image Cropper",
+    "results": {
+      "youtube": "posted id=UGgn6PdptZI",
+      "facebook": "posted id=28840799448925150",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AWPWMC3pn7VS-u9pOb__W3L\"}}"
+    }
   }
 ]
