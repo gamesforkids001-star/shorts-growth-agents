@@ -484,5 +484,23 @@
       "facebook": "posted id=1767323847872774",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"Az3KeWYq2Ikj3xxYk4Q8POQ\"}}"
     }
+  },
+  {
+    "date": "2026-11-06",
+    "slot": 2,
+    "tool": "text-cleaner",
+    "demo": "extra-spaces",
+    "topic": "Text Cleaner basic walkthrough",
+    "format": "myth_vs_fact",
+    "hook": "stop",
+    "cta": "Free on {site}. Tap the link in my profile to try it.",
+    "voice": "en-AU-NatashaNeural",
+    "opener": "Cleaning extra spaces from pasted text",
+    "title": "Removing extra spaces from text with Text Cleaner",
+    "results": {
+      "youtube": "posted id=ZuKv_rbDv6c",
+      "facebook": "posted id=3023317708023269",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AzKEn-oGxzUv9MtwrtVsdaA\"}}"
+    }
   }
 ]
