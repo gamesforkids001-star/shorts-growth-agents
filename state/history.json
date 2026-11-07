@@ -520,5 +520,23 @@
       "facebook": "posted id=28840799448925150",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AWPWMC3pn7VS-u9pOb__W3L\"}}"
     }
+  },
+  {
+    "date": "2026-11-07",
+    "slot": 2,
+    "tool": "remove-duplicate-lines",
+    "demo": "fruit-list",
+    "topic": "Remove Duplicate Lines basic walkthrough",
+    "format": "mistake_to_avoid",
+    "hook": "imagine",
+    "cta": "You can open it on {site}. Check my profile for the link.",
+    "voice": "en-GB-RyanNeural",
+    "opener": "Removing repeated lines from a short",
+    "title": "Clean up repeated lines with Remove Duplicate Lines",
+    "results": {
+      "youtube": "posted id=CkM3xw4kryQ",
+      "facebook": "posted id=1661965578675313",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A0TCYEqZFSs_h98eYC0txvX\"}}"
+    }
   }
 ]
