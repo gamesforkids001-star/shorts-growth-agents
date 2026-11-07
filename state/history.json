@@ -538,5 +538,23 @@
       "facebook": "posted id=1661965578675313",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A0TCYEqZFSs_h98eYC0txvX\"}}"
     }
+  },
+  {
+    "date": "2026-11-07",
+    "slot": 4,
+    "tool": "jpg-to-pdf",
+    "demo": "two-images",
+    "topic": "JPG to PDF basic walkthrough",
+    "format": "before_after",
+    "hook": "fact",
+    "cta": "It is free to use on {site}. The link is in my profile.",
+    "voice": "en-IN-NeerjaNeural",
+    "opener": "Putting two images into one PDF",
+    "title": "Combining two images into a single PDF document",
+    "results": {
+      "youtube": "posted id=0ybL_MUA7rQ",
+      "facebook": "posted id=2597840924054775",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AH1-xzWgiMZpD8aN8rzNwZl\"}}"
+    }
   }
 ]
