@@ -556,5 +556,23 @@
       "facebook": "posted id=2597840924054775",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AH1-xzWgiMZpD8aN8rzNwZl\"}}"
     }
+  },
+  {
+    "date": "2026-11-08",
+    "slot": 2,
+    "tool": "random-number-generator",
+    "demo": "one-number",
+    "topic": "picking one random number in a range with Random Number Generator",
+    "format": "question",
+    "hook": "question",
+    "cta": "Try it free on {site}. Link in my profile.",
+    "voice": "en-US-GuyNeural",
+    "opener": "Need to pick a random value?",
+    "title": "Picking a random number between 1 and 50",
+    "results": {
+      "youtube": "posted id=3bnslNDR5k8",
+      "facebook": "posted id=2111266239780805",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A9GPShZmua-exboPfPS-6yw\"}}"
+    }
   }
 ]
