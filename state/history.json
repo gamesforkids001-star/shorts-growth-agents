@@ -592,5 +592,23 @@
       "facebook": "posted id=2690102658075607",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AS3pcm5nbstv7jeW7e-nHJW\"}}"
     }
+  },
+  {
+    "date": "2026-11-09",
+    "slot": 2,
+    "tool": "case-converter",
+    "demo": "code-names",
+    "topic": "converting text case to camelCase and snake_case in browser",
+    "format": "mini_story",
+    "hook": "stop",
+    "cta": "Free on {site}. Tap the link in my profile to try it.",
+    "voice": "en-IN-NeerjaNeural",
+    "opener": "Coding often requires specific text formats.",
+    "title": "Formatting text into camelCase and snake_case",
+    "results": {
+      "youtube": "posted id=pgqJ8nIc9sA",
+      "facebook": "posted id=1174863085079046",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AS7ImPCFPzw5_DtzGSMq1Aj\"}}"
+    }
   }
 ]
