@@ -628,5 +628,23 @@
       "facebook": "posted id=2687862964987390",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AGaYVffSjHHd1it-StE1yP4\"}}"
     }
+  },
+  {
+    "date": "2026-11-10",
+    "slot": 4,
+    "tool": "sort-text-lines",
+    "demo": "by-length",
+    "topic": "Sorting lines by length with Text Sorter",
+    "format": "mistake_to_avoid",
+    "hook": "quick_one",
+    "cta": "It is free to use on {site}. The link is in my profile.",
+    "voice": "en-US-DavisNeural",
+    "opener": "Trying to organize a messy unordered",
+    "title": "Arranging text lines by character count with Text Sorter",
+    "results": {
+      "youtube": "posted id=VNDHQr5a37k",
+      "facebook": "posted id=4548187175509224",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AYUMvGgoaFAF2YVp3Ht0731\"}}"
+    }
   }
 ]
