@@ -664,5 +664,23 @@
       "facebook": "posted id=1172073042041839",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A3mAWmIc1f5ylKTGTa1IG-u\"}}"
     }
+  },
+  {
+    "date": "2026-11-12",
+    "slot": 2,
+    "tool": "image-compressor",
+    "demo": "lower-quality",
+    "topic": "Image Compressor basic walkthrough",
+    "format": "quick_tip",
+    "hook": "problem",
+    "cta": "Find it free on {site}, link in my profile.",
+    "voice": "en-US-JennyNeural",
+    "opener": "Large images often refuse to send.",
+    "title": "Reducing image file size using Image Compressor",
+    "results": {
+      "youtube": "posted id=GmeM6nxX2Hs",
+      "facebook": "posted id=1077032475384751",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"ASlpFY5IiTFMeW1AfYE8DhO\"}}"
+    }
   }
 ]
