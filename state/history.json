@@ -700,5 +700,23 @@
       "facebook": "posted id=1140731951885839",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AP4wmsiVAryIFMuYmA80M93\"}}"
     }
+  },
+  {
+    "date": "2026-11-13",
+    "slot": 4,
+    "tool": "qr-code-generator",
+    "demo": "colored-qr",
+    "topic": "QR Code Generator basic walkthrough",
+    "format": "question",
+    "hook": "imagine",
+    "cta": "Free on {site}. Tap the link in my profile to try it.",
+    "voice": "en-GB-SoniaNeural",
+    "opener": "Changing the QR code color with",
+    "title": "Changing QR code color in the browser",
+    "results": {
+      "youtube": "posted id=Ab2OaCXJ5A0",
+      "facebook": "posted id=1671819951080931",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AALXBx_4vDiXWhFmO4VNKE1\"}}"
+    }
   }
 ]
