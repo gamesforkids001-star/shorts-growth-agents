@@ -736,5 +736,23 @@
       "facebook": "posted id=1177220648067551",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AnFlwWML1nB9dNRXGGNTNxS\"}}"
     }
+  },
+  {
+    "date": "2026-11-14",
+    "slot": 4,
+    "tool": "color-picker",
+    "demo": "hex-codes",
+    "topic": "Color Picker basic walkthrough",
+    "format": "when_to_use",
+    "hook": "quick_one",
+    "cta": "Try it free on {site}. Link in my profile.",
+    "voice": "en-IN-NeerjaNeural",
+    "opener": "Typing a HEX color and reading",
+    "title": "Converting HEX color codes with Color Picker",
+    "results": {
+      "youtube": "posted id=m_FLrdHwrVk",
+      "facebook": "posted id=1692323175882792",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AdfVndMdGyvqSXqL1O8m2FD\"}}"
+    }
   }
 ]
