@@ -718,5 +718,23 @@
       "facebook": "posted id=1671819951080931",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AALXBx_4vDiXWhFmO4VNKE1\"}}"
     }
+  },
+  {
+    "date": "2026-11-14",
+    "slot": 2,
+    "tool": "age-calculator",
+    "demo": "exact-age",
+    "topic": "finding exact age from birth date",
+    "format": "mini_story",
+    "hook": "question",
+    "cta": "Give it a try on {site}. My profile has the link.",
+    "voice": "en-US-DavisNeural",
+    "opener": "Ever wonder how to track a",
+    "title": "Determining exact age from birth date using Age Calculator",
+    "results": {
+      "youtube": "posted id=SZDV-CN0DiY",
+      "facebook": "posted id=1177220648067551",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AnFlwWML1nB9dNRXGGNTNxS\"}}"
+    }
   }
 ]
