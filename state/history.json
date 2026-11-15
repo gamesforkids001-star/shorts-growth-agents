@@ -754,5 +754,23 @@
       "facebook": "posted id=1692323175882792",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AdfVndMdGyvqSXqL1O8m2FD\"}}"
     }
+  },
+  {
+    "date": "2026-11-15",
+    "slot": 2,
+    "tool": "file-info",
+    "demo": "photo-info",
+    "topic": "File Info Checker basic walkthrough",
+    "format": "checklist",
+    "hook": "problem",
+    "cta": "You can open it on {site}. Check my profile for the link.",
+    "voice": "en-US-AriaNeural",
+    "opener": "Checking the details of a photo",
+    "title": "Inspecting photo details with File Info Checker",
+    "results": {
+      "youtube": "posted id=U84nI0K5LBI",
+      "facebook": "posted id=3652632384898494",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A4smW8sSIL-x4MXcEp8INQs\"}}"
+    }
   }
 ]
