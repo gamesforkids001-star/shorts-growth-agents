@@ -772,5 +772,23 @@
       "facebook": "posted id=3652632384898494",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A4smW8sSIL-x4MXcEp8INQs\"}}"
     }
+  },
+  {
+    "date": "2026-11-15",
+    "slot": 4,
+    "tool": "merge-pdf",
+    "demo": "merge-and-clear",
+    "topic": "Merge PDF basic walkthrough",
+    "format": "myth_vs_fact",
+    "hook": "fact",
+    "cta": "Find it free on {site}, link in my profile.",
+    "voice": "en-US-GuyNeural",
+    "opener": "Adding PDFs and clearing the list",
+    "title": "Combining two PDF files and clearing the list",
+    "results": {
+      "youtube": "posted id=7htpXNwGvE4",
+      "facebook": "posted id=998960249342568",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AbZ_SdLoR-OPWEPvo9KOCTA\"}}"
+    }
   }
 ]
