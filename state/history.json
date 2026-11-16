@@ -790,5 +790,23 @@
       "facebook": "posted id=998960249342568",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AbZ_SdLoR-OPWEPvo9KOCTA\"}}"
     }
+  },
+  {
+    "date": "2026-11-16",
+    "slot": 0,
+    "tool": "password-generator",
+    "demo": "longer-password",
+    "topic": "Password Generator basic walkthrough",
+    "format": "quick_tip",
+    "hook": "question",
+    "cta": "Free on {site}. Tap the link in my profile to try it.",
+    "voice": "en-IN-NeerjaNeural",
+    "opener": "Making the password longer with the",
+    "title": "Creating longer passwords with the length slider",
+    "results": {
+      "youtube": "posted id=qrSpvHyizms",
+      "facebook": "posted id=1788088122458534",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A3k5ybWz9LDis9Tou7b56Xy\"}}"
+    }
   }
 ]
