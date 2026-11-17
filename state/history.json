@@ -862,5 +862,23 @@
       "facebook": "posted id=2148151209131545",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A5lqHzPjGcupszKBVMZCq61\"}}"
     }
+  },
+  {
+    "date": "2026-11-17",
+    "slot": 4,
+    "tool": "image-resizer",
+    "demo": "resize-width",
+    "topic": "Image Resizer width adjustment walkthrough",
+    "format": "mistake_to_avoid",
+    "hook": "fact",
+    "cta": "You can open it on {site}. Check my profile for the link.",
+    "voice": "en-IN-NeerjaNeural",
+    "opener": "Many people struggle to fit pictures",
+    "title": "Adjusting image width using Image Resizer",
+    "results": {
+      "youtube": "posted id=Eh8XGkX6JII",
+      "facebook": "posted id=1147564087726685",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"Akf1pWCwwM88ZOIg3fQFCcE\"}}"
+    }
   }
 ]
