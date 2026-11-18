@@ -898,5 +898,23 @@
       "facebook": "posted id=3054469998285090",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"ACizfbHVs4HyO4BM2Arcxo-\"}}"
     }
+  },
+  {
+    "date": "2026-11-18",
+    "slot": 2,
+    "tool": "case-converter",
+    "demo": "headline-title-case",
+    "topic": "Case Converter basic walkthrough",
+    "format": "question",
+    "hook": "question",
+    "cta": "It is free to use on {site}. The link is in my profile.",
+    "voice": "en-GB-RyanNeural",
+    "opener": "Turning a plain headline into Title",
+    "title": "Converting a headline to Title Case",
+    "results": {
+      "youtube": "posted id=1ZjH_G3YzMk",
+      "facebook": "posted id=2655069284960573",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"ANLVHMdXf_FfxkaGwUUecUo\"}}"
+    }
   }
 ]
