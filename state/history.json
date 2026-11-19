@@ -952,5 +952,23 @@
       "facebook": "posted id=3083876741958176",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A3tcj__4esVVxfGXcT8OvX9\"}}"
     }
+  },
+  {
+    "date": "2026-11-19",
+    "slot": 4,
+    "tool": "bmi-calculator",
+    "demo": "metric-check",
+    "topic": "BMI Calculator metric units walkthrough",
+    "format": "when_to_use",
+    "hook": "imagine",
+    "cta": "You can open it on {site}. Check my profile for the link.",
+    "voice": "en-GB-SoniaNeural",
+    "opener": "Imagine tracking fitness goals during workouts.",
+    "title": "Checking BMI with metric units",
+    "results": {
+      "youtube": "posted id=pIaMOADliBQ",
+      "facebook": "posted id=1609037587116847",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"Auvl1PEtCFiLvGTlilYg9ry\"}}"
+    }
   }
 ]
