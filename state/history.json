@@ -916,5 +916,23 @@
       "facebook": "posted id=2655069284960573",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"ANLVHMdXf_FfxkaGwUUecUo\"}}"
     }
+  },
+  {
+    "date": "2026-11-19",
+    "slot": 0,
+    "tool": "random-number-generator",
+    "demo": "unique-numbers",
+    "topic": "Random Number Generator basic walkthrough",
+    "format": "mini_story",
+    "hook": "quick_one",
+    "cta": "Give it a try on {site}. My profile has the link.",
+    "voice": "en-US-DavisNeural",
+    "opener": "Picking several unique numbers with the",
+    "title": "Picking unique numbers with Random Number Generator",
+    "results": {
+      "youtube": "posted id=pUHHIQTJ4iE",
+      "facebook": "posted id=1130088586311870",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AawHFwI_fKT-Oh372FlGDTj\"}}"
+    }
   }
 ]
