@@ -988,5 +988,23 @@
       "facebook": "posted id=1119513614236877",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A5BZZ0LqJbC_-Q9EEBsvGAL\"}}"
     }
+  },
+  {
+    "date": "2026-11-20",
+    "slot": 2,
+    "tool": "image-converter",
+    "demo": "png-to-jpg",
+    "topic": "PNG to JPG conversion walkthrough",
+    "format": "before_after",
+    "hook": "problem",
+    "cta": "Give it a try on {site}. My profile has the link.",
+    "voice": "en-GB-RyanNeural",
+    "opener": "Dealing with incompatible picture formats is",
+    "title": "Converting a PNG file to JPG format in the browser",
+    "results": {
+      "youtube": "posted id=p-fUQkY6eiM",
+      "facebook": "posted id=1124761633678915",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A4UxCcl2EGJOTQNTscckFaj\"}}"
+    }
   }
 ]
