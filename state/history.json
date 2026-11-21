@@ -1042,5 +1042,23 @@
       "facebook": "posted id=2327868041487649",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"As-Mo-to77ZPwpbjGswkNfG\"}}"
     }
+  },
+  {
+    "date": "2026-11-21",
+    "slot": 4,
+    "tool": "jpg-to-pdf",
+    "demo": "original-size",
+    "topic": "JPG to PDF basic walkthrough",
+    "format": "mini_story",
+    "hook": "fact",
+    "cta": "Free on {site}. Tap the link in my profile to try it.",
+    "voice": "en-IN-NeerjaNeural",
+    "opener": "Making a PDF at the image's",
+    "title": "Making a PDF at original image size",
+    "results": {
+      "youtube": "posted id=NZTjVcEbnEo",
+      "facebook": "posted id=29380070811609995",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AI8B3AmyTa9HP0hnJsfMd8c\"}}"
+    }
   }
 ]
