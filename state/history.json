@@ -1060,5 +1060,23 @@
       "facebook": "posted id=29380070811609995",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AI8B3AmyTa9HP0hnJsfMd8c\"}}"
     }
+  },
+  {
+    "date": "2026-11-22",
+    "slot": 0,
+    "tool": "merge-pdf",
+    "demo": "merge-two",
+    "topic": "Merge PDF basic walkthrough",
+    "format": "when_to_use",
+    "hook": "imagine",
+    "cta": "Try it free on {site}. Link in my profile.",
+    "voice": "en-GB-SoniaNeural",
+    "opener": "Joining two PDFs into one with",
+    "title": "Combining two PDF documents using Merge PDF",
+    "results": {
+      "youtube": "posted id=XifD1lfdAw4",
+      "facebook": "posted id=2073775889982261",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A9Qmcw34qpUriU8bJJIwB-p\"}}"
+    }
   }
 ]
