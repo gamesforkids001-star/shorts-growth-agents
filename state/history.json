@@ -1078,5 +1078,23 @@
       "facebook": "posted id=2073775889982261",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"A9Qmcw34qpUriU8bJJIwB-p\"}}"
     }
+  },
+  {
+    "date": "2026-11-22",
+    "slot": 2,
+    "tool": "unit-converter",
+    "demo": "weight-tab",
+    "topic": "Unit Converter basic walkthrough",
+    "format": "before_after",
+    "hook": "question",
+    "cta": "Find it free on {site}, link in my profile.",
+    "voice": "en-US-DavisNeural",
+    "opener": "Switching to weight with the Unit",
+    "title": "How to convert weight using Unit Converter",
+    "results": {
+      "youtube": "posted id=-ZaJy5-x7Lg",
+      "facebook": "posted id=1670600178062293",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AlDjL1m7Xz1yQHdDYzlrj8O\"}}"
+    }
   }
 ]
