@@ -1096,5 +1096,23 @@
       "facebook": "posted id=1670600178062293",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AlDjL1m7Xz1yQHdDYzlrj8O\"}}"
     }
+  },
+  {
+    "date": "2026-11-23",
+    "slot": 0,
+    "tool": "sort-text-lines",
+    "demo": "numbers",
+    "topic": "Text Sorter basic walkthrough",
+    "format": "question",
+    "hook": "quick_one",
+    "cta": "Give it a try on {site}. My profile has the link.",
+    "voice": "en-US-JennyNeural",
+    "opener": "Sorting numbers in order with the",
+    "title": "Sorting numbers in order with Text Sorter",
+    "results": {
+      "youtube": "posted id=3LD4yz8qIaI",
+      "facebook": "posted id=1637659617837264",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AbdyjDyQSwc3YWQTLxcys-a\"}}"
+    }
   }
 ]
