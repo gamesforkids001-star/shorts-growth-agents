@@ -1150,5 +1150,23 @@
       "facebook": "posted id=1151950260553744",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AJkotTD0mro5S40Mq1qofo9\"}}"
     }
+  },
+  {
+    "date": "2026-11-24",
+    "slot": 2,
+    "tool": "split-pdf",
+    "demo": "first-page",
+    "topic": "Split PDF basic walkthrough",
+    "format": "when_to_use",
+    "hook": "problem",
+    "cta": "You can open it on {site}. Check my profile for the link.",
+    "voice": "en-US-AriaNeural",
+    "opener": "Pulling out the first page with",
+    "title": "Split PDF - free online tool demo",
+    "results": {
+      "youtube": "posted id=nZUQ8xzXn6k",
+      "facebook": "posted id=1477492340978943",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AHF7YRkejaxkcJTcD6O2606\"}}"
+    }
   }
 ]
