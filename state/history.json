@@ -1132,5 +1132,23 @@
       "facebook": "posted id=4553232951558913",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AibJM1Z8eVKtStNA1KIHCZH\"}}"
     }
+  },
+  {
+    "date": "2026-11-24",
+    "slot": 0,
+    "tool": "color-picker",
+    "demo": "random-color",
+    "topic": "Color Picker basic walkthrough",
+    "format": "three_steps",
+    "hook": "stop",
+    "cta": "Try it free on {site}. Link in my profile.",
+    "voice": "en-US-DavisNeural",
+    "opener": "Trying a random color with the",
+    "title": "Testing random color generation in the browser Color Picker",
+    "results": {
+      "youtube": "posted id=ko7v1L3CPbI",
+      "facebook": "posted id=1151950260553744",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AJkotTD0mro5S40Mq1qofo9\"}}"
+    }
   }
 ]
