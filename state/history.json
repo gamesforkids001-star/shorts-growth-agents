@@ -1168,5 +1168,23 @@
       "facebook": "posted id=1477492340978943",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AHF7YRkejaxkcJTcD6O2606\"}}"
     }
+  },
+  {
+    "date": "2026-11-25",
+    "slot": 0,
+    "tool": "word-counter",
+    "demo": "sample-keywords",
+    "topic": "Word Counter basic walkthrough",
+    "format": "before_after",
+    "hook": "question",
+    "cta": "Give it a try on {site}. My profile has the link.",
+    "voice": "en-US-JennyNeural",
+    "opener": "Loading sample text and reading the",
+    "title": "Analyzing text density using Word Counter",
+    "results": {
+      "youtube": "posted id=tmJPiT-dqCI",
+      "facebook": "posted id=1369989985082045",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AqTbLl7RXRH1XIK7yA4G_R2\"}}"
+    }
   }
 ]
