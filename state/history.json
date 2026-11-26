@@ -1222,5 +1222,23 @@
       "facebook": "posted id=1826768771965573",
       "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"AGae_10PXF0AGRSByjBb6oZ\"}}"
     }
+  },
+  {
+    "date": "2026-11-26",
+    "slot": 2,
+    "tool": "json-formatter",
+    "demo": "beautify-sample",
+    "topic": "JSON Formatter sample walkthrough",
+    "format": "mistake_to_avoid",
+    "hook": "stop",
+    "cta": "You can open it on {site}. Check my profile for the link.",
+    "voice": "en-US-GuyNeural",
+    "opener": "Struggling to read unorganized code blocks?",
+    "title": "Beautifying sample JSON with JSON Formatter",
+    "results": {
+      "youtube": "posted id=arCTm_V__a0",
+      "facebook": "posted id=1157426896826250",
+      "instagram": "FAILED: Instagram container: HTTP 400 {\"error\":{\"message\":\"Error validating access token: Session key is malformed because of invalid user id.\",\"type\":\"OAuthException\",\"code\":190,\"error_subcode\":0,\"fbtrace_id\":\"APD_gvKI7O0iPOrjUPdC4Ge\"}}"
+    }
   }
 ]
